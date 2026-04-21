@@ -220,6 +220,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div id="room-status"></div>
         <div class="settings-row"><label><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</label><select id="mic-select"></select></div>
         <div class="settings-row"><label><i class="bi bi-camera-video"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;:</label><select id="cam-select"></select></div>
+        <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted)"><i class="bi bi-clock-history"></i> &#x05d0;&#x05d7;&#x05e8;&#x05d5;&#x05e0;&#x05d9;&#x05dd;: <span id="recent-rooms-list"></span></div>
         <div style="position:relative">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <span style="font-size:0.7rem;color:var(--muted);cursor:pointer" onclick="const dl=document.getElementById('debug-log');dl.style.display=dl.style.display==='none'?'block':'none'"><i class="bi bi-terminal"></i> &#x05dc;&#x05d5;&#x05d2;</span>
@@ -232,7 +233,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <!-- STUDIO PANEL -->
     <div class="panel" id="panel-studio" style="display:none">
         <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value});const be=document.getElementById('banner-episode');if(be){be.textContent=this.value?'\uD83C\uDFA4 '+this.value:'';be.style.display=this.value?'inline':'none';}">
-        <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden">
+        <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden;cursor:pointer;transition:max-height 0.3s,padding 0.3s" onclick="this.classList.toggle('collapsed');if(this.classList.contains('collapsed')){this.style.maxHeight='28px';this.style.padding='4px 20px';this.style.overflow='hidden';}else{this.style.maxHeight='none';this.style.padding='10px 20px';}">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
             <span style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite"><i class="bi bi-soundwave"></i></span>
@@ -434,7 +435,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 443 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 447 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -478,6 +479,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 // Global error handler
 window.addEventListener('error',e=>{try{dlog('\u274C '+e.message+' ('+e.filename+':'+e.lineno+')','err');}catch(ex){}});
 window.addEventListener('unhandledrejection',e=>{try{dlog('\u274C Promise: '+e.reason,'err');}catch(ex){}});
+// Online/offline detection
+window.addEventListener('offline',()=>{dlog('\u26A0 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05E0\u05D5\u05EA\u05E7!','err');if(isConnected)showStatus('studio-status','\u26A0 \u05D0\u05D9\u05DF \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u2014 \u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E2\u05DC\u05D5\u05DC \u05DC\u05D4\u05D9\u05E0\u05EA\u05E7','error');});
+window.addEventListener('online',()=>{dlog('\u2705 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05D7\u05D6\u05E8!','ok');if(isConnected)showStatus('studio-status','\u2705 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05D7\u05D6\u05E8 \u2014 \u05DE\u05E0\u05E1\u05D4 \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9','success');});
 let peer=null,conn=null,activeCall=null,localStream=null,remoteStream=null;
 let userName='',isHost=false,isConnected=false,isMuted=false,isCamOff=false,useVideo=false;
 let mediaRecLocal=null,mediaRecMixed=null,chunksLocal=[],chunksMixed=[];
@@ -806,10 +810,14 @@ function startAudioRelay() {
         if (peak < gateThresh) { window._gateCount=(window._gateCount||0)+1; return; } // gated
         if(window._gateCount>50){dlog('Gate: '+window._gateCount+' chunks suppressed','ok');window._gateCount=0;}
 
-        // Convert to Int16 (50% smaller than Float32)
+        // Soft limiter + Convert to Int16
         const samples = new Int16Array(input.length);
         for (let i = 0; i < input.length; i++) {
-            samples[i] = Math.max(-32768, Math.min(32767, Math.round(input[i] * 32767)));
+            let s = input[i];
+            // Soft clip: tanh compression above 0.8
+            if (s > 0.8) s = 0.8 + 0.2 * Math.tanh((s - 0.8) * 5);
+            else if (s < -0.8) s = -0.8 + 0.2 * Math.tanh((s + 0.8) * 5);
+            samples[i] = Math.max(-32768, Math.min(32767, Math.round(s * 32767)));
         }
         try {
             conn.send({type: 'a', s: samples, seq: chunkSeq++, sr: audioCtx.sampleRate});
@@ -961,6 +969,9 @@ function showConnected() {
     try{localStorage.setItem('podcast_last_connect',new Date().toLocaleString('he-IL'));
     const sc=parseInt(localStorage.getItem('podcast_session_count')||'0')+1;
     localStorage.setItem('podcast_session_count',sc.toString());
+    // Save to recent rooms
+    const rid=document.getElementById('room-id').value;
+    if(rid){let rr=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');rr=rr.filter(r=>r!==rid);rr.unshift(rid);if(rr.length>10)rr.length=10;localStorage.setItem('podcast_recent_rooms',JSON.stringify(rr));}
     dlog('\u05E1\u05E9\u05DF #'+sc,'ok');}catch(e){}
     startWaveform();
     // Update connection stats every second
@@ -2084,6 +2095,12 @@ try{
     if(savedName)document.getElementById('user-name').value=savedName;
     const savedRoom=localStorage.getItem('podcast_last_room');
     if(savedRoom)document.getElementById('room-id').value=savedRoom;
+    // Recent rooms
+    const recentRooms=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');
+    if(recentRooms.length>0){
+        const rr=document.getElementById('recent-rooms'),rl=document.getElementById('recent-rooms-list');
+        if(rr&&rl){rr.style.display='block';rl.innerHTML=recentRooms.slice(0,5).map(r=>'<span style="cursor:pointer;color:var(--gold);margin:0 3px;padding:1px 6px;background:rgba(212,175,55,0.1);border-radius:4px" onclick="document.getElementById(\'room-id\').value=\''+r+'\'">'+r.substring(0,10)+'</span>').join('');}
+    }
     const lastConn=localStorage.getItem('podcast_last_connect');
     const sesCount=localStorage.getItem('podcast_session_count');
     if(sesCount)dlog('\u05E1\u05D4\"\u05DB \u05E1\u05E9\u05E0\u05D9\u05DD: '+sesCount,'ok');
