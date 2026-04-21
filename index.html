@@ -57,6 +57,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 @keyframes statusFadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes loadingSpin{to{transform:rotate(360deg)}}
 .loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:loadingSpin 0.8s linear infinite;margin-left:6px;vertical-align:middle}
+.status.error .loading-spinner{border-color:var(--red);border-top-color:transparent}
 .status.success{background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);color:var(--green)}
 .status.error{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red)}
 .status.waiting{background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold)}
@@ -132,7 +133,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
 .room-id-display{background:linear-gradient(135deg,rgba(10,10,20,0.9),rgba(20,20,40,0.8));padding:14px 20px;border-radius:12px;border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:900;font-family:'Consolas','Courier New',monospace;text-align:center;margin-top:10px;letter-spacing:4px;direction:ltr;user-select:all;cursor:pointer;box-shadow:0 0 15px rgba(212,175,55,0.15),inset 0 0 30px rgba(212,175,55,0.03);transition:all 0.3s}
 .room-id-display:hover{box-shadow:0 0 30px rgba(212,175,55,0.35),inset 0 0 30px rgba(212,175,55,0.05);transform:scale(1.02)}
-#debug-log{background:#0a0a14;border:1px solid #2a2a3a;border-radius:8px;padding:8px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth;display:none}
+#debug-log{background:rgba(5,5,10,0.9);border:1px solid #2a2a3a;border-radius:10px;padding:10px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:'Consolas','Courier New',monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth;display:none;line-height:1.5}
 #debug-log .err{color:#f66}#debug-log .warn{color:#fa0}#debug-log .ok{color:#6f6}
 
 /* Tabs */
@@ -597,7 +598,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 585 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 590 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2855,10 +2856,11 @@ function sendChat() {
         if(cmd==='/clear'){document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0;input.value='';return;}
         if(cmd==='/topic'||cmd==='/t'){if(arg)addTopic(arg);switchTab('topics');input.value='';return;}
         if(cmd==='/sfx'&&arg){playSFX(arg);input.value='';return;}
+        if(cmd==='/ping'){addChatMsg('\uD83C\uDFD3','\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D9\u05E6\u05D9\u05D1\u05D5\u05EA: '+(pingsSent>0?Math.round(pongsReceived/pingsSent*100):0)+'%',false);input.value='';return;}
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/marker /clear /topic /sfx /stats /time /who /help',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/marker /clear /topic /sfx /stats /time /who /ping /help',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
