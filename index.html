@@ -599,7 +599,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 660 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 665 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2764,6 +2764,53 @@ function toggleCompact(){
 let dimmed=false;
 function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightness(0.6)':'none';dlog('Dim: '+(dimmed?'ON':'OFF'),'ok');toast(dimmed?'\uD83C\uDF19 \u05E2\u05DE\u05E2\u05D5\u05DD':'\u2600\uFE0F \u05E8\u05D2\u05D9\u05DC',1200);}
 
+// === COLOR THEMES ===
+const themes={
+    gold:{gold:'#d4af37',gold2:'#f7e98e',bg:'#0a0a14'},
+    neon:{gold:'#00ff88',gold2:'#88ffcc',bg:'#0a0a14'},
+    ocean:{gold:'#00bcd4',gold2:'#80deea',bg:'#0a1420'},
+    sunset:{gold:'#ff6b35',gold2:'#ffa07a',bg:'#1a0a14'},
+    purple:{gold:'#9b59b6',gold2:'#d2a8e0',bg:'#0f0a1a'},
+    red:{gold:'#e74c3c',gold2:'#ff8a80',bg:'#140a0a'}
+};
+function setTheme(name){
+    const t=themes[name];if(!t){toast('\u05E2\u05E8\u05DB\u05D5\u05EA: gold neon ocean sunset purple red');return;}
+    document.documentElement.style.setProperty('--gold',t.gold);
+    document.documentElement.style.setProperty('--gold2',t.gold2);
+    document.documentElement.style.setProperty('--bg',t.bg);
+    document.body.style.background=t.bg;
+    toast('\uD83C\uDFA8 '+name,1500);dlog('Theme: '+name,'ok');
+    localStorage.setItem('podcast_theme',name);
+}
+// Load saved theme
+try{const st=localStorage.getItem('podcast_theme');if(st&&themes[st])setTheme(st);}catch(e){}
+
+// === REAL-TIME VOICE EFFECTS ===
+let voiceEffect=null,effectNode=null;
+function setVoiceEffect(type){
+    if(!audioCtx){toast('\u05D0\u05D9\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8');return;}
+    // Remove old effect
+    if(effectNode){try{effectNode.disconnect();}catch(e){}effectNode=null;}
+    if(type==='none'||type===voiceEffect){voiceEffect=null;toast('\u05D0\u05E4\u05E7\u05D8 \u05DB\u05D1\u05D5\u05D9',1500);return;}
+    voiceEffect=type;
+    if(type==='echo'){
+        effectNode=audioCtx.createDelay(0.5);effectNode.delayTime.value=0.15;
+        const fb=audioCtx.createGain();fb.gain.value=0.4;
+        if(micGainNode){micGainNode.connect(effectNode);effectNode.connect(fb);fb.connect(effectNode);}
+        toast('\uD83D\uDD0A \u05D0\u05E7\u05D5',1500);
+    }else if(type==='robot'){
+        effectNode=audioCtx.createBiquadFilter();effectNode.type='bandpass';effectNode.frequency.value=800;effectNode.Q.value=10;
+        if(micGainNode){micGainNode.connect(effectNode);}
+        toast('\uD83E\uDD16 \u05E8\u05D5\u05D1\u05D5\u05D8',1500);
+    }else if(type==='deep'){
+        // Simulate deep voice by boosting bass
+        effectNode=audioCtx.createBiquadFilter();effectNode.type='lowshelf';effectNode.frequency.value=300;effectNode.gain.value=12;
+        if(micGainNode){micGainNode.connect(effectNode);}
+        toast('\uD83D\uDDE3 \u05E2\u05DE\u05D5\u05E7',1500);
+    }
+    dlog('Voice effect: '+type,'ok');
+}
+
 // === HELP ===
 function showConnectionInfo(){
     const lossR=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
@@ -2881,7 +2928,11 @@ function sendChat() {
         if(cmd==='/whoosh'){playSFX('whoosh');input.value='';return;}
         if(cmd==='/buzzer'){playSFX('buzzer');input.value='';return;}
         if(cmd==='/transition'){playSFX('transition');input.value='';return;}
-        if(cmd==='/version'||cmd==='/v'){addChatMsg('\u2139\uFE0F','v10.5 | 660 \u05E9\u05D3\u05E8\u05D5\u05D2\u05D9\u05DD | 43 \u05E4\u05E7\u05D5\u05D3\u05D5\u05EA | 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9\u05DD',false);input.value='';return;}
+        if(cmd==='/theme'&&arg){setTheme(arg);input.value='';return;}
+        if(cmd==='/theme'){addChatMsg('\uD83C\uDFA8','gold | neon | ocean | sunset | purple | red',false);input.value='';return;}
+        if(cmd==='/voice'&&arg){setVoiceEffect(arg);input.value='';return;}
+        if(cmd==='/voice'){addChatMsg('\uD83C\uDFA4','echo | robot | deep | none',false);input.value='';return;}
+        if(cmd==='/version'||cmd==='/v'){addChatMsg('\u2139\uFE0F','v10.5 | 665 \u05E9\u05D3\u05E8\u05D5\u05D2\u05D9\u05DD | 48 \u05E4\u05E7\u05D5\u05D3\u05D5\u05EA | 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9\u05DD',false);input.value='';return;}
         if(cmd==='/clap'||cmd==='/applause'){playSFX('applause');input.value='';return;}
         if(cmd==='/pause'){pauseRecording();input.value='';return;}
         if(cmd==='/log'){copyDebugLog();toast('\u2705 \u05DC\u05D5\u05D2 \u05D4\u05D5\u05E2\u05EA\u05E7');input.value='';return;}
@@ -2896,7 +2947,7 @@ function sendChat() {
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (44):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /pause /mute /cam /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05D0\u05E4\u05E7\u05D8\u05D9\u05DD: /sfx /ding /clap /whoosh /buzzer /transition\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect /dc\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log /v',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (48):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /pause /mute /cam /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05D0\u05E4\u05E7\u05D8\u05D9\u05DD: /sfx /ding /clap /whoosh /buzzer /transition\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\uD83C\uDFA8 /theme [gold|neon|ocean|sunset|purple|red]\n\uD83C\uDFA4 /voice [echo|robot|deep|none]\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect /dc\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log /v',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
