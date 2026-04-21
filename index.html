@@ -80,7 +80,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .avatar-initials.me{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(212,175,55,0.1));color:var(--gold);border:2px solid rgba(212,175,55,0.3)}
 .avatar-initials.remote{background:linear-gradient(135deg,rgba(41,128,185,0.3),rgba(41,128,185,0.1));color:var(--blue);border:2px solid rgba(41,128,185,0.3)}
 .meter-box{text-align:center;max-width:60px}
-.meter-bar-wrap{height:60px;width:20px;background:var(--bg);border-radius:10px;margin:0 auto;position:relative;overflow:hidden;border:2px solid var(--border)}
+.meter-bar-wrap{height:60px;width:20px;background:var(--bg);border-radius:10px;margin:0 auto;position:relative;overflow:hidden;border:2px solid var(--border);box-shadow:inset 0 2px 6px rgba(0,0,0,0.3)}
 .meter-bar{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,var(--green) 0%,var(--green) 50%,#f39c12 75%,var(--red) 100%);border-radius:0 0 8px 8px;transition:height 0.06s ease-out}
 .meter-peak{position:absolute;width:100%;height:2px;background:var(--gold);transition:bottom 0.1s;box-shadow:0 0 4px var(--gold)}
 .meter-bar-wrap.clipping{border-color:var(--red);animation:clipFlash 0.3s}
@@ -124,8 +124,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .toggle-row{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
 .toggle-row label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.9rem}
 .toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold)}
-.room-id-display{background:var(--bg);padding:12px 18px;border-radius:10px;border:2px solid var(--gold);color:var(--gold);font-size:1.3rem;font-weight:900;font-family:'Consolas','Courier New',monospace;text-align:center;margin-top:10px;letter-spacing:3px;direction:ltr;user-select:all;cursor:pointer;box-shadow:0 0 15px rgba(212,175,55,0.15);transition:box-shadow 0.3s}
-.room-id-display:hover{box-shadow:0 0 25px rgba(212,175,55,0.3)}
+.room-id-display{background:linear-gradient(135deg,rgba(10,10,20,0.9),rgba(20,20,40,0.8));padding:14px 20px;border-radius:12px;border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:900;font-family:'Consolas','Courier New',monospace;text-align:center;margin-top:10px;letter-spacing:4px;direction:ltr;user-select:all;cursor:pointer;box-shadow:0 0 15px rgba(212,175,55,0.15),inset 0 0 30px rgba(212,175,55,0.03);transition:all 0.3s}
+.room-id-display:hover{box-shadow:0 0 30px rgba(212,175,55,0.35),inset 0 0 30px rgba(212,175,55,0.05);transform:scale(1.02)}
 #debug-log{background:#0a0a14;border:1px solid #2a2a3a;border-radius:8px;padding:8px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth;display:none}
 #debug-log .err{color:#f66}#debug-log .warn{color:#fa0}#debug-log .ok{color:#6f6}
 
@@ -569,7 +569,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,100+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 494 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 50+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 494 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 495 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1391,7 +1391,7 @@ function animateMeters(){
 }
 let vizMode='bars'; // 'bars', 'wave', or 'spectrum'
 function toggleVizMode(){vizMode=vizMode==='bars'?'wave':vizMode==='wave'?'spectrum':'bars';dlog('Viz: '+vizMode,'ok');}
-function startWaveform(){const canvas=document.getElementById('waveCanvas'),ctx=canvas.getContext('2d');
+function startWaveform(){const canvas=document.getElementById('waveCanvas');if(!canvas)return;const ctx=canvas.getContext('2d');
 let _cw=0,_ch=0;
 function draw(){
     const ow=canvas.offsetWidth,oh=canvas.offsetHeight;
@@ -1583,7 +1583,7 @@ function startRecording(){
     const rb=document.getElementById('btn-rec');rb.innerHTML='<span class="rec-dot"></span> \u05E2\u05D5\u05E6\u05E8';rb.classList.add('btn-rec-active');
     document.getElementById('timer').classList.add('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('rec-active'));
-    document.querySelector('.waveform').style.boxShadow='0 0 15px rgba(231,76,60,0.2),inset 0 0 10px rgba(231,76,60,0.05)';
+    const wfEl=document.querySelector('.waveform');if(wfEl)wfEl.style.boxShadow='0 0 15px rgba(231,76,60,0.2),inset 0 0 10px rgba(231,76,60,0.05)';
     // Red recording favicon
     try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23e74c3c'/><circle cx='8' cy='8' r='3' fill='white'/></svg>";}catch(e){}
     showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
