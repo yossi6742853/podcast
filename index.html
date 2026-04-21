@@ -138,8 +138,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     .timer{font-size:1.8rem}
     .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
     .tab{padding:8px 12px;font-size:0.8rem;white-space:nowrap}
-    .rec-controls{gap:5px}
-    .rec-controls .btn{padding:6px 12px;font-size:0.8rem}
+    .rec-controls{gap:4px;justify-content:center}
+    .rec-controls .btn{padding:5px 10px;font-size:0.75rem}
+    .rec-controls .btn .hide-mobile{display:none}
     .meter-box{max-width:50px}
     .meter-bar-wrap{height:50px;width:18px}
     .room-row{flex-direction:column}
@@ -212,7 +213,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- STUDIO PANEL -->
     <div class="panel" id="panel-studio" style="display:none">
-        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" onchange="document.title=this.value||'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'">
+        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'">
         <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
@@ -253,9 +254,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div class="rec-controls">
             <button class="btn btn-red" id="btn-rec" onclick="toggleRecording()" title="R | WebM 256kbps + WAV 24kHz"><i class="bi bi-record-circle"></i> &#x05d4;&#x05ea;&#x05d7;&#x05dc; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</button>
             <button class="btn btn-sm btn-blue" id="btn-pause" onclick="pauseRecording()" style="display:none" title="P"><i class="bi bi-pause-fill"></i></button>
-            <button class="btn btn-sm btn-blue" onclick="toggleMute()" id="btn-mute" title="M"><i class="bi bi-mic-fill"></i> &#x05d4;&#x05e9;&#x05ea;&#x05e7;</button>
-            <button class="btn btn-sm btn-blue" onclick="toggleCam()" id="btn-cam" title="V"><i class="bi bi-camera-video-fill"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;</button>
-            <button class="btn btn-sm btn-gold" onclick="addMarker()" title="B" id="btn-marker"><i class="bi bi-bookmark-plus"></i> &#x05e1;&#x05de;&#x05df;</button>
+            <button class="btn btn-sm btn-blue" onclick="toggleMute()" id="btn-mute" title="M"><i class="bi bi-mic-fill"></i> <span class="hide-mobile">&#x05d4;&#x05e9;&#x05ea;&#x05e7;</span></button>
+            <button class="btn btn-sm btn-blue" onclick="toggleCam()" id="btn-cam" title="V"><i class="bi bi-camera-video-fill"></i> <span class="hide-mobile">&#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;</span></button>
+            <button class="btn btn-sm btn-gold" onclick="addMarker()" title="B" id="btn-marker"><i class="bi bi-bookmark-plus"></i> <span class="hide-mobile">&#x05e1;&#x05de;&#x05df;</span></button>
             <button class="btn btn-sm btn-green" onclick="sendTestTone()" title="&#x05e9;&#x05dc;&#x05d7; &#x05e6;&#x05dc;&#x05d9;&#x05dc; &#x05d8;&#x05e1;&#x05d8;"><i class="bi bi-broadcast"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleStudioFS()" title="&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;"><i class="bi bi-fullscreen"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleDim()" title="&#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;"><i class="bi bi-brightness-low"></i></button>
@@ -801,7 +802,7 @@ function showConnected() {
     const pr=document.getElementById('panel-room'),ps=document.getElementById('panel-studio');
     pr.style.opacity='0';pr.style.transition='opacity 0.4s';
     setTimeout(()=>{pr.style.display='none';ps.style.display='block';ps.style.opacity='0';ps.style.transition='opacity 0.4s';
-    setTimeout(()=>{ps.style.opacity='1';},50);},400);
+    setTimeout(()=>{ps.style.opacity='1';window.scrollTo({top:0,behavior:'smooth'});},50);},400);
     document.getElementById('name-local').textContent = userName;
     document.getElementById('label-local').textContent = userName;
     document.getElementById('banner-local').textContent = userName + (isHost?' (\u05DE\u05D0\u05E8\u05D7)':' (\u05D0\u05D5\u05E8\u05D7)');
@@ -811,6 +812,10 @@ function showConnected() {
     showStatus('studio-status', '\u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+Math.round(CHUNK_SIZE/actSR*1000)+'ms \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 \uD83D\uDCE1 \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5', 'success');
     playConnectSound();
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('connected-glow'));
+    // Notify if tab is background
+    if(document.hidden&&Notification.permission==='granted'){
+        try{new Notification('\u05D4\u05D0\u05D5\u05E8\u05D7 \u05D4\u05EA\u05D7\u05D1\u05E8!',{body:'\u05D4\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \u05DE\u05D5\u05DB\u05DF',icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><text y="14" font-size="14">\uD83C\uDFA4</text></svg>',tag:'podcast-connect'});}catch(e){}
+    }
     // Auto-test audio after 2 seconds
     setTimeout(()=>{if(audioChunksOut===0&&isConnected){dlog('Auto-sending test tone...','warn');sendTestTone();}},2000);
     // Warn if still no audio after 10 seconds
@@ -991,7 +996,17 @@ function draw(){
         ctx.stroke();
     });
     // Recording overlay
-    if(isRecording){ctx.fillStyle='rgba(231,76,60,0.03)';ctx.fillRect(0,0,w,h);}
+    if(isRecording){
+        ctx.fillStyle='rgba(231,76,60,0.03)';ctx.fillRect(0,0,w,h);
+        // Pulsing recording indicator line at top
+        const pulse=Math.sin(Date.now()/300)*0.3+0.7;
+        ctx.fillStyle='rgba(231,76,60,'+pulse+')';ctx.fillRect(0,0,w,2);
+        // Markers as vertical gold lines
+        if(recStartTime&&markers.length>0){
+            const elapsed=Date.now()-recStartTime;
+            markers.forEach(m=>{const x=(m.ms/elapsed)*w;if(x>0&&x<w){ctx.strokeStyle='rgba(212,175,55,0.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}});
+        }
+    }
     // Center divider with gradient
     const divGrad=ctx.createLinearGradient(w/2,0,w/2,h);
     divGrad.addColorStop(0,'transparent');divGrad.addColorStop(0.5,'rgba(255,255,255,0.15)');divGrad.addColorStop(1,'transparent');
@@ -1572,6 +1587,10 @@ function addChatMsg(name, text, isMe) {
     if(!isMe){
         unreadChat++;
         playBeep(500,0.08,0.05);
+        // Browser notification when tab is background
+        if(document.hidden&&Notification.permission==='granted'){
+            try{new Notification('\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \u2014 '+name,{body:text.substring(0,100),icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><text y="14" font-size="14">\uD83C\uDFA4</text></svg>',tag:'podcast-chat'});}catch(e){}
+        } else if(Notification.permission==='default'){Notification.requestPermission();}
         // Update chat tab badge
         const chatTab=document.querySelector('.tab:nth-child(4)');
         if(chatTab&&!document.querySelector('#tab-chat.active'))chatTab.innerHTML='<i class="bi bi-chat-dots"></i> \u05E6\u05D0\u05D8 <span style="background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem">'+unreadChat+'</span>';
@@ -1756,6 +1775,12 @@ try{
     const savedTitle=localStorage.getItem('podcast_episode_title');
     if(savedTitle){const t=document.getElementById('episode-title');if(t)t.value=savedTitle;}
 }catch(e){addTopic();addTopic();addTopic();}
+
+// Request notification permission (for background chat alerts)
+if('Notification' in window && Notification.permission==='default'){
+    // Request on first user interaction to avoid browser blocking
+    document.addEventListener('click',function reqNotif(){Notification.requestPermission();document.removeEventListener('click',reqNotif);},{once:true});
+}
 
 // Welcome message
 dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.1 ===','ok');
