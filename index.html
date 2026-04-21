@@ -2,7 +2,13 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0a0a14">
+<meta name="description" content="&#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; &#x05de;&#x05e7;&#x05d5;&#x05d5;&#x05df; &#x2014; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5;, &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5;, &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;, &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05d4; &#x05d5;&#x05e2;&#x05d5;&#x05d3;">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="&#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO">
+<meta property="og:description" content="&#x05d4;&#x05e7;&#x05dc;&#x05d8; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; &#x05de;&#x05e7;&#x05e6;&#x05d5;&#x05e2;&#x05d9; &#x05d9;&#x05e9;&#x05d9;&#x05e8;&#x05d5;&#x05ea; &#x05de;&#x05d4;&#x05d3;&#x05e4;&#x05d3;&#x05e4;&#x05df;">
 <title>&#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🎙️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -218,7 +224,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- STUDIO PANEL -->
     <div class="panel" id="panel-studio" style="display:none">
-        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'">
+        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value})">
         <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
@@ -394,7 +400,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 430+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 439 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -536,6 +542,9 @@ function setupDataConn(c) {
                 dlog('\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E1\u05D5\u05E0\u05DB\u05E8\u05E0\u05D5 ('+d.topics.length+')','ok');
                 showStatus('studio-status','\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E2\u05D5\u05D3\u05DB\u05E0\u05D5 \u05DE\u05D4\u05DE\u05D0\u05E8\u05D7','success');
             }
+        } else if (d.type === 'episode_title') {
+            const et=document.getElementById('episode-title');
+            if(et&&d.title){et.value=d.title;document.title='\u2705 '+d.title+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';dlog('\u05E9\u05DD \u05E4\u05E8\u05E7: '+d.title,'ok');}
         } else if (d.type === 'msg') {
             addChatMsg(d.name || '\u05DE\u05E8\u05D5\u05D7\u05E7', d.text, false);
         } else if (d.type === 'ping') {
@@ -683,6 +692,8 @@ async function joinRoom() {
         dlog('Connecting to ' + remoteId + '...', 'ok');
         const c = peer.connect(remoteId, {reliable: true, serialization: 'binary'});
         setupDataConn(c);
+        // Connection timeout — if no open event in 15s, warn user
+        setTimeout(()=>{if(!isConnected){showStatus('room-status','\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05D5\u05E7\u05D7 \u05D9\u05D5\u05EA\u05E8 \u05DE\u05D3\u05D9. \u05D5\u05D3\u05D0 \u05E9\u05D4\u05DE\u05D0\u05E8\u05D7 \u05E4\u05EA\u05D7 \u05D7\u05D3\u05E8 \u05D5\u05E9\u05D4\u05E7\u05D5\u05D3 \u05E0\u05DB\u05D5\u05DF.','error');dlog('Connection timeout 15s','warn');}},15000);
     });
     peer.on('error', function(e) {
         dlog('Error: '+e.type, 'err');
@@ -891,7 +902,7 @@ function showConnected() {
     // Auto-test audio after 2 seconds
     setTimeout(()=>{if(audioChunksOut===0&&isConnected){dlog('Auto-sending test tone...','warn');sendTestTone();}},2000);
     // Warn if still no audio after 10 seconds
-    setTimeout(()=>{if(audioChunksIn===0&&isConnected){dlog('\u26A0 \u05DC\u05D0 \u05D4\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10 \u05E9\u05E0\u05D9\u05D5\u05EA! \u05D1\u05D3\u05D5\u05E7 \u05DE\u05D9\u05E7 + \u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05D3\u05E3','err');showStatus('studio-status','\u26A0 \u05D0\u05D9\u05DF \u05D0\u05D5\u05D3\u05D9\u05D5 \u05DE\u05D4\u05E6\u05D3 \u05D4\u05E9\u05E0\u05D9 \u2014 \u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05D3\u05E3 \u05DB\u05D3\u05D9 \u05DC\u05D4\u05E4\u05E2\u05D9\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5','error');}},10000);
+    setTimeout(()=>{if(audioChunksIn===0&&isConnected){dlog('\u26A0 \u05DC\u05D0 \u05D4\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10\u05E9','err');showStatus('studio-status','\u26A0 \u05D0\u05D9\u05DF \u05D0\u05D5\u05D3\u05D9\u05D5 \u05DE\u05D4\u05E6\u05D3 \u05D4\u05E9\u05E0\u05D9 <button class="btn btn-sm btn-green" onclick="sendTestTone();if(audioCtx&&audioCtx.state===\'suspended\')audioCtx.resume();if(remoteAudioCtx&&remoteAudioCtx.state===\'suspended\')remoteAudioCtx.resume();dlog(\'Audio fix attempt\',\'ok\')" style="margin-right:6px"><i class="bi bi-wrench"></i> \u05EA\u05E7\u05DF</button> <button class="btn btn-sm btn-blue" onclick="quickReconnect()" style="margin-right:6px"><i class="bi bi-arrow-repeat"></i> \u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9</button>','error');}},10000);
     document.title='\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8 \u2014 \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
     connStartTime = Date.now();
     try{localStorage.setItem('podcast_last_connect',new Date().toLocaleString('he-IL'));
@@ -1261,7 +1272,7 @@ function stopRecording(){
     const mkCount=markers.length;
     const lossP=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
     const qualIcon=lossP<1?'\u2705':lossP<5?'\uD83D\uDFE1':'\uD83D\uDD34';
-    showStatus('studio-status',qualIcon+' \u05D4\u05E7\u05DC\u05D8\u05D4 #'+recordingCount+' '+recDur+' | '+silCount+' \u05E9\u05E7\u05D8\u05D9\u05DD | '+mkCount+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP)+'%','success');
+    showStatus('studio-status',qualIcon+' \u05D4\u05E7\u05DC\u05D8\u05D4 #'+recordingCount+' '+recDur+' | '+silCount+' \u05E9\u05E7\u05D8\u05D9\u05DD | '+mkCount+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP)+'% <button class="btn btn-sm btn-red" onclick="toggleRecording()" style="margin-right:8px;padding:4px 12px"><i class="bi bi-record-circle"></i> \u05D4\u05E7\u05DC\u05D8 \u05E9\u05D5\u05D1</button>','success');
     // Auto-switch to recordings tab
     switchTab('recordings');playStopSound();
     // Update recordings tab badge
