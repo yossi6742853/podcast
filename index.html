@@ -315,10 +315,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <input type="range" id="jitter-setting" min="20" max="200" value="60" oninput="document.getElementById('jitter-val').textContent=this.value+'ms'">
                 <span id="jitter-val" style="min-width:40px;font-size:0.8rem;color:var(--muted)">60ms</span>
             </div>
-            <div class="music-controls">
+            <div class="music-controls" style="gap:16px">
                 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
                     <input type="checkbox" id="auto-record" style="width:16px;height:16px;accent-color:var(--gold)">
-                    <i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;&#x05ea; &#x05d1;&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8;
+                    <i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
+                    <input type="checkbox" id="studio-reverb" onchange="toggleReverb(this.checked)" style="width:16px;height:16px;accent-color:var(--gold)">
+                    <i class="bi bi-soundwave"></i> &#x05e8;&#x05d5;&#x05d5;&#x05e8;&#x05d1;
                 </label>
             </div>
             <div class="music-controls">
@@ -368,8 +372,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="showQR()" title="QR &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7;"><i class="bi bi-qr-code"></i></button>
             </div>
         </div>
-        <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
-            R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | &#x05e8;&#x05d5;&#x05d5;&#x05d7;=PTT | C=&#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd; | G=&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;
+        <div style="margin-top:6px;font-size:0.65rem;color:var(--muted);text-align:center;opacity:0.5;line-height:1.6">
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">R</span>&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">M</span>&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">&#x05e8;&#x05d5;&#x05d5;&#x05d7;</span>PTT
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">B</span>&#x05e1;&#x05d9;&#x05de;&#x05df;
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">W</span>&#x05d9;&#x05d3;
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">G</span>&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;
+            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">?</span>&#x05e2;&#x05d6;&#x05e8;&#x05d4;
         </div>
 
         <!-- TABS -->
@@ -537,7 +547,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 480 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 482 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2203,6 +2213,31 @@ function broadcastCmd(cmd,val){
     dlog('Broadcast cmd: '+cmd+' to '+participants.size+' participants','ok');
 }
 
+// === STUDIO REVERB ===
+let reverbNode=null;
+function toggleReverb(on){
+    if(!remoteAudioCtx){dlog('No audio context for reverb','warn');return;}
+    if(on&&!reverbNode){
+        try{
+            // Create impulse response for a small studio room
+            const sr=remoteAudioCtx.sampleRate;const len=sr*1.2; // 1.2 second reverb
+            const buf=remoteAudioCtx.createBuffer(2,len,sr);
+            for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);
+                for(let i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.exp(-i/len*5)*0.15;} // exponential decay
+            }
+            reverbNode=remoteAudioCtx.createConvolver();reverbNode.buffer=buf;
+            // Wet/dry mix: connect EQ output to both destination and reverb
+            const wet=remoteAudioCtx.createGain();wet.gain.value=0.15; // 15% wet
+            if(eqTreble){eqTreble.connect(reverbNode);reverbNode.connect(wet);wet.connect(remoteAudioCtx.destination);}
+            dlog('Reverb ON (studio room)','ok');
+            showStatus('studio-status','\uD83C\uDFDB \u05E8\u05D5\u05D5\u05E8\u05D1 \u05D0\u05D5\u05DC\u05E4\u05DF','success');
+        }catch(e){dlog('Reverb error: '+e.message,'err');}
+    }else if(!on&&reverbNode){
+        try{reverbNode.disconnect();reverbNode=null;}catch(e){}
+        dlog('Reverb OFF','ok');
+    }
+}
+
 // === QR CODE ===
 function showQR(){
     const rid=document.getElementById('room-id').value;
@@ -2355,7 +2390,7 @@ function doDisconnect(){
     if(audioCtx&&audioCtx.state!=='closed'){try{audioCtx.close();}catch(e){}}audioCtx=null;
     if(remoteAudioCtx&&remoteAudioCtx.state!=='closed'){try{remoteAudioCtx.close();}catch(e){}}remoteAudioCtx=null;
     localAnalyser=null;remoteAnalyser=null;remoteGainNode=null;
-    noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;musicSourceNode=null;
+    noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;musicSourceNode=null;reverbNode=null;
     if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
     connStartTime=null;bytesSent=0;bytesReceived=0;recRemoteChunks=[];_countdownActive=false;
     pingsSent=0;pongsReceived=0;isPaused=false;silenceSegments=[];currentSilenceStart=null;lastPongTime=0;joinRetryCount=0;
