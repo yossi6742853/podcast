@@ -325,10 +325,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                     <option value="0">&#x05dc;&#x05dc;&#x05d0; &#x05d4;&#x05d2;&#x05d1;&#x05dc;&#x05d4;</option>
                 </select>
             </div>
-            <div class="music-controls">
+            <div class="music-controls" style="gap:16px">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
+                    <input type="checkbox" id="bt-mode" checked onchange="setBTMode(this.checked)" style="width:16px;height:16px;accent-color:var(--blue)">
+                    <i class="bi bi-bluetooth"></i> &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1;
+                </label>
                 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
                     <input type="checkbox" id="self-monitor" onchange="if(window._silentGain)window._silentGain.gain.value=this.checked?0.3:0" style="width:16px;height:16px;accent-color:var(--gold)">
-                    <i class="bi bi-headphones"></i> &#x05e9;&#x05de;&#x05e2; &#x05d0;&#x05ea; &#x05e2;&#x05e6;&#x05de;&#x05d9; (&#x05dc;&#x05d0; &#x05dc;&#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1;!)
+                    <i class="bi bi-headphones"></i> &#x05de;&#x05d5;&#x05e0;&#x05d9;&#x05d8;&#x05d5;&#x05e8;
                 </label>
             </div>
             <div class="music-controls">
@@ -347,10 +351,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <span id="guest-status" style="font-size:0.7rem;color:var(--green)"><i class="bi bi-circle-fill" style="font-size:0.5rem"></i> &#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05de;&#x05d7;&#x05d5;&#x05d1;&#x05e8;</span>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-                <button class="btn btn-sm btn-red" onclick="hostCmd('mute')"><i class="bi bi-mic-mute"></i> &#x05d4;&#x05e9;&#x05ea;&#x05e7; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
-                <button class="btn btn-sm btn-green" onclick="hostCmd('unmute')"><i class="bi bi-mic"></i> &#x05d1;&#x05d8;&#x05dc; &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;</button>
-                <button class="btn btn-sm btn-red" onclick="hostCmd('rec_start')"><i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
-                <button class="btn btn-sm btn-blue" onclick="hostCmd('rec_stop')"><i class="bi bi-stop-circle"></i> &#x05e2;&#x05e6;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+                <button class="btn btn-sm btn-red" onclick="broadcastCmd('mute')"><i class="bi bi-mic-mute"></i> &#x05d4;&#x05e9;&#x05ea;&#x05e7; &#x05d4;&#x05db;&#x05dc;</button>
+                <button class="btn btn-sm btn-green" onclick="broadcastCmd('unmute')"><i class="bi bi-mic"></i> &#x05d1;&#x05d8;&#x05dc; &#x05d4;&#x05db;&#x05dc;</button>
+                <button class="btn btn-sm btn-red" onclick="broadcastCmd('rec_start')"><i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8; &#x05d4;&#x05db;&#x05dc;</button>
+                <button class="btn btn-sm btn-blue" onclick="broadcastCmd('rec_stop')"><i class="bi bi-stop-circle"></i> &#x05e2;&#x05e6;&#x05d5;&#x05e8; &#x05d4;&#x05db;&#x05dc;</button>
             </div>
             <div class="music-controls">
                 <span class="music-label" style="min-width:80px"><i class="bi bi-person"></i> &#x05d2;&#x05d9;&#x05d9;&#x05df; &#x05d0;&#x05d5;&#x05e8;&#x05d7;:</span>
@@ -530,7 +534,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 470 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 474 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1107,9 +1111,10 @@ function drainJitterBuffer() {
         src.connect(remoteGainNode);
 
         const now = remoteAudioCtx.currentTime;
+        const btExtra = window._btMode ? 0.05 : 0; // Extra buffer for BT
         // If we've fallen behind, catch up smoothly
-        if (nextPlayTime < now - 0.15) {
-            nextPlayTime = now + 0.02;
+        if (nextPlayTime < now - (0.15 + btExtra)) {
+            nextPlayTime = now + 0.02 + btExtra;
         }
         src.start(nextPlayTime);
         nextPlayTime += buffer.duration;
@@ -2142,6 +2147,25 @@ function hostCmd(cmd,val){
     if(!conn||!conn.open){dlog('Not connected','warn');return;}
     conn.send({type:'host_cmd',cmd:cmd,val:val?parseInt(val):undefined});
     dlog('Host cmd: '+cmd+(val?' = '+val:''),'ok');
+}
+function broadcastCmd(cmd,val){
+    broadcast({type:'host_cmd',cmd:cmd,val:val?parseInt(val):undefined});
+    dlog('Broadcast cmd: '+cmd+' to '+participants.size+' participants','ok');
+}
+
+// === BLUETOOTH MODE ===
+function setBTMode(on){
+    // BT mode: zero self-monitor, increase jitter buffer for BT latency
+    if(window._silentGain)window._silentGain.gain.value=0;
+    document.getElementById('self-monitor').checked=false;
+    if(on){
+        window._btMode=true;
+        dlog('Bluetooth mode ON — self-monitor disabled, extra buffer','ok');
+        showStatus('studio-status','\uD83D\uDD35 \u05DE\u05E6\u05D1 \u05D1\u05DC\u05D5\u05D8\u05D5\u05E1 \u2014 \u05D0\u05D5\u05E4\u05D8\u05D9\u05DE\u05DC\u05D9','success');
+    }else{
+        window._btMode=false;
+        dlog('Bluetooth mode OFF','ok');
+    }
 }
 
 // === LIVE MIC SWITCH ===
