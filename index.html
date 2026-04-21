@@ -45,7 +45,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .room-row input::placeholder{color:rgba(255,255,255,0.2)}
 .room-row input:focus{border-color:var(--gold);outline:none;box-shadow:0 0 10px rgba(212,175,55,0.15)}
 .btn{padding:8px 20px;border-radius:8px;border:none;font-size:0.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px}
-.btn-gold{background:linear-gradient(135deg,var(--gold),#e8c84a);color:#000}.btn-gold:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.35)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#e8c84a);color:#000;text-shadow:none}.btn-gold:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.35)}
 .btn-green{background:linear-gradient(135deg,var(--green),#2ecc71);color:#fff}.btn-green:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(39,174,96,0.3)}
 .btn-red{background:linear-gradient(135deg,var(--red),#e95e50);color:#fff}.btn-red:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(231,76,60,0.3)}
 .btn-blue{background:linear-gradient(135deg,var(--blue),#3498db);color:#fff}.btn-blue:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(41,128,185,0.3)}
@@ -108,7 +108,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .btn:active::after{width:200px;height:200px;opacity:0;transition:0s}
 .btn-rec-active{animation:recGlow 1.5s infinite;background:var(--red)}
 @keyframes recGlow{0%,100%{box-shadow:0 0 5px var(--red)}50%{box-shadow:0 0 25px var(--red),0 0 50px rgba(231,76,60,0.3)}}
-.waveform{height:65px;background:linear-gradient(180deg,rgba(10,10,20,0.8),rgba(20,20,40,0.5));border-radius:10px;margin:8px 0;overflow:hidden;border:1px solid var(--border);box-shadow:inset 0 2px 10px rgba(0,0,0,0.5);position:relative}
+.waveform{height:65px;background:linear-gradient(180deg,rgba(10,10,20,0.8),rgba(20,20,40,0.5));border-radius:10px;transition:box-shadow 0.5s;margin:8px 0;overflow:hidden;border:1px solid var(--border);box-shadow:inset 0 2px 10px rgba(0,0,0,0.5);position:relative}
 .waveform::before{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--blue),transparent);opacity:0.3}
 #waveCanvas{width:100%;height:100%}
 .settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
@@ -1549,6 +1549,7 @@ function startRecording(){
     const rb=document.getElementById('btn-rec');rb.innerHTML='<span class="rec-dot"></span> \u05E2\u05D5\u05E6\u05E8';rb.classList.add('btn-rec-active');
     document.getElementById('timer').classList.add('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('rec-active'));
+    document.querySelector('.waveform').style.boxShadow='0 0 15px rgba(231,76,60,0.2),inset 0 0 10px rgba(231,76,60,0.05)';
     // Red recording favicon
     try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23e74c3c'/><circle cx='8' cy='8' r='3' fill='white'/></svg>";}catch(e){}
     showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
@@ -1628,6 +1629,7 @@ function stopRecording(){
     const rb2=document.getElementById('btn-rec');rb2.innerHTML='<i class="bi bi-record-circle"></i> \u05D4\u05EA\u05D7\u05DC \u05D4\u05E7\u05DC\u05D8\u05D4';rb2.classList.remove('btn-rec-active');
     document.getElementById('timer').classList.remove('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.remove('rec-active'));
+    const wf=document.querySelector('.waveform');if(wf)wf.style.boxShadow='';
     document.getElementById('btn-pause').style.display='none';
     const rpw2=document.getElementById('rec-progress-wrap');if(rpw2)rpw2.style.display='none';
     // Restore normal favicon
@@ -2112,13 +2114,28 @@ function playBGLoop(style){
     const ctx=_beepCtx,now=ctx.currentTime;
     const dur=16; // 16 second loop
     if(style==='chill'){
-        // Soft pad chords (Am-F-C-G)
+        // Rich pad chords (Am-F-C-G) with slow filter sweep
         [[220,261,330],[174,220,261],[261,330,392],[196,247,294]].forEach((chord,ci)=>{
-            chord.forEach(f=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.value=0.02;o.connect(g);g.connect(ctx.destination);o.start(now+ci*4);o.stop(now+ci*4+4.2);bgLoopOscs.push(o);});
+            chord.forEach(f=>{
+                // Sine layer
+                const o=ctx.createOscillator(),g=ctx.createGain(),flt=ctx.createBiquadFilter();
+                o.type='sine';o.frequency.value=f;g.gain.value=0.018;
+                flt.type='lowpass';flt.frequency.setValueAtTime(400,now+ci*4);flt.frequency.linearRampToValueAtTime(1200,now+ci*4+2);flt.frequency.linearRampToValueAtTime(400,now+ci*4+4);
+                o.connect(flt);flt.connect(g);g.connect(ctx.destination);o.start(now+ci*4);o.stop(now+ci*4+4.3);bgLoopOscs.push(o);
+                // Triangle shimmer layer
+                const o2=ctx.createOscillator(),g2=ctx.createGain();o2.type='triangle';o2.frequency.value=f*2;g2.gain.value=0.006;o2.connect(g2);g2.connect(ctx.destination);o2.start(now+ci*4+0.5);o2.stop(now+ci*4+3.5);bgLoopOscs.push(o2);
+            });
         });
+        // Subtle bass pulse
+        [0,4,8,12].forEach(t=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=55;g.gain.setValueAtTime(0.025,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+1.5);o.connect(g);g.connect(ctx.destination);o.start(now+t);o.stop(now+t+2);bgLoopOscs.push(o);});
     }else if(style==='upbeat'){
-        // Rhythmic pulse
-        for(let i=0;i<dur*2;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=i%4===0?220:i%2===0?330:440;g.gain.setValueAtTime(0.04,now+i*0.5);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.5+0.3);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+i*0.5+0.35);bgLoopOscs.push(o);}
+        // Rhythmic melody + bass + hi-hat
+        const melody=[440,523,659,523,440,392,440,523,659,784,659,523,440,392,330,440];
+        melody.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0.03,now+i);g.gain.exponentialRampToValueAtTime(0.001,now+i+0.6);o.connect(g);g.connect(ctx.destination);o.start(now+i);o.stop(now+i+0.65);bgLoopOscs.push(o);});
+        // Bass line
+        [110,110,146,110,130,130,110,98].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.035,now+i*2);g.gain.exponentialRampToValueAtTime(0.001,now+i*2+1.5);o.connect(g);g.connect(ctx.destination);o.start(now+i*2);o.stop(now+i*2+1.8);bgLoopOscs.push(o);});
+        // Hi-hat rhythm
+        for(let i=0;i<dur*4;i++){const buf=ctx.createBuffer(1,ctx.sampleRate*0.03,ctx.sampleRate);const d=buf.getChannelData(0);for(let j=0;j<d.length;j++)d[j]=(Math.random()*2-1)*Math.exp(-j/d.length*8);const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=buf;g.gain.value=i%2===0?0.02:0.01;s.connect(g);g.connect(ctx.destination);s.start(now+i*0.25);bgLoopOscs.push(s);}
     }else if(style==='ambient'){
         // Slow evolving tones
         [110,165,220,277].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;o.frequency.setValueAtTime(f,now);o.frequency.linearRampToValueAtTime(f*1.05,now+dur/2);o.frequency.linearRampToValueAtTime(f,now+dur);g.gain.value=0.015;o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+dur);bgLoopOscs.push(o);});
