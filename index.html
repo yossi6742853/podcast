@@ -196,7 +196,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.4 | 458</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.5 | 470</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -324,6 +324,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                     <option value="120" selected>2 &#x05e9;&#x05e2;&#x05d5;&#x05ea;</option>
                     <option value="0">&#x05dc;&#x05dc;&#x05d0; &#x05d4;&#x05d2;&#x05d1;&#x05dc;&#x05d4;</option>
                 </select>
+            </div>
+            <div class="music-controls">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
+                    <input type="checkbox" id="self-monitor" onchange="if(window._silentGain)window._silentGain.gain.value=this.checked?0.3:0" style="width:16px;height:16px;accent-color:var(--gold)">
+                    <i class="bi bi-headphones"></i> &#x05e9;&#x05de;&#x05e2; &#x05d0;&#x05ea; &#x05e2;&#x05e6;&#x05de;&#x05d9; (&#x05dc;&#x05d0; &#x05dc;&#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1;!)
+                </label>
             </div>
             <div class="music-controls">
                 <span class="music-label" style="min-width:80px">&#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea;:</span>
@@ -524,7 +530,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 465 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 470 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -899,7 +905,11 @@ function startAudioRelay() {
 
     const processor = audioCtx.createScriptProcessor(CHUNK_SIZE, 1, 1);
     micGainNode.connect(processor);
-    processor.connect(audioCtx.destination);
+    // Connect to silent gain (NOT destination) to avoid hearing yourself with Bluetooth delay
+    window._silentGain = audioCtx.createGain();
+    window._silentGain.gain.value = 0; // muted output — ScriptProcessor needs a connected output to fire
+    processor.connect(window._silentGain);
+    window._silentGain.connect(audioCtx.destination);
     relayProcessor = processor;
 
     let chunksSentCount = 0;
@@ -1970,29 +1980,37 @@ function playSFX(type){
     dlog('SFX: '+type,'ok');
 }
 // === TTS INTRO/OUTRO ===
+// Preload TTS voices
+let _ttsVoices=[];
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>{_ttsVoices=speechSynthesis.getVoices();dlog('TTS voices: '+_ttsVoices.length,'ok');};speechSynthesis.getVoices();}
+function _getTTSVoice(){return _ttsVoices.find(v=>v.lang.startsWith('he'))||_ttsVoices.find(v=>v.lang.includes('IL'))||_ttsVoices[0]||null;}
+
 function speakIntro(){
-    if(!('speechSynthesis' in window)){dlog('TTS not supported','err');return;}
+    if(!('speechSynthesis' in window)){dlog('TTS not supported','err');showStatus('studio-status','TTS \u05DC\u05D0 \u05E0\u05EA\u05DE\u05DA','error');return;}
     const epTitle=document.getElementById('episode-title')?.value||'\u05D4\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
-    // Play intro jingle first, then speak
     playSFX('intro');
     setTimeout(()=>{
-        const u=new SpeechSynthesisUtterance('\u05D1\u05E8\u05D5\u05DB\u05D9\u05DD \u05D4\u05D1\u05D0\u05D9\u05DD \u05DC'+epTitle+'! \u05D0\u05E0\u05D7\u05E0\u05D5 \u05DE\u05EA\u05D7\u05D9\u05DC\u05D9\u05DD.');
-        u.lang='he-IL';u.rate=0.9;u.pitch=1.0;u.volume=0.8;
-        // Try to find Hebrew voice
-        const voices=speechSynthesis.getVoices();
-        const heVoice=voices.find(v=>v.lang.startsWith('he'))||voices.find(v=>v.lang.startsWith('ar'))||null;
-        if(heVoice)u.voice=heVoice;
+        const u=new SpeechSynthesisUtterance('\u05D1\u05E8\u05D5\u05DB\u05D9\u05DD \u05D4\u05D1\u05D0\u05D9\u05DD \u05DC'+epTitle+'. \u05D0\u05E0\u05D7\u05E0\u05D5 \u05DE\u05EA\u05D7\u05D9\u05DC\u05D9\u05DD!');
+        u.lang='he-IL';u.rate=0.85;u.pitch=1.1;u.volume=0.9;
+        const v=_getTTSVoice();if(v)u.voice=v;
         speechSynthesis.speak(u);
-        dlog('TTS intro: '+epTitle,'ok');
-    },2500); // After jingle
+        dlog('TTS intro: '+epTitle+(v?' voice='+v.name:''),'ok');
+    },3000);
 }
 function speakCustom(text){
     if(!('speechSynthesis' in window))return;
-    const u=new SpeechSynthesisUtterance(text);u.lang='he-IL';u.rate=0.9;u.pitch=1.0;u.volume=0.8;
-    const voices=speechSynthesis.getVoices();
-    const heVoice=voices.find(v=>v.lang.startsWith('he'))||null;
-    if(heVoice)u.voice=heVoice;
+    const u=new SpeechSynthesisUtterance(text);u.lang='he-IL';u.rate=0.85;u.pitch=1.1;u.volume=0.9;
+    const v=_getTTSVoice();if(v)u.voice=v;
     speechSynthesis.speak(u);
+}
+function speakOutro(){
+    if(!('speechSynthesis' in window))return;
+    const epTitle=document.getElementById('episode-title')?.value||'\u05D4\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
+    const u=new SpeechSynthesisUtterance('\u05EA\u05D5\u05D3\u05D4 \u05E9\u05D4\u05D0\u05D6\u05E0\u05EA\u05DD. \u05D4\u05D9\u05D4 \u05D6\u05D4 '+epTitle+'. \u05DC\u05D4\u05EA\u05E8\u05D0\u05D5\u05EA!');
+    u.lang='he-IL';u.rate=0.85;u.pitch=1.0;u.volume=0.9;
+    const v=_getTTSVoice();if(v)u.voice=v;
+    speechSynthesis.speak(u);
+    setTimeout(()=>playSFX('outro'),3000);
 }
 
 // === BACKGROUND MUSIC LOOPS ===
@@ -2143,6 +2161,10 @@ function doDisconnect(){
         if(recordingCount>0){try{exportSessionLog();dlog('Session log auto-exported','ok');}catch(e){}}
     }
     if(isRecording)stopRecording();
+    // Stop BG loops
+    stopBGLoop();
+    // Stop TTS
+    if('speechSynthesis' in window)speechSynthesis.cancel();
     // Stop transcription if active
     if(isTranscribing){try{speechRec.stop();}catch(e){}isTranscribing=false;}
     // Stop music
@@ -2625,7 +2647,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.4 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.5 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
