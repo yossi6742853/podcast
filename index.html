@@ -359,7 +359,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div id="participants-mixer" style="margin-top:6px"></div>
             <div style="margin-top:6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
                 <button class="btn btn-sm btn-gold" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';navigator.clipboard.writeText(u).then(()=>this.innerHTML='\u2705')"><i class="bi bi-clipboard"></i> &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
-                <button class="btn btn-sm btn-green" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';const t='\u05D4\u05D9! \u05D1\u05D5\u05D0 \u05DC\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \uD83C\uDFA4\n'+u;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')"><i class="bi bi-whatsapp"></i> &#x05e9;&#x05dc;&#x05d7; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+                <button class="btn btn-sm btn-green" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';const t='\u05D4\u05D9! \u05D1\u05D5\u05D0 \u05DC\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \uD83C\uDFA4\n'+u;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')"><i class="bi bi-whatsapp"></i> &#x05e9;&#x05dc;&#x05d7;</button>
+                <button class="btn btn-sm btn-blue" onclick="showQR()" title="QR &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7;"><i class="bi bi-qr-code"></i></button>
             </div>
         </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
@@ -2159,9 +2160,20 @@ function updateParticipantsList(){
             html+='<button class="btn btn-sm btn-green" style="padding:1px 5px;font-size:0.65rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'unmute\'})" title="\u05D1\u05D8\u05DC"><i class="bi bi-mic"></i></button>';
             html+='<input type="range" min="0" max="200" value="100" style="flex:1;min-width:50px;height:4px" oninput="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'gain\',val:parseInt(this.value)})">';
             html+='<span style="font-size:0.6rem;color:var(--muted)">'+dur+'m</span>';
+            html+='<button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:0.7rem;opacity:0.4;padding:0 2px" onclick="if(confirm(\'\u05DC\u05E0\u05EA\u05E7 \u05D0\u05EA \'+\''+escHtml(p.name)+'\'+\'?\'))kickParticipant(\''+pid+'\')" title="\u05E0\u05EA\u05E7"><i class="bi bi-x-circle"></i></button>';
             html+='</div>';
         });
         mixer.innerHTML=html||'<div style="color:var(--muted);font-size:0.75rem;text-align:center">\u05D0\u05D9\u05DF \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD</div>';
+    }
+}
+// Kick a participant
+function kickParticipant(pid){
+    const p=participants.get(pid);
+    if(p){
+        if(p.conn&&p.conn.open)p.conn.close();
+        participants.delete(pid);updateParticipantsList();
+        dlog('Kicked: '+p.name,'warn');
+        addChatMsg('\u26D4',p.name+' \u05E0\u05D5\u05EA\u05E7 \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D4\u05DE\u05D0\u05E8\u05D7',false);
     }
 }
 // Send to specific participant
@@ -2184,6 +2196,20 @@ function hostCmd(cmd,val){
 function broadcastCmd(cmd,val){
     broadcast({type:'host_cmd',cmd:cmd,val:val?parseInt(val):undefined});
     dlog('Broadcast cmd: '+cmd+' to '+participants.size+' participants','ok');
+}
+
+// === QR CODE ===
+function showQR(){
+    const rid=document.getElementById('room-id').value;
+    if(!rid)return;
+    const url=location.origin+location.pathname+'?join='+rid+'&role=guest';
+    const qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(url);
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(5px)';
+    overlay.onclick=()=>overlay.remove();
+    overlay.innerHTML='<div style="background:white;padding:20px;border-radius:16px;text-align:center" onclick="event.stopPropagation()"><img src="'+qrUrl+'" alt="QR" style="width:200px;height:200px;border-radius:8px"><div style="color:#000;font-size:0.8rem;margin-top:8px;font-weight:700;font-family:Heebo">\u05E1\u05E8\u05D5\u05E7 \u05DC\u05D4\u05E6\u05D8\u05E8\u05E4\u05D5\u05EA</div><div style="color:#666;font-size:0.7rem;margin-top:4px;direction:ltr;word-break:break-all">'+url.substring(0,50)+'...</div></div><button class="btn btn-gold" style="margin-top:15px" onclick="this.parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button>';
+    document.body.appendChild(overlay);
+    dlog('QR code shown','ok');
 }
 
 // === BLUETOOTH MODE ===
@@ -2291,7 +2317,10 @@ function doDisconnect(){
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div><div style="color:var(--red);font-weight:700">'+recordingCount+'</div></div>'
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DC\u05D8\u05E0\u05E1\u05D9</div><div style="font-weight:700;color:'+(avgLatency<100?'var(--green)':'#f39c12')+'">'+avgLatency+'ms</div></div>'
             +'</div>'
-            +'<div style="text-align:center;margin-top:15px;display:flex;gap:8px;justify-content:center"><button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(\'\u05E1\u05D9\u05DB\u05D5\u05DD: '+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+score+'/100 '+stars+'\').then(()=>this.textContent=\'\u2705\')"><i class="bi bi-clipboard"></i> \u05D4\u05E2\u05EA\u05E7</button><button class="btn btn-gold" onclick="this.closest(\'div\').parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button></div>';
+            +'<div style="text-align:center;margin-top:15px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+            +'<button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(\'\u05E1\u05D9\u05DB\u05D5\u05DD: '+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | '+score+'/100 '+stars+'\').then(()=>this.textContent=\'\u2705\')"><i class="bi bi-clipboard"></i></button>'
+            +'<button class="btn btn-sm btn-green" onclick="window.open(\'https://wa.me/?text=\'+encodeURIComponent(\'\uD83C\uDFA4 \u05E1\u05D9\u05DB\u05D5\u05DD \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8\\n'+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA\\n'+score+'/100 '+stars+'\'),\'_blank\')"><i class="bi bi-whatsapp"></i></button>'
+            +'<button class="btn btn-gold" onclick="this.closest(\'div\').parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button></div>';
         document.body.appendChild(summaryCard);
         // Auto-dismiss after 10s
         setTimeout(()=>{if(summaryCard.isConnected)summaryCard.remove();},10000);
@@ -2865,7 +2894,7 @@ if (autoJoinCode) {
 const isGuestMode=urlParams.get('role')==='guest';
 if(isGuestMode){
     document.querySelector('h1').innerHTML='<i class="bi bi-mic-fill"></i> \u05D0\u05D5\u05E8\u05D7 \u05D1\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
-    document.querySelector('.subtitle').textContent='\u05D2\u05E8\u05E1\u05D4 \u05DE\u05E6\u05D5\u05DE\u05E6\u05DE\u05EA \u2014 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05E9\u05D5\u05DC\u05D8';
+    const sub=document.getElementById('app-subtitle')||document.querySelector('.subtitle');if(sub)sub.textContent='\u05D2\u05E8\u05E1\u05D4 \u05DE\u05E6\u05D5\u05DE\u05E6\u05DE\u05EA \u2014 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05E9\u05D5\u05DC\u05D8';
     // Hide host-only elements in room panel
     document.getElementById('btn-create')?.remove();
     // Hide host-only controls in studio (will apply when studio shows)
