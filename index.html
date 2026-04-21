@@ -194,7 +194,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.2 | 436</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.3 | 450</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -222,7 +222,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div id="room-status"></div>
         <div class="settings-row"><label><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</label><select id="mic-select"></select></div>
         <div class="settings-row"><label><i class="bi bi-camera-video"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;:</label><select id="cam-select"></select></div>
-        <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted)"><i class="bi bi-clock-history"></i> &#x05d0;&#x05d7;&#x05e8;&#x05d5;&#x05e0;&#x05d9;&#x05dd;: <span id="recent-rooms-list"></span></div>
+        <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap"><i class="bi bi-clock-history"></i> <span id="recent-rooms-list"></span><span onclick="localStorage.removeItem('podcast_recent_rooms');this.parentElement.style.display='none'" style="cursor:pointer;color:var(--red);opacity:0.5;font-size:0.65rem" title="&#x05e0;&#x05e7;&#x05d4;">&#x2715;</span></div>
         <div style="position:relative">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <span style="font-size:0.7rem;color:var(--muted);cursor:pointer" onclick="const dl=document.getElementById('debug-log');dl.style.display=dl.style.display==='none'?'block':'none'"><i class="bi bi-terminal"></i> &#x05dc;&#x05d5;&#x05d2;</span>
@@ -234,8 +234,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- STUDIO PANEL -->
     <div class="panel" id="panel-studio" style="display:none">
-        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value});const be=document.getElementById('banner-episode');if(be){be.textContent=this.value?'\uD83C\uDFA4 '+this.value:'';be.style.display=this.value?'inline':'none';}">
-        <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden;cursor:pointer;transition:max-height 0.3s,padding 0.3s" onclick="this.classList.toggle('collapsed');if(this.classList.contains('collapsed')){this.style.maxHeight='28px';this.style.padding='4px 20px';this.style.overflow='hidden';}else{this.style.maxHeight='none';this.style.padding='10px 20px';}">
+        <input id="episode-title" placeholder="&#x05e4;&#x05e8;&#x05e7; — &#x05dc;&#x05d7;&#x05e5; &#x05dc;&#x05e9;&#x05dd;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value});const be=document.getElementById('banner-episode');if(be){be.textContent=this.value?'\uD83C\uDFA4 '+this.value:'';be.style.display=this.value?'inline':'none';}">
+        <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden;cursor:pointer;transition:max-height 0.3s,padding 0.3s" onclick="this.classList.toggle('collapsed');if(this.classList.contains('collapsed')){this.style.maxHeight='24px';this.style.padding='3px 20px';this.style.overflow='hidden';this.style.fontSize='0.7rem';this.style.justifyContent='flex-start';}else{this.style.maxHeight='none';this.style.padding='10px 20px';this.style.fontSize='';this.style.justifyContent='center';}">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
             <span style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite"><i class="bi bi-soundwave"></i></span>
@@ -441,7 +441,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 449 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 450 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -450,7 +450,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <h2 style="color:var(--gold);margin-bottom:15px">&#x05e2;&#x05d6;&#x05e8;&#x05d4; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d4;</h2>
         <div style="columns:2;column-gap:30px">
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
-            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
+            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
             &#x2022; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; 24kHz &#x05d3;&#x05e8;&#x05da; Data Channel<br>
             &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV + WebM<br>
@@ -470,13 +470,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             4. &#x05e8;&#x05e2;&#x05e0;&#x05df; &#x05d5;&#x05e0;&#x05e1;&#x05d4; &#x05e9;&#x05d5;&#x05d1;
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v9.2:</b><br>
-            &#x2022; &#x05e1;&#x05d9;&#x05e0;&#x05db;&#x05e8;&#x05d5;&#x05df; &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; &#x05d1;&#x05d9;&#x05df; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd;<br>
-            &#x2022; &#x05e1;&#x05d9;&#x05db;&#x05d5;&#x05dd; &#x05e1;&#x05e9;&#x05df; &#x05d5;&#x05d9;&#x05d6;&#x05d5;&#x05d0;&#x05dc;&#x05d9; &#x05e2;&#x05dd; &#x05db;&#x05d5;&#x05db;&#x05d1;&#x05d9;&#x05dd;<br>
-            &#x2022; &#x05e1;&#x05e3; &#x05e8;&#x05e2;&#x05e9; &#x05de;&#x05ea;&#x05db;&#x05d5;&#x05d5;&#x05e0;&#x05df; + &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d5;&#x05ea;<br>
-            &#x2022; &#x05d0;&#x05d5;&#x05d5;&#x05d8;&#x05e8;&#x05d9;&#x05dd; &#x05e2;&#x05dd; &#x05e8;&#x05d0;&#x05e9;&#x05d9; &#x05ea;&#x05d9;&#x05d1;&#x05d5;&#x05ea;<br>
-            &#x2022; &#x05e1;&#x05e4;&#x05d9;&#x05e8;&#x05ea; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; 3-2-1 &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>
-            &#x2022; &#x05d4;&#x05ea;&#x05e8;&#x05d0;&#x05d5;&#x05ea; &#x05d3;&#x05e4;&#x05d3;&#x05e4;&#x05df; &#x05dc;&#x05e6;&#x05d0;&#x05d8;
+            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v9.3:</b><br>
+            &#x2022; PiP (&#x05ea;&#x05de;&#x05d5;&#x05e0;&#x05d4; &#x05d1;&#x05ea;&#x05d5;&#x05da; &#x05ea;&#x05de;&#x05d5;&#x05e0;&#x05d4;) &#x05dc;&#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5; &#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;<br>
+            &#x2022; &#x05de;&#x05d2;&#x05d1;&#x05d9;&#x05dc; &#x05e8;&#x05db;&#x05da; (soft limiter)<br>
+            &#x2022; &#x05d7;&#x05d3;&#x05e8;&#x05d9;&#x05dd; &#x05d0;&#x05d7;&#x05e8;&#x05d5;&#x05e0;&#x05d9;&#x05dd; + &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;<br>
+            &#x2022; &#x05d4;&#x05ea;&#x05e8;&#x05d0;&#x05d5;&#x05ea; &#x05d3;&#x05e4;&#x05d3;&#x05e4;&#x05df; + &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05ea; &#x05d0;&#x05d5;&#x05e4;&#x05dc;&#x05d9;&#x05d9;&#x05df;<br>
+            &#x2022; &#x05db;&#x05e4;&#x05ea;&#x05d5;&#x05e8; &#x05d8;&#x05e1;&#x05d8; S + &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; G<br>
+            &#x2022; &#x05e1;&#x05e3; &#x05e8;&#x05e2;&#x05e9; + &#x05d6;&#x05de;&#x05df; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05de;&#x05ea;&#x05db;&#x05d5;&#x05d5;&#x05e0;&#x05d9;&#x05dd;
         </div>
         <div style="margin-top:15px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
@@ -956,6 +956,9 @@ function showConnected() {
     document.getElementById('label-local').textContent = userName;
     document.getElementById('banner-local').textContent = userName + (isHost?' (\u05DE\u05D0\u05E8\u05D7)':' (\u05D0\u05D5\u05E8\u05D7)');
     document.getElementById('remote-no-vid').style.display = 'block';
+    // Auto-fill episode title with date if empty
+    const et2=document.getElementById('episode-title');
+    if(et2&&!et2.value){const d=new Date();et2.value='\u05E4\u05E8\u05E7 '+d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});et2.dispatchEvent(new Event('input'));}
     // Avatar initials
     const initials=userName.substring(0,2);
     const lb=document.getElementById('local-box');
@@ -2110,7 +2113,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.2 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.3 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
