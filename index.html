@@ -209,7 +209,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.1 | 485</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 500</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -568,8 +568,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
-    <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,100+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 494 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 50+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 495 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+    <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 500 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; &#x1f389;
     </div>
 </div>
 
@@ -597,7 +597,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             4. &#x05e8;&#x05e2;&#x05e0;&#x05df; &#x05d5;&#x05e0;&#x05e1;&#x05d4; &#x05e9;&#x05d5;&#x05d1;
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10:</b><br>
+            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10.2 &#x1f389; &#x05e1;&#x05d1;&#x05d1; 500:</b><br>
             &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd; + &#x05de;&#x05d9;&#x05e7;&#x05e1;&#x05e8;<br>
             &#x2022; &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05d0;&#x05d5;&#x05dc;&#x05e4;&#x05df; (HPF+De-esser+Presence)<br>
             &#x2022; QR &#x05dc;&#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;<br>
@@ -1195,6 +1195,10 @@ function showConnected() {
     showStatus('studio-status', '\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 S \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5, R \u05DC\u05D4\u05E7\u05DC\u05D8\u05D4', 'success');
     playConnectSound();
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('connected-glow'));
+    // Connection celebration
+    if(!window._connCelebrated){window._connCelebrated=true;
+        ['\uD83C\uDFA4','\u2705','\uD83C\uDFB5','\uD83C\uDF89'].forEach((e,i)=>{const f=document.createElement('div');f.textContent=e;f.style.cssText='position:fixed;bottom:40%;left:'+(20+i*20)+'%;font-size:2.5rem;z-index:300;pointer-events:none;animation:floatUp '+(1.2+i*0.3)+'s ease-out forwards';document.body.appendChild(f);setTimeout(()=>f.remove(),2000);});
+    }
     // Notify if tab is background
     if(document.hidden&&Notification.permission==='granted'){
         try{new Notification('\u05D4\u05D0\u05D5\u05E8\u05D7 \u05D4\u05EA\u05D7\u05D1\u05E8!',{body:'\u05D4\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \u05DE\u05D5\u05DB\u05DF',icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><text y="14" font-size="14">\uD83C\uDFA4</text></svg>',tag:'podcast-connect'});}catch(e){}
@@ -2983,7 +2987,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.2 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
