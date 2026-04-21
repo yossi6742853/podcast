@@ -580,7 +580,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 510 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 512 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -813,10 +813,12 @@ function setupDataConn(c) {
             showStatus('studio-status','\u2705 \u05D7\u05D9\u05D1\u05D5\u05E8 \u05D7\u05D5\u05D3\u05E9! \u05E9\u05DE\u05E2 \u05E4\u05E2\u05D9\u05DC.','success');
             toast('\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9!',2000);
         }
-        // Start latency ping
-        allIntervals.push(setInterval(() => {
+        // Start latency ping (clear old one first to prevent piling)
+        if(window._pingInterval){clearInterval(window._pingInterval);const idx=allIntervals.indexOf(window._pingInterval);if(idx>-1)allIntervals.splice(idx,1);}
+        window._pingInterval=setInterval(() => {
             if (conn && conn.open) {conn.send({type: 'ping', t: Date.now()});pingsSent++;}
-        }, 3000));
+        }, 3000);
+        allIntervals.push(window._pingInterval);
     });
     let reconnectAttempts = 0;
     c.on('close', function() {
@@ -834,6 +836,10 @@ function setupDataConn(c) {
             setTimeout(() => {
                 if (!conn || !conn.open) {
                     dlog('Auto-reconnect #'+reconnectAttempts+'...', 'warn');
+                    // Reset audio processor for fresh start
+                    if(relayProcessor){try{relayProcessor.disconnect();}catch(e){}}relayProcessor=null;
+                    jitterBuf=[];playbackStarted=false;nextPlayTime=0;lastSeq=-1;
+                    if(remoteAudioCtx){try{remoteAudioCtx.close();}catch(e){}}remoteAudioCtx=null;remoteGainNode=null;remoteSR=0;
                     const remoteId = document.getElementById('room-id').value;
                     if (remoteId && peer && !peer.destroyed) {
                         const newConn = peer.connect(remoteId, {reliable: true, serialization: 'binary'});
@@ -1137,7 +1143,9 @@ function playRemoteAudio(samples, seq, sr) {
     for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 32768;
 
     bytesReceived += float32.byteLength + 10;audioChunksIn++;lastAudioTime=Date.now();
-    if(audioChunksIn===1){dlog('First audio received! sr='+(sr||'?'),'ok');showStatus('studio-status','\u05D0\u05D5\u05D3\u05D9\u05D5 \u05D6\u05D5\u05E8\u05DD! \u2705','success');}
+    if(audioChunksIn===1){dlog('First audio received! sr='+(sr||'?'),'ok');showStatus('studio-status','\u05D0\u05D5\u05D3\u05D9\u05D5 \u05D6\u05D5\u05E8\u05DD! \u2705','success');toast('\uD83D\uDD0A \u05E9\u05DE\u05E2 \u05E4\u05E2\u05D9\u05DC!',2000);}
+    // Detect audio resume after gap (reconnect)
+    if(lastAudioTime>0&&Date.now()-lastAudioTime>5000&&audioChunksIn>10){dlog('Audio resumed after gap','ok');toast('\uD83D\uDD0A \u05E9\u05DE\u05E2 \u05D7\u05D6\u05E8!',1500);}
     // Save for recording if active
     if (isRecording && !isPaused) recRemoteChunks.push(float32.slice());
 
