@@ -220,7 +220,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div id="mic-test-level" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#f39c12,var(--red));border-radius:6px;transition:width 0.05s"></div>
         </div>
         <div id="room-status"></div>
-        <div class="settings-row"><label><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</label><select id="mic-select"></select></div>
+        <div class="settings-row"><label><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</label><select id="mic-select" onchange="if(isConnected)switchMicLive()"></select></div>
         <div class="settings-row"><label><i class="bi bi-camera-video"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;:</label><select id="cam-select"></select></div>
         <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap"><i class="bi bi-clock-history"></i> <span id="recent-rooms-list"></span><span onclick="localStorage.removeItem('podcast_recent_rooms');this.parentElement.style.display='none'" style="cursor:pointer;color:var(--red);opacity:0.5;font-size:0.65rem" title="&#x05e0;&#x05e7;&#x05d4;">&#x2715;</span></div>
         <div style="position:relative">
@@ -349,6 +349,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
                     <span style="font-size:0.8rem;color:var(--gold);font-weight:700"><i class="bi bi-chat-square-text"></i> &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9;</span>
                     <button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(document.getElementById('transcript-text').textContent).then(()=>showStatus('studio-status','\u05EA\u05DE\u05DC\u05D5\u05DC \u05D4\u05D5\u05E2\u05EA\u05E7!','success'))" style="padding:3px 8px"><i class="bi bi-clipboard"></i></button>
+                    <button class="btn btn-sm btn-gold" onclick="exportTranscript()" style="padding:3px 8px"><i class="bi bi-download"></i></button>
                 </div>
                 <div id="transcript-text" style="max-height:120px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:0.85rem;color:var(--text);direction:rtl;line-height:1.6"></div>
             </div>
@@ -1011,6 +1012,9 @@ function showConnected() {
         const el = document.getElementById('timer');
         if (!isRecording && connStartTime) {
             el.textContent = fmtTime(Date.now() - connStartTime);
+            // Update tab title with connection time
+            const epT=document.getElementById('episode-title')?.value;
+            document.title=(epT?'\u2705 '+epT:'\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8')+' \u2022 '+fmtTime(Date.now()-connStartTime);
         }
         // Stats bar
         const sb = document.getElementById('stats-bar');
@@ -1546,6 +1550,17 @@ function toggleTranscription(){
     dlog('Transcription started (he-IL)','ok');
 }
 
+function exportTranscript(){
+    const txt=document.getElementById('transcript-text');
+    if(!txt||!txt.textContent.trim()){dlog('No transcript','warn');return;}
+    const epTitle=document.getElementById('episode-title')?.value||'';
+    const blob=new Blob([txt.textContent],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=(epTitle||'\u05EA\u05DE\u05DC\u05D5\u05DC')+'_'+new Date().toISOString().slice(0,10)+'.txt';
+    a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    dlog('Transcript exported','ok');
+}
+
 function applyEQPreset(preset){
     const presets={voice:{bass:3,treble:2,nr:true},warm:{bass:6,treble:-3,nr:false},bright:{bass:-2,treble:8,nr:true}};
     const p=presets[preset];if(!p)return;
@@ -1675,25 +1690,46 @@ function exportChat(){
 }
 
 // === NOTIFICATION SOUNDS ===
+let _beepCtx=null;
 function playBeep(freq, duration, vol) {
     try {
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        if(!_beepCtx||_beepCtx.state==='closed')_beepCtx=new AudioContext();
+        if(_beepCtx.state==='suspended')_beepCtx.resume();
+        const osc = _beepCtx.createOscillator();
+        const gain = _beepCtx.createGain();
         osc.type = 'sine';
         osc.frequency.value = freq || 800;
         gain.gain.value = vol || 0.15;
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(_beepCtx.destination);
         osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.3));
-        osc.stop(ctx.currentTime + (duration || 0.3));
+        gain.gain.exponentialRampToValueAtTime(0.001, _beepCtx.currentTime + (duration || 0.3));
+        osc.stop(_beepCtx.currentTime + (duration || 0.3));
     } catch(e) {}
 }
 function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900, 0.2), 150); }
 function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
 function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.15), 150); }
+
+// === LIVE MIC SWITCH ===
+async function switchMicLive(){
+    const micId=document.getElementById('mic-select').value;
+    if(!micId)return;
+    try{
+        const newStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:micId},echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+        // Replace audio track in localStream
+        const oldTrack=localStream.getAudioTracks()[0];
+        if(oldTrack)oldTrack.stop();
+        localStream.removeTrack(oldTrack);
+        localStream.addTrack(newStream.getAudioTracks()[0]);
+        // Reconnect audio chain
+        if(relayProcessor){relayProcessor.disconnect();relayProcessor=null;}
+        startAudioRelay();
+        dlog('Mic switched live: '+micId.substring(0,8)+'...','ok');
+        showStatus('studio-status','\uD83C\uDF99 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u05D4\u05D5\u05D7\u05DC\u05E3!','success');
+    }catch(e){dlog('Mic switch error: '+e.message,'err');}
+}
 
 // === QUICK RECONNECT ===
 function quickReconnect(){
@@ -2069,9 +2105,12 @@ function copyDebugLog(){
     navigator.clipboard.writeText(log.innerText).then(()=>dlog('Log copied to clipboard','ok')).catch(()=>{});
 }
 function clearDownloads() {
+    const count=document.querySelectorAll('#downloads .download-item').length;
+    if(count>0&&!confirm('\u05DC\u05DE\u05D7\u05D5\u05E7 '+count+' \u05E7\u05D1\u05E6\u05D9\u05DD?'))return;
     const dl = document.getElementById('downloads');
     dl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);opacity:0.5"><i class="bi bi-record-circle" style="font-size:2rem;display:block;margin-bottom:8px"></i>\u05DC\u05D7\u05E5 "\u05D4\u05EA\u05D7\u05DC \u05D4\u05E7\u05DC\u05D8\u05D4" \u05D0\u05D5 R \u05DC\u05D4\u05EA\u05D7\u05DC\u05D4</div>';
-    dlog('Downloads cleared', 'ok');
+    const rs=document.getElementById('rec-summary');if(rs)rs.style.display='none';
+    dlog('Downloads cleared ('+count+' files)', 'ok');
 }
 
 function exportChaptersYT(){
