@@ -336,6 +336,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-green" onclick="exportSessionLog()"><i class="bi bi-journal-text"></i> &#x05d9;&#x05d5;&#x05de;&#x05df;</button>
                 <button class="btn btn-sm btn-green" onclick="copySessionLog()" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05d9;&#x05d5;&#x05de;&#x05df;"><i class="bi bi-clipboard-check"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="copyDebugLog()"><i class="bi bi-clipboard"></i> &#x05dc;&#x05d5;&#x05d2;</button>
+                <button class="btn btn-sm btn-gold" onclick="toggleTranscription()" id="btn-transcribe" title="&#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9; (Web Speech API)"><i class="bi bi-chat-square-text"></i> &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc;</button>
                 <button class="btn btn-sm btn-gold" onclick="downloadAll()"><i class="bi bi-download"></i> &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;</button>
                 <button class="btn btn-sm btn-red" onclick="clearDownloads()"><i class="bi bi-trash"></i> &#x05e0;&#x05e7;&#x05d4;</button>
                 <span style="color:var(--muted);font-size:0.8rem"><i class="bi bi-info-circle"></i> WebM + WAV</span>
@@ -343,6 +344,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div style="position:relative">
                 <textarea id="episode-notes" placeholder="&#x05d4;&#x05e2;&#x05e8;&#x05d5;&#x05ea; &#x05dc;&#x05e4;&#x05e8;&#x05e7;... (&#x05e0;&#x05e9;&#x05de;&#x05e8; &#x05d1;&#x05d9;&#x05d5;&#x05de;&#x05df;)" style="width:100%;min-height:50px;margin-top:8px;padding:8px 8px 20px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.85rem;resize:vertical" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px';document.getElementById('notes-count').textContent=this.value.trim().split(/\s+/).filter(w=>w).length+' \u05DE\u05D9\u05DC\u05D9\u05DD'"></textarea>
                 <span id="notes-count" style="position:absolute;bottom:6px;left:8px;font-size:0.6rem;color:var(--muted);opacity:0.5">0 &#x05de;&#x05d9;&#x05dc;&#x05d9;&#x05dd;</span>
+            </div>
+            <div id="transcription-area" style="display:none;margin-top:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                    <span style="font-size:0.8rem;color:var(--gold);font-weight:700"><i class="bi bi-chat-square-text"></i> &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9;</span>
+                    <button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(document.getElementById('transcript-text').textContent).then(()=>showStatus('studio-status','\u05EA\u05DE\u05DC\u05D5\u05DC \u05D4\u05D5\u05E2\u05EA\u05E7!','success'))" style="padding:3px 8px"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div id="transcript-text" style="max-height:120px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:0.85rem;color:var(--text);direction:rtl;line-height:1.6"></div>
             </div>
         </div>
 
@@ -1503,9 +1511,41 @@ function setMicGain(v){if(micGainNode)micGainNode.gain.value=v/100;document.getE
 // === STEREO PAN ===
 let panNode=null;
 function setPan(v){
+    v=parseInt(v);if(Math.abs(v)<=5){v=0;document.getElementById('stereo-pan').value=0;} // snap to center
     document.getElementById('pan-val').textContent=v>0?'R'+v:v<0?'L'+Math.abs(v):'C';
     if(panNode)panNode.pan.value=v/100;
 }
+// === LIVE TRANSCRIPTION (Web Speech API) ===
+let speechRec=null,isTranscribing=false;
+function toggleTranscription(){
+    if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+        dlog('Speech API not supported','err');showStatus('studio-status','\u05EA\u05DE\u05DC\u05D5\u05DC \u05DC\u05D0 \u05E0\u05EA\u05DE\u05DA \u05D1\u05D3\u05E4\u05D3\u05E4\u05DF \u05D6\u05D4','error');return;
+    }
+    const btn=document.getElementById('btn-transcribe'),area=document.getElementById('transcription-area');
+    if(isTranscribing){
+        isTranscribing=false;if(speechRec)speechRec.stop();
+        btn.innerHTML='<i class="bi bi-chat-square-text"></i> \u05EA\u05DE\u05DC\u05D5\u05DC';btn.classList.remove('btn-rec-active');
+        dlog('Transcription stopped','ok');return;
+    }
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    speechRec=new SR();speechRec.continuous=true;speechRec.interimResults=true;speechRec.lang='he-IL';
+    const txt=document.getElementById('transcript-text');
+    area.style.display='block';
+    speechRec.onresult=function(e){
+        let final='',interim='';
+        for(let i=e.resultIndex;i<e.results.length;i++){
+            if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';
+            else interim=e.results[i][0].transcript;
+        }
+        if(final){const span=document.createElement('span');span.textContent=final;txt.appendChild(span);txt.scrollTop=txt.scrollHeight;}
+    };
+    speechRec.onerror=function(e){dlog('Speech: '+e.error,'warn');if(e.error==='not-allowed')showStatus('studio-status','\u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u05E0\u05D3\u05D7\u05EA\u05D4 \u05DC\u05EA\u05DE\u05DC\u05D5\u05DC','error');};
+    speechRec.onend=function(){if(isTranscribing)speechRec.start();}; // auto-restart
+    speechRec.start();isTranscribing=true;
+    btn.innerHTML='<i class="bi bi-chat-square-text"></i> \u05E2\u05D5\u05E6\u05E8';btn.classList.add('btn-rec-active');
+    dlog('Transcription started (he-IL)','ok');
+}
+
 function applyEQPreset(preset){
     const presets={voice:{bass:3,treble:2,nr:true},warm:{bass:6,treble:-3,nr:false},bright:{bass:-2,treble:8,nr:true}};
     const p=presets[preset];if(!p)return;
@@ -1540,8 +1580,11 @@ function toggleNoiseReduction() {
 // === EQ (Bass/Treble for remote audio) ===
 let eqBass = null, eqTreble = null;
 function updateEQ() {
-    const bv = parseInt(document.getElementById('eq-bass').value);
-    const tv = parseInt(document.getElementById('eq-treble').value);
+    let bv = parseInt(document.getElementById('eq-bass').value);
+    let tv = parseInt(document.getElementById('eq-treble').value);
+    // Snap to zero when within ±1
+    if(Math.abs(bv)<=1){bv=0;document.getElementById('eq-bass').value=0;}
+    if(Math.abs(tv)<=1){tv=0;document.getElementById('eq-treble').value=0;}
     document.getElementById('eq-bass-val').textContent = bv + ' dB';
     document.getElementById('eq-treble-val').textContent = tv + ' dB';
     if (eqBass) eqBass.gain.value = bv;
@@ -1568,7 +1611,8 @@ function addTopic(text=''){
     const n=topicCount;
     const hints=['\u05E4\u05EA\u05D9\u05D7\u05D4...','\u05E0\u05D5\u05E9\u05D0 \u05E8\u05D0\u05E9\u05D5\u05DF...','\u05E0\u05D5\u05E9\u05D0 \u05E9\u05E0\u05D9...','\u05E0\u05D5\u05E9\u05D0 \u05E0\u05D5\u05E1\u05E3...'];
     const ph=n<=hints.length?hints[n-1]:'\u05E0\u05D5\u05E9\u05D0 '+n+'...';
-    item.innerHTML='<span class="num" onclick="setCurrentTopic('+n+')" title="\u05DC\u05D7\u05E5 \u05DC\u05D4\u05D2\u05D3\u05D9\u05E8 \u05DB\u05E0\u05D5\u05DB\u05D7\u05D9">'+n+'</span><input placeholder="'+ph+'" value="'+(text||'')+'" onkeydown="if(event.key===\'Enter\')addTopic()"><span class="done" onclick="toggleTopic('+n+')" title="\u05E1\u05D9\u05D9\u05DD"><i class="bi bi-check-circle"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',-1)" title="\u05DC\u05DE\u05E2\u05DC\u05D4"><i class="bi bi-chevron-up"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',1)" title="\u05DC\u05DE\u05D8\u05D4"><i class="bi bi-chevron-down"></i></span><span style="color:var(--red);cursor:pointer;font-size:0.9rem;margin-right:4px" onclick="removeTopic('+n+')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></span>';
+    const safeText=(text||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    item.innerHTML='<span class="num" onclick="setCurrentTopic('+n+')" title="\u05DC\u05D7\u05E5 \u05DC\u05D4\u05D2\u05D3\u05D9\u05E8 \u05DB\u05E0\u05D5\u05DB\u05D7\u05D9">'+n+'</span><input placeholder="'+ph+'" value="'+safeText+'" onkeydown="if(event.key===\'Enter\')addTopic()"><span class="done" onclick="toggleTopic('+n+')" title="\u05E1\u05D9\u05D9\u05DD"><i class="bi bi-check-circle"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',-1)" title="\u05DC\u05DE\u05E2\u05DC\u05D4"><i class="bi bi-chevron-up"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',1)" title="\u05DC\u05DE\u05D8\u05D4"><i class="bi bi-chevron-down"></i></span><span style="color:var(--red);cursor:pointer;font-size:0.9rem;margin-right:4px" onclick="removeTopic('+n+')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></span>';
     list.appendChild(item);item.querySelector('input').focus();
 }
 function toggleTopic(n){const el=document.getElementById('topic-'+n);if(el)el.classList.toggle('completed');updateTopicBadge();}
