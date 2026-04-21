@@ -191,7 +191,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <p class="subtitle">&#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; + &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5; &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x2022; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05d4; &#x2022; &#x05e6;&#x05d0;&#x05d8; &#x2022; &#x05e1;&#x05d9;&#x05de;&#x05e0;&#x05d9;&#x05dd;</p>
 
     <!-- ROOM PANEL -->
-    <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr">
+    <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s">
         <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
@@ -1044,6 +1044,7 @@ function showConnected() {
         // Stats bar
         const sb = document.getElementById('stats-bar');
         sb.style.display = 'block';
+        sb.style.borderColor=isRecording?'var(--red)':'var(--border)';
         const ct=connStartTime?fmtTime(Date.now()-connStartTime):'--';
         document.getElementById('conn-time-stat').textContent = ct;
         const bt=document.getElementById('banner-time');
@@ -1088,7 +1089,7 @@ function showConnected() {
         }
         // Stale connection check
         if(lastPongTime>0&&Date.now()-lastPongTime>15000){
-            showStatus('studio-status','\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05D0 \u05D9\u05E6\u05D9\u05D1 \u05DB\u05D1\u05E8 15 \u05E9\u05E0\u05D9\u05D5\u05EA','error');
+            showStatus('studio-status','\u05D7\u05D9\u05D1\u05D5\u05E8 \u05DC\u05D0 \u05D9\u05E6\u05D9\u05D1 15s <button class="btn btn-sm btn-green" onclick="quickReconnect()" style="margin-right:4px"><i class="bi bi-arrow-repeat"></i></button>','error');
             const badge=document.getElementById('latency-badge');if(badge)badge.className='disconnected';
         }
     }, 1000));
@@ -1363,12 +1364,14 @@ function startRecording(){
     }
 }
 function stopRecording(){
-    isRecording=false;clearInterval(timerInterval);if(autoSaveInterval)clearInterval(autoSaveInterval);recordingCount++;
+    if(!isRecording){dlog('stopRecording called but not recording','warn');return;}
+    isRecording=false;isPaused=false;clearInterval(timerInterval);if(autoSaveInterval)clearInterval(autoSaveInterval);recordingCount++;
     const silences=silenceSegments.length;
-    recLog.push({event:'stop',time:new Date().toLocaleTimeString(),recNum:recordingCount,duration:fmtTime(Date.now()-recStartTime),silences:silences});
-    const dur=fmtTime(Date.now()-recStartTime);
+    const dur=recStartTime?fmtTime(Date.now()-recStartTime):'00:00:00';
+    recLog.push({event:'stop',time:new Date().toLocaleTimeString(),recNum:recordingCount,duration:dur,silences:silences});
 
     // 1. Save local mic as WebM (Opus, high quality)
+    if(!mediaRecLocal||mediaRecLocal.state==='inactive'){dlog('No active MediaRecorder to stop','warn');return;}
     const sL=new Promise(r=>{mediaRecLocal.onstop=()=>r(new Blob(chunksLocal,{type:'audio/webm'}));mediaRecLocal.stop();});
     const dateTag=new Date().toISOString().slice(0,10);
     const epT=document.getElementById('episode-title')?.value?.trim().replace(/[^\w\u0590-\u05FF]/g,'').substring(0,20)||'';
@@ -1900,6 +1903,10 @@ function doDisconnect(){
         if(recordingCount>0){try{exportSessionLog();dlog('Session log auto-exported','ok');}catch(e){}}
     }
     if(isRecording)stopRecording();
+    // Stop transcription if active
+    if(isTranscribing){try{speechRec.stop();}catch(e){}isTranscribing=false;}
+    // Stop music
+    const mp2=document.getElementById('musicPlayer');if(mp2&&!mp2.paused)mp2.pause();
     if(autoSaveInterval){clearInterval(autoSaveInterval);autoSaveInterval=null;}
     if(relayProcessor){relayProcessor.disconnect();relayProcessor=null;}
     if(activeCall){activeCall.close();activeCall=null;}
@@ -2359,9 +2366,17 @@ if(location.protocol==='https:'||location.hostname.includes('github.io')){
 }
 // Check connectivity with latency
 const pjsStart=Date.now();
-fetch('https://0.peerjs.com/').then(r=>{const lat=Date.now()-pjsStart;if(r.ok)dlog('PeerJS: \u2705 ('+lat+'ms)','ok');else dlog('PeerJS: \u274C '+r.status,'err');}).catch(e=>dlog('PeerJS: \u274C \u05D7\u05E1\u05D5\u05DD!','err'));
+let _readyChecks=0;
+fetch('https://0.peerjs.com/').then(r=>{const lat=Date.now()-pjsStart;if(r.ok){dlog('PeerJS: \u2705 ('+lat+'ms)','ok');_readyChecks++;}else dlog('PeerJS: \u274C '+r.status,'err');updateReadiness();}).catch(e=>{dlog('PeerJS: \u274C \u05D7\u05E1\u05D5\u05DD!','err');updateReadiness();});
 // Check WebRTC support
-if(window.RTCPeerConnection)dlog('WebRTC: \u2705','ok');else dlog('WebRTC: \u274C \u05DC\u05D0 \u05E0\u05EA\u05DE\u05DA','err');
+if(window.RTCPeerConnection){dlog('WebRTC: \u2705','ok');_readyChecks++;}else dlog('WebRTC: \u274C \u05DC\u05D0 \u05E0\u05EA\u05DE\u05DA','err');
+// Check mic permission
+navigator.mediaDevices.enumerateDevices().then(d=>{if(d.some(x=>x.kind==='audioinput'))_readyChecks++;updateReadiness();}).catch(()=>{});
+function updateReadiness(){
+    const rs=document.getElementById('room-status');
+    if(_readyChecks>=3)showStatus('room-status','\u2705 \u05D4\u05DB\u05DC \u05DE\u05D5\u05DB\u05DF! \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u05D0\u05D5 \u05D4\u05E6\u05D8\u05E8\u05E3','success');
+    else if(_readyChecks>=1)showStatus('room-status','\u26A0 \u05D1\u05D3\u05D9\u05E7\u05D4... ('+_readyChecks+'/3)','waiting');
+}
 
 // Restore last used name from localStorage
 try{
