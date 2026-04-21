@@ -79,7 +79,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .video-box:hover .avatar-initials{opacity:0.9;transform:translate(-50%,-50%) scale(1.05)}
 .avatar-initials.me{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(212,175,55,0.1));color:var(--gold);border:2px solid rgba(212,175,55,0.3)}
 .avatar-initials.remote{background:linear-gradient(135deg,rgba(41,128,185,0.3),rgba(41,128,185,0.1));color:var(--blue);border:2px solid rgba(41,128,185,0.3)}
-.meter-box{text-align:center;max-width:60px}
+.meter-box{text-align:center;max-width:60px;transition:transform 0.2s}
+.meter-box:hover{transform:scale(1.05)}
 .meter-bar-wrap{height:60px;width:20px;background:var(--bg);border-radius:10px;margin:0 auto;position:relative;overflow:hidden;border:2px solid var(--border);box-shadow:inset 0 2px 6px rgba(0,0,0,0.3)}
 .meter-bar{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,var(--green) 0%,var(--green) 50%,#f39c12 75%,var(--red) 100%);border-radius:0 0 8px 8px;transition:height 0.06s ease-out}
 .meter-peak{position:absolute;width:100%;height:2px;background:var(--gold);transition:bottom 0.08s;box-shadow:0 0 6px var(--gold)}
@@ -210,7 +211,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 500</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 514</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -580,7 +581,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 513 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 514 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1995,8 +1996,9 @@ function updateEQ() {
     // Snap to zero when within ±1
     if(Math.abs(bv)<=1){bv=0;document.getElementById('eq-bass').value=0;}
     if(Math.abs(tv)<=1){tv=0;document.getElementById('eq-treble').value=0;}
-    document.getElementById('eq-bass-val').textContent = bv + ' dB';
-    document.getElementById('eq-treble-val').textContent = tv + ' dB';
+    const bvEl=document.getElementById('eq-bass-val'),tvEl=document.getElementById('eq-treble-val');
+    bvEl.textContent = bv + ' dB';bvEl.style.color=bv>0?'var(--green)':bv<0?'var(--red)':'var(--muted)';
+    tvEl.textContent = tv + ' dB';tvEl.style.color=tv>0?'var(--green)':tv<0?'var(--red)':'var(--muted)';
     if (eqBass) eqBass.gain.value = bv;
     if (eqTreble) eqTreble.gain.value = tv;
 }
