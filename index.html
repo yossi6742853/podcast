@@ -174,7 +174,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <div id="latency-badge"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
         <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v8.1 | 380+</span></div>
-        <div id="share-url-bar" style="display:none;margin-bottom:8px;padding:6px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='\u05D4\u05D5\u05E2\u05EA\u05E7!')">
+        <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
+            <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
             <div style="display:flex;align-items:center;gap:6px"><span style="background:var(--gold);color:#000;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900">1</span><b style="color:var(--gold)">&#x05de;&#x05d0;&#x05e8;&#x05d7;</b> &#x05e6;&#x05d5;&#x05e8; &#x05d7;&#x05d3;&#x05e8; &#x2192; &#x05e9;&#x05dc;&#x05d7; &#x05e7;&#x05d5;&#x05d3;</div>
@@ -375,7 +376,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v8.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 365+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.0 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 395+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1694,11 +1695,7 @@ addTopic();addTopic();addTopic();
 // Welcome message
 dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v8.1 ===','ok');
 dlog('\u05D1\u05D3\u05D5\u05E7 \u05DE\u05D9\u05E7 \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
-if(location.protocol==='http:'||location.protocol==='https:'){
-    dlog('\u05E9\u05E8\u05EA: '+location.href,'ok');
-    const sub=document.getElementById('share-url-bar');
-    if(sub){sub.style.display='block';sub.innerHTML='<i class="bi bi-link-45deg"></i> '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>';}
-}
+dlog('\u05E7\u05D9\u05E9\u05D5\u05E8: '+location.href,'ok');
 
 // Restore last used name from localStorage
 try{
