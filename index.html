@@ -97,6 +97,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .rec-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .rec-dot{width:12px;height:12px;border-radius:50%;background:var(--red);display:inline-block;animation:recBlink 1s infinite}
 @keyframes recBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-200px) scale(1.5)}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.1)}}
 .btn:active{transform:scale(0.95)!important}
 .btn{position:relative;overflow:hidden}
@@ -631,6 +632,8 @@ function setupDataConn(c) {
                 dlog('\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E1\u05D5\u05E0\u05DB\u05E8\u05E0\u05D5 ('+d.topics.length+')','ok');
                 showStatus('studio-status','\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E2\u05D5\u05D3\u05DB\u05E0\u05D5 \u05DE\u05D4\u05DE\u05D0\u05E8\u05D7','success');
             }
+        } else if (d.type === 'sfx') {
+            window._sfxFromRemote=true;playSFX(d.sfx);window._sfxFromRemote=false;
         } else if (d.type === 'episode_title') {
             const et=document.getElementById('episode-title');
             if(et&&d.title){et.value=d.title;document.title='\u2705 '+d.title+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';dlog('\u05E9\u05DD \u05E4\u05E8\u05E7: '+d.title,'ok');}
@@ -1259,6 +1262,7 @@ function pauseRecording(){
         btn.className='btn btn-sm btn-green';
         showStatus('studio-status','\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DE\u05D5\u05E9\u05D4\u05D9\u05EA','waiting');
         document.getElementById('timer').classList.replace('recording','paused');
+        try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23f39c12'/><rect x='5' y='4' width='2' height='8' fill='white' rx='1'/><rect x='9' y='4' width='2' height='8' fill='white' rx='1'/></svg>";}catch(e){}
         playBeep(600,0.1);setTimeout(()=>playBeep(400,0.15),120);
         dlog('Recording paused','warn');
     }else{
@@ -1268,6 +1272,7 @@ function pauseRecording(){
         btn.className='btn btn-sm btn-blue';
         showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
         document.getElementById('timer').classList.replace('paused','recording');
+        try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23e74c3c'/><circle cx='8' cy='8' r='3' fill='white'/></svg>";}catch(e){}
         playBeep(400,0.1);setTimeout(()=>playBeep(600,0.15),120);
         dlog('Recording resumed','ok');
     }
@@ -1760,6 +1765,8 @@ function playSFX(type){
     }else if(type==='whoosh'){
         const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(100,now);o.frequency.exponentialRampToValueAtTime(4000,now+0.2);o.frequency.exponentialRampToValueAtTime(100,now+0.4);g.gain.setValueAtTime(0.06,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.4);o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.4);
     }
+    // Send to remote (skip if received from remote to avoid loop)
+    if(conn&&conn.open&&!window._sfxFromRemote)conn.send({type:'sfx',sfx:type});
     dlog('SFX: '+type,'ok');
 }
 function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900, 0.2), 150); }
@@ -1857,7 +1864,7 @@ function doDisconnect(){
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div><div style="color:var(--red);font-weight:700">'+recordingCount+'</div></div>'
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DC\u05D8\u05E0\u05E1\u05D9</div><div style="font-weight:700;color:'+(avgLatency<100?'var(--green)':'#f39c12')+'">'+avgLatency+'ms</div></div>'
             +'</div>'
-            +'<div style="text-align:center;margin-top:15px"><button class="btn btn-gold" onclick="this.parentElement.parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button></div>';
+            +'<div style="text-align:center;margin-top:15px;display:flex;gap:8px;justify-content:center"><button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(\'\u05E1\u05D9\u05DB\u05D5\u05DD: '+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+score+'/100 '+stars+'\').then(()=>this.textContent=\'\u2705\')"><i class="bi bi-clipboard"></i> \u05D4\u05E2\u05EA\u05E7</button><button class="btn btn-gold" onclick="this.closest(\'div\').parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button></div>';
         document.body.appendChild(summaryCard);
         // Auto-dismiss after 10s
         setTimeout(()=>{if(summaryCard.isConnected)summaryCard.remove();},10000);
@@ -2045,6 +2052,12 @@ function sendReaction(emoji) {
     if(!conn||!conn.open)return;
     conn.send({type:'msg',name:userName,text:emoji});
     addChatMsg(userName,emoji,true);
+    // Floating emoji animation
+    const float=document.createElement('div');
+    float.textContent=emoji;
+    float.style.cssText='position:fixed;bottom:30%;left:50%;transform:translateX(-50%);font-size:3rem;z-index:300;pointer-events:none;animation:floatUp 1.5s ease-out forwards';
+    document.body.appendChild(float);
+    setTimeout(()=>float.remove(),1500);
 }
 function sendChat() {
     const input = document.getElementById('chat-input');
@@ -2071,6 +2084,8 @@ function addChatMsg(name, text, isMe) {
     if(!isMe){
         unreadChat++;
         playBeep(500,0.08,0.05);
+        // Float emoji for incoming reactions (single emoji messages)
+        if(text.length<=2&&/\p{Emoji}/u.test(text)){const float=document.createElement('div');float.textContent=text;float.style.cssText='position:fixed;bottom:30%;left:50%;transform:translateX(-50%);font-size:3rem;z-index:300;pointer-events:none;animation:floatUp 1.5s ease-out forwards';document.body.appendChild(float);setTimeout(()=>float.remove(),1500);}
         // Browser notification when tab is background
         if(document.hidden&&Notification.permission==='granted'){
             try{new Notification('\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \u2014 '+name,{body:text.substring(0,100),icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><text y="14" font-size="14">\uD83C\uDFA4</text></svg>',tag:'podcast-chat'});}catch(e){}
