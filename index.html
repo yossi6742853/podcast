@@ -210,6 +210,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
         <div id="room-buttons" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
             <button class="btn btn-gold" id="btn-create" onclick="createRoom()"><i class="bi bi-plus-circle"></i> &#x05e6;&#x05d5;&#x05e8; &#x05d7;&#x05d3;&#x05e8;</button>
+            <span style="color:var(--muted);font-size:0.8rem;padding:0 4px">&#x05d0;&#x05d5;</span>
             <button class="btn btn-blue" id="btn-join" onclick="joinRoom()"><i class="bi bi-box-arrow-in-left"></i> &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</button>
             <button class="btn btn-sm btn-green" onclick="testMic()"><i class="bi bi-mic"></i> &#x05d1;&#x05d3;&#x05d5;&#x05e7; &#x05de;&#x05d9;&#x05e7;</button>
             <button class="btn btn-sm btn-blue" onclick="soundTest()"><i class="bi bi-headphones"></i> &#x05d4;&#x05e9;&#x05de;&#x05e2; &#x05d0;&#x05ea; &#x05e2;&#x05e6;&#x05de;&#x05da;</button>
@@ -365,24 +366,24 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <audio id="musicPlayer" loop ontimeupdate="updateMusicTime()"></audio>
             <div class="music-controls" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
                 <span class="music-label"><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</span>
-                <input type="range" id="mic-gain" min="0" max="200" value="100" oninput="setMicGain(this.value)">
+                <input type="range" id="mic-gain" min="0" max="200" value="100" oninput="setMicGain(this.value)" ondblclick="this.value=100;setMicGain(100)">
                 <span id="mic-gain-val">100%</span>
             </div>
             <div class="music-controls">
                 <span class="music-label"><i class="bi bi-volume-up"></i> &#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;:</span>
-                <input type="range" id="remote-vol" min="0" max="150" value="100" oninput="setRemoteVol(this.value)">
+                <input type="range" id="remote-vol" min="0" max="150" value="100" oninput="setRemoteVol(this.value)" ondblclick="this.value=100;setRemoteVol(100)">
                 <span id="remote-vol-val">100%</span>
             </div>
             <div style="margin-top:15px;padding-top:12px;border-top:1px solid var(--border)">
                 <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-sliders"></i> &#x05d0;&#x05e7;&#x05d5;&#x05dc;&#x05d9;&#x05d9;&#x05d6;&#x05e8; &#x05e9;&#x05de;&#x05e2; &#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</div>
                 <div class="music-controls">
                     <span class="music-label">&#x05d1;&#x05d0;&#x05e1;:</span>
-                    <input type="range" id="eq-bass" min="-12" max="12" value="0" oninput="updateEQ()">
+                    <input type="range" id="eq-bass" min="-12" max="12" value="0" oninput="updateEQ()" ondblclick="this.value=0;updateEQ()" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1;">
                     <span id="eq-bass-val">0 dB</span>
                 </div>
                 <div class="music-controls">
                     <span class="music-label">&#x05d8;&#x05e8;&#x05d1;&#x05dc;:</span>
-                    <input type="range" id="eq-treble" min="-12" max="12" value="0" oninput="updateEQ()">
+                    <input type="range" id="eq-treble" min="-12" max="12" value="0" oninput="updateEQ()" ondblclick="this.value=0;updateEQ()" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1;">
                     <span id="eq-treble-val">0 dB</span>
                 </div>
                 <div class="music-controls">
@@ -393,8 +394,11 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 </div>
                 <div class="music-controls">
                     <span class="music-label"><i class="bi bi-headphones"></i> &#x05e4;&#x05d0;&#x05e0;:</span>
-                    <input type="range" id="stereo-pan" min="-100" max="100" value="0" oninput="setPan(this.value)">
+                    <input type="range" id="stereo-pan" min="-100" max="100" value="0" oninput="setPan(this.value)" ondblclick="this.value=0;setPan(0)" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1;">
                     <span id="pan-val" style="min-width:30px">0</span>
+                </div>
+                <div style="margin-top:8px;text-align:center">
+                    <button class="btn btn-sm btn-blue" onclick="resetAudioSettings()" style="opacity:0.7"><i class="bi bi-arrow-counterclockwise"></i> &#x05d0;&#x05e4;&#x05e1; &#x05d4;&#x05db;&#x05dc;</button>
                 </div>
             </div>
         </div>
@@ -1474,6 +1478,15 @@ function setPan(v){
     document.getElementById('pan-val').textContent=v>0?'R'+v:v<0?'L'+Math.abs(v):'C';
     if(panNode)panNode.pan.value=v/100;
 }
+function resetAudioSettings(){
+    document.getElementById('mic-gain').value=100;setMicGain(100);
+    document.getElementById('remote-vol').value=100;setRemoteVol(100);
+    document.getElementById('eq-bass').value=0;
+    document.getElementById('eq-treble').value=0;updateEQ();
+    document.getElementById('stereo-pan').value=0;setPan(0);
+    document.getElementById('noise-reduction').checked=false;toggleNoiseReduction();
+    dlog('Audio settings reset','ok');showStatus('studio-status','\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA \u05E9\u05DE\u05E2 \u05D0\u05D5\u05E4\u05E1\u05D5','success');
+}
 
 // === NOISE REDUCTION ===
 let noiseFilter = null;
@@ -1528,7 +1541,7 @@ function updateTopicBadge(){
     if(tab)tab.innerHTML='<i class="bi bi-list-check"></i> \u05E0\u05D5\u05E9\u05D0\u05D9\u05DD'+(remaining>0?' <span style="background:var(--blue);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem">'+remaining+'</span>':' \u2705');
     const pb=document.getElementById('topic-progress-bar');
     if(pb&&total>0)pb.style.width=Math.round(done/total*100)+'%';
-    if(done===total&&total>0)dlog('\u05DB\u05DC \u05D4\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5! \u2705','ok');
+    if(done===total&&total>0){dlog('\u05DB\u05DC \u05D4\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5! \u2705','ok');showStatus('studio-status','\uD83C\uDF89 \u05DB\u05DC \u05D4\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5!','success');playBeep(800,0.1);setTimeout(()=>playBeep(1000,0.1),100);setTimeout(()=>playBeep(1200,0.15),200);}
 }
 function removeTopic(n){const el=document.getElementById('topic-'+n);if(el)el.remove();}
 let currentTopicStart=0;
