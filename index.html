@@ -28,7 +28,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-h
 h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradient(135deg,#d4af37 0%,#f7e98e 25%,#d4af37 50%,#f7e98e 75%,#d4af37 100%);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerTitle 6s linear infinite;filter:drop-shadow(0 0 15px rgba(212,175,55,0.3))}
 @keyframes bodyFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shimmerTitle{0%{background-position:0% 0%}100%{background-position:300% 0%}}
-.subtitle{color:var(--muted);margin-bottom:15px;text-align:center;font-size:0.85rem}
+.subtitle{color:var(--muted);margin-bottom:15px;text-align:center;font-size:0.85rem;animation:tabFadeIn 1s ease-out;letter-spacing:0.5px}
 /* Latency indicator */
 #latency-badge{position:fixed;top:10px;left:10px;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);padding:4px 12px;border-radius:20px;font-size:0.75rem;color:var(--green);border:1px solid rgba(39,174,96,0.3);z-index:100;display:none}
 #latency-badge::before{content:'\25CF';margin-left:6px;color:var(--green);font-size:0.9rem}
@@ -45,7 +45,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .room-row input{flex:1;min-width:140px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:0.95rem;font-family:inherit}
 .room-row input::placeholder{color:rgba(255,255,255,0.2)}
 .room-row input:focus{border-color:var(--gold);outline:none;box-shadow:0 0 10px rgba(212,175,55,0.15)}
-.btn{padding:8px 20px;border-radius:8px;border:none;font-size:0.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px}
+.btn{padding:8px 20px;border-radius:8px;border:none;font-size:0.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);display:inline-flex;align-items:center;gap:5px}
 .btn-gold{background:linear-gradient(135deg,var(--gold),#e8c84a);color:#000;text-shadow:none}.btn-gold:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.35)}
 .btn-green{background:linear-gradient(135deg,var(--green),#2ecc71);color:#fff}.btn-green:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(39,174,96,0.3)}
 .btn-red{background:linear-gradient(135deg,var(--red),#e95e50);color:#fff}.btn-red:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(231,76,60,0.3)}
@@ -71,7 +71,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .video-label{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.75);padding:4px 12px;border-radius:8px;font-size:0.8rem;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:6px}
 .mini-level{width:3px;height:12px;border-radius:1px;background:rgba(255,255,255,0.15);display:inline-block;transition:height 0.08s}
 .video-label.me{color:var(--gold)}.video-label.remote{color:var(--blue)}
-.video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:dotPulse 3s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:0.6;box-shadow:0 0 12px var(--green)}}
 .mute-indicator{position:absolute;bottom:8px;left:8px;background:rgba(231,76,60,0.85);color:#fff;padding:3px 8px;border-radius:6px;font-size:0.65rem;font-weight:700;display:none;z-index:5;animation:recBlink 1.5s infinite}
 .no-video-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;color:var(--muted);opacity:0.3}
 .avatar-initials{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75px;height:75px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:900;opacity:0.7;transition:opacity 0.3s,transform 0.3s}
@@ -130,7 +131,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
 /* Tabs */
 .tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--border)}
-.tab{padding:10px 20px;cursor:pointer;font-weight:700;font-size:0.9rem;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.3s;border-radius:8px 8px 0 0}
+.tab{padding:10px 20px;cursor:pointer;font-weight:700;font-size:0.9rem;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.25s;border-radius:8px 8px 0 0;position:relative}
 .tab:hover{color:var(--text);background:rgba(255,255,255,0.03)}
 .tab:focus-visible{color:var(--gold);background:rgba(212,175,55,0.08)}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(212,175,55,0.05)}
@@ -146,7 +147,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 /* Topics */
 .topic-list{margin-top:8px}
 .topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);transition:all 0.3s;animation:tabFadeIn 0.3s}
-.topic-item:hover{background:rgba(255,255,255,0.02)}
+.topic-item:hover{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);transform:translateX(2px)}
 .topic-item .num{color:var(--gold);font-weight:900;min-width:25px;cursor:pointer}
 .topic-item.current{border-color:var(--gold);background:rgba(212,175,55,0.08)}
 .topic-item input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
@@ -567,8 +568,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
-    <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 493 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+    <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,100+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 494 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 50+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;">
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 494 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
