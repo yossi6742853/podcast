@@ -202,7 +202,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div style="display:flex;align-items:center;gap:6px"><span style="background:var(--blue);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900">2</span><b style="color:var(--blue)">&#x05d0;&#x05d5;&#x05e8;&#x05d7;</b> &#x05d4;&#x05db;&#x05e0;&#x05e1; &#x05e7;&#x05d5;&#x05d3; &#x2192; &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</div>
         </div>
         <div class="room-row">
-            <input id="room-id" placeholder="&#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8;" value="">
+            <input id="room-id" placeholder="&#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8; &#x05d0;&#x05d5; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;" value="" oninput="const v=this.value;if(v.includes('?join=')){this.value=new URLSearchParams(v.split('?')[1]).get('join')||v;dlog('Extracted room code from URL','ok');}">
             <input id="user-name" placeholder="&#x05d4;&#x05e9;&#x05dd; &#x05e9;&#x05dc;&#x05da;" value="">
         </div>
         <div class="toggle-row">
@@ -310,7 +310,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             </div>
         </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
-            R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | P=&#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | S=&#x05d8;&#x05e1;&#x05d8; | B=&#x05e1;&#x05d9;&#x05de;&#x05df; | T=&#x05e6;&#x05d0;&#x05d8; | F=&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd; | ?=&#x05e2;&#x05d6;&#x05e8;&#x05d4;
+            R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; (Shift=&#x05de;&#x05d9;&#x05d9;&#x05d3;&#x05d9;) | P=&#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | S=&#x05d8;&#x05e1;&#x05d8; | B=&#x05e1;&#x05d9;&#x05de;&#x05df; | G=&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; | T=&#x05e6;&#x05d0;&#x05d8; | F=&#x05de;&#x05e1;&#x05da; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;
         </div>
 
         <!-- TABS -->
@@ -725,7 +725,10 @@ async function createRoom() {
 }
 
 async function joinRoom() {
-    const remoteId = document.getElementById('room-id').value.trim();
+    let remoteId = document.getElementById('room-id').value.trim();
+    // Extract room code from URL if pasted
+    if(remoteId.includes('?join=')){try{remoteId=new URLSearchParams(remoteId.split('?')[1]).get('join')||remoteId;}catch(e){}}
+    document.getElementById('room-id').value=remoteId;
     userName = document.getElementById('user-name').value.trim() || '\u05D0\u05D5\u05E8\u05D7';
     if (!remoteId) { showStatus('room-status', '\u05D4\u05DB\u05E0\u05E1 \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8', 'error'); return; }
     const bc2=document.getElementById('btn-create'),bj2=document.getElementById('btn-join');
@@ -873,7 +876,7 @@ function playRemoteAudio(samples, seq, sr) {
     bytesReceived += float32.byteLength + 10;audioChunksIn++;lastAudioTime=Date.now();
     if(audioChunksIn===1){dlog('First audio received! sr='+(sr||'?'),'ok');showStatus('studio-status','\u05D0\u05D5\u05D3\u05D9\u05D5 \u05D6\u05D5\u05E8\u05DD! \u2705','success');}
     // Save for recording if active
-    if (isRecording) recRemoteChunks.push(float32.slice());
+    if (isRecording && !isPaused) recRemoteChunks.push(float32.slice());
 
     // Add to jitter buffer
     // Insert in order by sequence number (handle out-of-order packets)
@@ -973,7 +976,7 @@ function showConnected() {
         const ct=connStartTime?fmtTime(Date.now()-connStartTime):'--';
         document.getElementById('conn-time-stat').textContent = ct;
         const bt=document.getElementById('banner-time');
-        if(bt){const qEmoji=avgLatency<50?'\u2705':avgLatency<100?'\uD83D\uDFE2':avgLatency<200?'\uD83D\uDFE1':'\uD83D\uDD34';bt.textContent=ct+' '+qEmoji;}
+        if(bt){const qEmoji=avgLatency<50?'\u2705':avgLatency<100?'\uD83D\uDFE2':avgLatency<200?'\uD83D\uDFE1':'\uD83D\uDD34';const recInd=isRecording?(isPaused?' \u23F8':' \uD83D\uDD34'):'';bt.textContent=ct+' '+qEmoji+recInd;}
         const totalBytes = bytesSent + bytesReceived;
         const bps = Math.round((totalBytes - lastBytes) / 1024);
         lastBytes = totalBytes;
@@ -1202,8 +1205,10 @@ function pauseRecording(){
         dlog('Recording resumed','ok');
     }
 }
-function toggleRecording(){
+function toggleRecording(skipCountdown){
     if(isRecording){stopRecording();return;}
+    // Skip countdown if Shift held or parameter passed
+    if(skipCountdown){startRecording();return;}
     // Visual countdown overlay 3-2-1
     let count=3;
     const overlay=document.createElement('div');
@@ -1980,7 +1985,7 @@ document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); exportSessionLog(); }
     else if (e.ctrlKey && (e.key === 'd' || e.key === 'D')) { e.preventDefault(); downloadAll(); }
     // Plain keys
-    else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); toggleRecording(); }
+    else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); toggleRecording(e.shiftKey); }
     else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleMute(); }
     else if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleCam(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); pauseRecording(); }
@@ -1988,6 +1993,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 's' || e.key === 'S') { e.preventDefault(); sendTestTone(); }
     else if (e.key === 't' || e.key === 'T') { e.preventDefault(); switchTab('chat'); document.getElementById('chat-input').focus(); }
     else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
+    else if (e.key === 'g' || e.key === 'G') { e.preventDefault(); const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'; }
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
