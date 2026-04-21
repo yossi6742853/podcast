@@ -1285,10 +1285,13 @@ function pauseRecording(){
         dlog('Recording resumed','ok');
     }
 }
+let _countdownActive=false;
 function toggleRecording(skipCountdown){
     if(isRecording){stopRecording();return;}
+    if(_countdownActive)return; // prevent double-click during countdown
     // Skip countdown if Shift held or parameter passed
     if(skipCountdown){startRecording();return;}
+    _countdownActive=true;
     // Visual countdown overlay 3-2-1
     let count=3;
     const overlay=document.createElement('div');
@@ -1309,6 +1312,7 @@ function toggleRecording(skipCountdown){
             playBeep(900,0.2);
             setTimeout(()=>{overlay.remove();},400);
             clearInterval(cd);
+            _countdownActive=false;
             startRecording();
         }
     },1000);
@@ -1316,15 +1320,20 @@ function toggleRecording(skipCountdown){
     if(conn&&conn.open)conn.send({type:'countdown',n:3});
 }
 function startRecording(){
-    if(!isConnected)return;chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;window._recWarned=false;
+    if(!isConnected){showStatus('studio-status','\u05DC\u05D0 \u05DE\u05D7\u05D5\u05D1\u05E8 \u2014 \u05D0\u05D9 \u05D0\u05E4\u05E9\u05E8 \u05DC\u05D4\u05E7\u05DC\u05D9\u05D8','error');dlog('Cannot record: not connected','err');return;}
+    if(!localStream||localStream.getAudioTracks().length===0){showStatus('studio-status','\u05D0\u05D9\u05DF \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2014 \u05D1\u05D3\u05D5\u05E7 \u05D4\u05E8\u05E9\u05D0\u05D5\u05EA','error');dlog('Cannot record: no mic stream','err');return;}
+    try{
+    chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;window._recWarned=false;
     // Record local mic directly (high quality)
     const las=new MediaStream(localStream.getAudioTracks());
     const mimeType=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'';
     const bitrate=window._recBitrate||256000;
     mediaRecLocal=new MediaRecorder(las,mimeType?{mimeType:mimeType,audioBitsPerSecond:bitrate}:{audioBitsPerSecond:bitrate});
-    dlog('MediaRecorder: '+(mimeType||'default'),'ok');
+    dlog('MediaRecorder: '+(mimeType||'default')+' @ '+(bitrate/1000)+'kbps','ok');
     mediaRecLocal.ondataavailable=e=>{if(e.data.size>0)chunksLocal.push(e.data);};
+    mediaRecLocal.onerror=e=>{dlog('MediaRecorder error: '+e.error,'err');showStatus('studio-status','\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05D4\u05E7\u05DC\u05D8\u05D4: '+e.error,'error');};
     mediaRecLocal.start(1000);
+    dlog('MediaRecorder state after start: '+mediaRecLocal.state+' tracks: '+las.getAudioTracks().length+' enabled: '+las.getAudioTracks().map(t=>t.enabled),'ok');
     // Auto-save every 30 seconds to prevent data loss
     autoSaveInterval = setInterval(() => {
         if (!isRecording || isPaused || chunksLocal.length === 0) return;
@@ -1345,8 +1354,13 @@ function startRecording(){
     document.getElementById('rec-num-display').textContent='\u05D4\u05E7\u05DC\u05D8\u05D4 #'+(recordingCount+1)+topicLabel;
     // Prevent screen sleep during recording
     try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').then(wl=>{window._wakeLock=wl;dlog('Screen wake lock active','ok');}).catch(()=>{});}catch(e){}
-    dlog('Recording started (local + remote buffer)', 'ok');
+    dlog('Recording started (local + remote buffer) state='+mediaRecLocal.state, 'ok');
     playRecordSound();
+    }catch(e){
+        dlog('Recording start FAILED: '+e.message,'err');
+        showStatus('studio-status','\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05D4\u05EA\u05D7\u05DC\u05EA \u05D4\u05E7\u05DC\u05D8\u05D4: '+e.message,'error');
+        isRecording=false;
+    }
 }
 function stopRecording(){
     isRecording=false;clearInterval(timerInterval);if(autoSaveInterval)clearInterval(autoSaveInterval);recordingCount++;
