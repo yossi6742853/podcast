@@ -579,7 +579,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 508 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 509 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2487,6 +2487,7 @@ function doDisconnect(){
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div><div style="color:var(--red);font-weight:700">'+recordingCount+'</div></div>'
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DC\u05D8\u05E0\u05E1\u05D9</div><div style="font-weight:700;color:'+(avgLatency<100?'var(--green)':'#f39c12')+'">'+avgLatency+'ms</div></div>'
             +'</div>'
+            +'<div style="text-align:center;margin-top:8px;font-size:0.75rem;color:var(--muted)">\u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length+' | \u05E6\u05D0\u05D8: '+totalChatMsgs+' | \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD: '+(participants.size+1)+'</div>'
             +'<div style="text-align:center;margin-top:15px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
             +'<button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(\'\u05E1\u05D9\u05DB\u05D5\u05DD: '+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | '+score+'/100 '+stars+'\').then(()=>this.textContent=\'\u2705\')"><i class="bi bi-clipboard"></i></button>'
             +'<button class="btn btn-sm btn-green" onclick="window.open(\'https://wa.me/?text=\'+encodeURIComponent(\'\uD83C\uDFA4 \u05E1\u05D9\u05DB\u05D5\u05DD \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8\\n'+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA\\n'+score+'/100 '+stars+'\'),\'_blank\')"><i class="bi bi-whatsapp"></i></button>'
