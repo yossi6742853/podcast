@@ -325,6 +325,24 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 </select>
             </div>
         </div>
+        <!-- Host Control Panel -->
+        <div id="host-panel" style="display:none;margin-top:8px;padding:10px;background:rgba(212,175,55,0.05);border-radius:8px;border:1px solid rgba(212,175,55,0.2)">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--gold);margin-bottom:6px"><i class="bi bi-shield-check"></i> &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05ea; &#x05de;&#x05d0;&#x05e8;&#x05d7;</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+                <button class="btn btn-sm btn-red" onclick="hostCmd('mute')"><i class="bi bi-mic-mute"></i> &#x05d4;&#x05e9;&#x05ea;&#x05e7; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+                <button class="btn btn-sm btn-green" onclick="hostCmd('unmute')"><i class="bi bi-mic"></i> &#x05d1;&#x05d8;&#x05dc; &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;</button>
+                <button class="btn btn-sm btn-red" onclick="hostCmd('rec_start')"><i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+                <button class="btn btn-sm btn-blue" onclick="hostCmd('rec_stop')"><i class="bi bi-stop-circle"></i> &#x05e2;&#x05e6;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+            </div>
+            <div class="music-controls">
+                <span class="music-label" style="min-width:80px"><i class="bi bi-person"></i> &#x05d2;&#x05d9;&#x05d9;&#x05df; &#x05d0;&#x05d5;&#x05e8;&#x05d7;:</span>
+                <input type="range" id="remote-gain-host" min="0" max="200" value="100" oninput="hostCmd('gain',this.value);document.getElementById('remote-gain-val').textContent=this.value+'%'">
+                <span id="remote-gain-val" style="min-width:30px;font-size:0.8rem;color:var(--muted)">100%</span>
+            </div>
+            <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center">
+                <span id="guest-link" style="cursor:pointer;color:var(--gold)" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';navigator.clipboard.writeText(u).then(()=>this.textContent='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!')"><i class="bi bi-link"></i> &#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7; (&#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;)</span>
+            </div>
+        </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
             R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | &#x05e8;&#x05d5;&#x05d5;&#x05d7;=PTT | C=&#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd; | G=&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;
         </div>
@@ -642,6 +660,13 @@ function setupDataConn(c) {
             }
         } else if (d.type === 'sfx') {
             window._sfxFromRemote=true;playSFX(d.sfx);window._sfxFromRemote=false;
+        } else if (d.type === 'host_cmd') {
+            // Host remote control commands
+            if(d.cmd==='mute'){toggleMute();dlog('Host muted you','warn');showStatus('studio-status','\uD83D\uDD07 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05D4\u05E9\u05EA\u05D9\u05E7 \u05D0\u05D5\u05EA\u05DA','waiting');}
+            else if(d.cmd==='unmute'){if(isMuted)toggleMute();dlog('Host unmuted you','ok');}
+            else if(d.cmd==='gain'&&d.val!==undefined){if(micGainNode)micGainNode.gain.value=d.val/100;dlog('Host set your gain: '+d.val+'%','ok');}
+            else if(d.cmd==='rec_start'){toggleRecording(true);dlog('Host started recording','ok');}
+            else if(d.cmd==='rec_stop'){if(isRecording)stopRecording();dlog('Host stopped recording','ok');}
         } else if (d.type === 'episode_title') {
             const et=document.getElementById('episode-title');
             if(et&&d.title){et.value=d.title;document.title='\u2705 '+d.title+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';dlog('\u05E9\u05DD \u05E4\u05E8\u05E7: '+d.title,'ok');}
@@ -999,6 +1024,9 @@ function showConnected() {
     // Auto-fill episode title with date if empty
     const et2=document.getElementById('episode-title');
     if(et2&&!et2.value){const d=new Date();et2.value='\u05E4\u05E8\u05E7 '+d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});et2.dispatchEvent(new Event('input'));}
+    // Show host panel for host only
+    const hp=document.getElementById('host-panel');
+    if(hp)hp.style.display=isHost?'block':'none';
     // Avatar initials
     const initials=userName.substring(0,2);
     const lb=document.getElementById('local-box');
@@ -1553,7 +1581,10 @@ function toggleMusic(){
         // Fade out
         let v=mp.volume;const fo=setInterval(()=>{v-=0.05;mp.volume=Math.max(0,v);if(v<=0){clearInterval(fo);mp.pause();}},50);
         btn.innerHTML='<i class="bi bi-play-fill"></i> \u05E0\u05D2\u05DF';
+        const bt2=document.getElementById('banner-time');if(bt2)bt2.innerHTML=bt2.textContent.replace(/\s*\uD83C\uDFB5/g,'');
     }
+    // Notify remote about music state
+    if(conn&&conn.open)conn.send({type:'msg',name:'\uD83C\uDFB5',text:mp.paused?'\u05DE\u05D5\u05D6\u05D9\u05E7\u05D4 \u05D4\u05D5\u05E4\u05E1\u05E7\u05D4':'\u05DE\u05D5\u05D6\u05D9\u05E7\u05D4 \u05DE\u05E0\u05D2\u05E0\u05EA'});
 }
 function setMusicVol(v){document.getElementById('musicPlayer').volume=v/100;document.getElementById('music-vol-val').textContent=v+'%';}
 function seekMusic(sec){const mp=document.getElementById('musicPlayer');if(mp&&mp.src)mp.currentTime=Math.max(0,mp.currentTime+sec);}
@@ -1804,6 +1835,13 @@ function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900
 function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
 function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.15), 150); }
+
+// === HOST COMMANDS ===
+function hostCmd(cmd,val){
+    if(!conn||!conn.open){dlog('Not connected','warn');return;}
+    conn.send({type:'host_cmd',cmd:cmd,val:val?parseInt(val):undefined});
+    dlog('Host cmd: '+cmd+(val?' = '+val:''),'ok');
+}
 
 // === LIVE MIC SWITCH ===
 async function switchMicLive(){
@@ -2410,6 +2448,17 @@ if (autoJoinCode) {
     // Auto-join if user name already saved
     const savedName2 = document.getElementById('user-name').value;
     if(savedName2){setTimeout(()=>{if(!isConnected){dlog('\u05D4\u05E6\u05D8\u05E8\u05E4\u05D5\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA...','ok');joinRoom();}},1500);}
+}
+
+// Guest mode: simplified UI
+const isGuestMode=urlParams.get('role')==='guest';
+if(isGuestMode){
+    document.querySelector('h1').innerHTML='<i class="bi bi-mic-fill"></i> \u05D0\u05D5\u05E8\u05D7 \u05D1\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
+    document.querySelector('.subtitle').textContent='\u05D2\u05E8\u05E1\u05D4 \u05DE\u05E6\u05D5\u05DE\u05E6\u05DE\u05EA \u2014 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05E9\u05D5\u05DC\u05D8';
+    // Hide host-only elements
+    document.getElementById('btn-create')?.remove();
+    document.querySelector('.room-row span')?.remove(); // "או"
+    dlog('Guest mode active','ok');
 }
 
 // Save name on change
