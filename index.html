@@ -342,8 +342,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <input type="range" id="remote-gain-host" min="0" max="200" value="100" oninput="hostCmd('gain',this.value);document.getElementById('remote-gain-val').textContent=this.value+'%'">
                 <span id="remote-gain-val" style="min-width:30px;font-size:0.8rem;color:var(--muted)">100%</span>
             </div>
-            <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center">
-                <span id="guest-link" style="cursor:pointer;color:var(--gold)" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';navigator.clipboard.writeText(u).then(()=>this.textContent='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!')"><i class="bi bi-link"></i> &#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7; (&#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;)</span>
+            <div style="margin-top:6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn-sm btn-gold" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';navigator.clipboard.writeText(u).then(()=>this.innerHTML='\u2705')"><i class="bi bi-clipboard"></i> &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
+                <button class="btn btn-sm btn-green" onclick="const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';const t='\u05D4\u05D9! \u05D1\u05D5\u05D0 \u05DC\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \uD83C\uDFA4\n'+u;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')"><i class="bi bi-whatsapp"></i> &#x05e9;&#x05dc;&#x05d7; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
             </div>
         </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
@@ -661,6 +662,9 @@ function setupDataConn(c) {
                 dlog('\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E1\u05D5\u05E0\u05DB\u05E8\u05E0\u05D5 ('+d.topics.length+')','ok');
                 showStatus('studio-status','\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E2\u05D5\u05D3\u05DB\u05E0\u05D5 \u05DE\u05D4\u05DE\u05D0\u05E8\u05D7','success');
             }
+        } else if (d.type === 'guest_status') {
+            const gs=document.getElementById('guest-status');
+            if(gs)gs.innerHTML='<i class="bi bi-circle-fill" style="font-size:0.5rem;color:'+(d.muted?'var(--red)':'var(--green)')+'"></i> '+(d.name||'\u05D0\u05D5\u05E8\u05D7')+(d.muted?' \uD83D\uDD07':'')+(d.rec?' \uD83D\uDD34':'');
         } else if (d.type === 'sfx') {
             window._sfxFromRemote=true;playSFX(d.sfx);window._sfxFromRemote=false;
         } else if (d.type === 'host_cmd') {
@@ -1116,6 +1120,8 @@ function showConnected() {
             rq.textContent=qText+(lossR>0?' | -'+lossR+'%':'');
             rq.style.color=avgLatency<100?'var(--green)':avgLatency<200?'#f39c12':'var(--red)';
         }
+        // Send guest status to host (every 5s)
+        if(!isHost&&conn&&conn.open&&Date.now()%5000<1100){conn.send({type:'guest_status',name:userName,muted:isMuted,rec:isRecording});}
         // Audio flow check
         if(lastAudioTime>0&&Date.now()-lastAudioTime>10000&&isConnected){
             showStatus('studio-status','\u05DC\u05D0 \u05DE\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10+ \u05E9\u05E0\u05D9\u05D5\u05EA','error');
@@ -1570,10 +1576,12 @@ function loadMusic(input){
     const mp=document.getElementById('musicPlayer');
     mp.src=URL.createObjectURL(f);
     document.getElementById('music-name').textContent='\u05E7\u05D5\u05D1\u05E5: '+f.name;
-    // Connect music to audio context for recording mix
-    if(audioCtx&&!musicSourceNode){
-        try{musicSourceNode=audioCtx.createMediaElementSource(mp);musicSourceNode.connect(audioCtx.destination);dlog('Music routed to audio output','ok');}catch(e){dlog('Music routing: '+e.message,'warn');}
-    }
+    // Connect music to audio context for recording mix (only after connected)
+    mp.onplay=function(){
+        if(audioCtx&&!musicSourceNode){
+            try{musicSourceNode=audioCtx.createMediaElementSource(mp);musicSourceNode.connect(audioCtx.destination);dlog('Music routed to audio output','ok');}catch(e){dlog('Music routing: '+e.message,'warn');}
+        }
+    };
     dlog('Music loaded: '+f.name,'ok');
 }
 function toggleMusic(){
@@ -1966,8 +1974,8 @@ function doDisconnect(){
     if(audioCtx&&audioCtx.state!=='closed'){try{audioCtx.close();}catch(e){}}audioCtx=null;
     if(remoteAudioCtx&&remoteAudioCtx.state!=='closed'){try{remoteAudioCtx.close();}catch(e){}}remoteAudioCtx=null;
     localAnalyser=null;remoteAnalyser=null;remoteGainNode=null;
-    noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;
-    connStartTime=null;bytesSent=0;bytesReceived=0;recRemoteChunks=[];
+    noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;musicSourceNode=null;
+    connStartTime=null;bytesSent=0;bytesReceived=0;recRemoteChunks=[];_countdownActive=false;
     pingsSent=0;pongsReceived=0;isPaused=false;silenceSegments=[];currentSilenceStart=null;lastPongTime=0;joinRetryCount=0;
     _ml=_mr=_pl=_pr=_lb=_rb=null;
     speakTimeLocal=0;speakTimeRemote=0;silenceCountLocal=0;silenceCountRemote=0;
@@ -2100,9 +2108,9 @@ function toggleCompact(){
         document.getElementById('btn-compact').innerHTML='<i class="bi bi-layout-text-sidebar"></i>';
         dlog('Compact mode ON','ok');
     }else{
-        document.querySelector('.video-grid').style.display='flex';
+        const vg=document.querySelector('.video-grid');if(vg)vg.style.display='flex';
         if(tabs)tabs.style.display='flex';
-        document.querySelector('.tab-content.active').style.display='block';
+        const atc=document.querySelector('.tab-content.active');if(atc)atc.style.display='block';else switchTab('recordings');
         document.getElementById('btn-compact').innerHTML='<i class="bi bi-layout-text-sidebar-reverse"></i>';
         dlog('Compact mode OFF','ok');
     }
