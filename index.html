@@ -173,7 +173,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v8.1 | 380+</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.0 | 410+</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -551,8 +551,8 @@ function setupDataConn(c) {
     c.on('error', function(e) {
         dlog('Data channel error: ' + e, 'err');
         if(String(e).includes('Negotiation')){
-            dlog('\u05D8\u05D9\u05E4: \u05D4\u05D0\u05D5\u05E8\u05D7 \u05E6\u05E8\u05D9\u05DA \u05DC\u05D4\u05D9\u05DB\u05E0\u05E1 \u05DE\u05D0\u05D5\u05EA\u05D5 \u05D3\u05E3 \u05D5\u05DC\u05D5\u05D5\u05D3\u05D0 \u05E9\u05D4\u05E7\u05D5\u05D3 \u05E0\u05DB\u05D5\u05DF','warn');
-            showStatus('room-status','\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05DB\u05E9\u05DC \u2014 \u05D5\u05D3\u05D0 \u05E9\u05D4\u05D0\u05D5\u05E8\u05D7 \u05E0\u05DB\u05E0\u05E1 \u05DE\u05D0\u05D5\u05EA\u05D5 \u05D3\u05E3 \u05D5\u05DC\u05D7\u05E5 "\u05D4\u05E6\u05D8\u05E8\u05E3" \u05E9\u05D5\u05D1','error');
+            dlog('\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05DB\u05E9\u05DC. \u05D4\u05D0\u05D5\u05E8\u05D7 \u05E6\u05E8\u05D9\u05DA \u05DC\u05E8\u05E2\u05E0\u05DF \u05D5\u05DC\u05DC\u05D7\u05D5\u05E5 \u05D4\u05E6\u05D8\u05E8\u05E3 \u05E9\u05D5\u05D1','warn');
+            showStatus('room-status','\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05DB\u05E9\u05DC \u2014 \u05D4\u05D0\u05D5\u05E8\u05D7 \u05E6\u05E8\u05D9\u05DA \u05DC\u05E8\u05E2\u05E0\u05DF \u05D0\u05EA \u05D4\u05D3\u05E3 \u05D5\u05DC\u05DC\u05D7\u05D5\u05E5 "\u05D4\u05E6\u05D8\u05E8\u05E3" \u05E9\u05D5\u05D1','error');
         }
     });
 }
