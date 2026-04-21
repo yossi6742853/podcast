@@ -508,7 +508,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                     <button class="btn btn-sm btn-green" onclick="applyEQPreset('bright')" title="&#x05d1;&#x05d4;&#x05d9;&#x05e8;" style="padding:4px 10px"><i class="bi bi-brightness-high"></i> &#x05d1;&#x05d4;&#x05d9;&#x05e8;</button>
                     <button class="btn btn-sm btn-red" onclick="applyEQPreset('radio')" title="&#x05e8;&#x05d3;&#x05d9;&#x05d5;" style="padding:4px 10px"><i class="bi bi-broadcast"></i> &#x05e8;&#x05d3;&#x05d9;&#x05d5;</button>
                     <button class="btn btn-sm btn-blue" onclick="applyEQPreset('telephone')" title="&#x05d8;&#x05dc;&#x05e4;&#x05d5;&#x05df;" style="padding:4px 10px"><i class="bi bi-telephone"></i></button>
-                    <button class="btn btn-sm btn-blue" onclick="resetAudioSettings()" style="opacity:0.7;padding:4px 10px"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    <button class="btn btn-sm btn-blue" onclick="resetAudioSettings()" style="opacity:0.7;padding:4px 10px" title="&#x05d0;&#x05e4;&#x05e1;"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    <button class="btn btn-sm btn-gold" onclick="savePreset()" style="padding:4px 10px" title="&#x05e9;&#x05de;&#x05d5;&#x05e8;"><i class="bi bi-save"></i></button>
+                    <button class="btn btn-sm btn-blue" onclick="loadPreset()" style="padding:4px 10px" title="&#x05d8;&#x05e2;&#x05df;"><i class="bi bi-folder2-open"></i></button>
                 </div>
             </div>
         </div>
@@ -530,7 +532,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background tab -->
         <!-- Chat tab -->
         <div class="tab-content" id="tab-chat">
-            <div id="chat-speaking" style="display:none;font-size:0.7rem;color:var(--muted);margin-bottom:3px;text-align:center"><span id="chat-speaking-text"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                <div id="chat-speaking" style="display:none;font-size:0.7rem;color:var(--muted)"><span id="chat-speaking-text"></span></div>
+                <span id="chat-count" style="font-size:0.6rem;color:var(--muted);opacity:0.5"></span>
+            </div>
             <div id="chat-messages" style="height:180px;overflow-y:auto;background:var(--bg);border-radius:8px;padding:8px;border:1px solid var(--border);margin-bottom:4px;font-size:0.9rem;direction:rtl;scroll-behavior:smooth"></div>
             <div id="typing-ind" style="display:none;font-size:0.75rem;color:var(--muted);margin-bottom:4px;font-style:italic"></div>
             <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
@@ -1199,6 +1204,8 @@ function showConnected() {
     if(rid){let rr=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');rr=rr.filter(r=>r!==rid);rr.unshift(rid);if(rr.length>10)rr.length=10;localStorage.setItem('podcast_recent_rooms',JSON.stringify(rr));}
     dlog('\u05E1\u05E9\u05DF #'+sc,'ok');}catch(e){}
     startWaveform();
+    // Auto-load saved preset
+    if(localStorage.getItem('podcast_preset')){try{loadPreset();}catch(e){}}
     // Auto-record if setting is checked
     const arChk=document.getElementById('auto-record');
     if(arChk&&arChk.checked){setTimeout(()=>{if(isConnected&&!isRecording){dlog('Auto-recording started','ok');toggleRecording();}},3000);}
@@ -1876,6 +1883,21 @@ function applyEQPreset(preset){
     dlog('EQ preset: '+preset+' (bass='+p.bass+' treble='+p.treble+')','ok');
     const names={voice:'\u05E7\u05D5\u05DC',warm:'\u05D7\u05DD',bright:'\u05D1\u05D4\u05D9\u05E8',radio:'\u05E8\u05D3\u05D9\u05D5',telephone:'\u05D8\u05DC\u05E4\u05D5\u05DF'};
     showStatus('studio-status','\uD83C\uDFA7 \u05E4\u05E8\u05D9\u05E1\u05D8 "'+(names[preset]||preset)+'" \u05D4\u05D5\u05D7\u05DC','success');
+}
+function savePreset(){
+    const preset={bass:document.getElementById('eq-bass').value,treble:document.getElementById('eq-treble').value,pan:document.getElementById('stereo-pan').value,micGain:document.getElementById('mic-gain').value,remoteVol:document.getElementById('remote-vol').value,nr:document.getElementById('noise-reduction').checked,bt:document.getElementById('bt-mode')?.checked,reverb:document.getElementById('studio-reverb')?.checked};
+    localStorage.setItem('podcast_preset',JSON.stringify(preset));
+    dlog('Preset saved','ok');showStatus('studio-status','\uD83D\uDCBE \u05D4\u05D2\u05D3\u05E8\u05D5\u05EA \u05E0\u05E9\u05DE\u05E8\u05D5!','success');
+}
+function loadPreset(){
+    try{const p=JSON.parse(localStorage.getItem('podcast_preset'));if(!p)return;
+    document.getElementById('eq-bass').value=p.bass||0;document.getElementById('eq-treble').value=p.treble||0;updateEQ();
+    document.getElementById('stereo-pan').value=p.pan||0;setPan(p.pan||0);
+    document.getElementById('mic-gain').value=p.micGain||100;setMicGain(p.micGain||100);
+    document.getElementById('remote-vol').value=p.remoteVol||100;setRemoteVol(p.remoteVol||100);
+    if(p.nr)document.getElementById('noise-reduction').checked=true;
+    dlog('Preset loaded','ok');showStatus('studio-status','\u2705 \u05D4\u05D2\u05D3\u05E8\u05D5\u05EA \u05E0\u05D8\u05E2\u05E0\u05D5','success');
+    }catch(e){}
 }
 function resetAudioSettings(){
     document.getElementById('mic-gain').value=100;setMicGain(100);
@@ -2692,6 +2714,7 @@ function addChatMsg(name, text, isMe) {
     const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>').replace(/\*([^*]+)\*/g,'<b>$1</b>');
     msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.75rem">' + new Date().toLocaleTimeString() + '</span><br>' + linkedText;
     box.appendChild(msg);totalChatMsgs++;
+    const cc=document.getElementById('chat-count');if(cc)cc.textContent=totalChatMsgs+' \u05D4\u05D5\u05D3\u05E2\u05D5\u05EA';
     // Auto-scroll only if near bottom
     if(box.scrollHeight-box.scrollTop-box.clientHeight<100)box.scrollTop=box.scrollHeight;
     box.scrollTop = box.scrollHeight;
@@ -3037,6 +3060,12 @@ function saveSessionHistory(){
         history.unshift(session);if(history.length>20)history.length=20;
         localStorage.setItem('podcast_history',JSON.stringify(history));
     }catch(e){}
+}
+
+// First-time welcome
+if(!localStorage.getItem('podcast_welcomed')){
+    localStorage.setItem('podcast_welcomed','1');
+    showStatus('room-status','\uD83C\uDFA4 <b>\u05D1\u05E8\u05D5\u05DB\u05D9\u05DD \u05D4\u05D1\u05D0\u05D9\u05DD!</b> \u05D4\u05DB\u05E0\u05E1 \u05E9\u05DE\u05DA, \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u05D5\u05E9\u05DC\u05D7 \u05D0\u05EA \u05D4\u05E7\u05D5\u05D3 \u05DC\u05D0\u05D5\u05E8\u05D7. \u05DC\u05D7\u05E5 "\u05D1\u05D3\u05D5\u05E7" \u05DC\u05D5\u05D5\u05D3\u05D0 \u05E9\u05D4\u05DB\u05DC \u05EA\u05E7\u05D9\u05DF.','info');
 }
 
 // Show session history
