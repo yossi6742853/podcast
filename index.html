@@ -207,7 +207,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- ROOM PANEL -->
     <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s">
-        <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
+        <span id="conn-health" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px"></span> <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
@@ -581,7 +581,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 514 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 515 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1326,6 +1326,9 @@ function showConnected() {
         // Banner soundwave color based on live audio flow
         const bsw=document.getElementById('banner-soundwave');
         if(bsw){const recentAudio=lastAudioTime>0&&Date.now()-lastAudioTime<3000;bsw.style.color=recentAudio?'var(--green)':'var(--muted)';}
+        // Connection health dot
+        const chDot=document.getElementById('conn-health');
+        if(chDot){const q=avgLatency<80?'var(--green)':avgLatency<200?'#f39c12':'var(--red)';chDot.style.background=q;}
         // Remote quality badge
         const rq=document.getElementById('remote-quality');
         if(rq&&audioChunksIn>0){
@@ -2993,6 +2996,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === 'h' || e.key === 'H') { e.preventDefault(); const hp=document.getElementById('host-panel');if(hp&&isHost)hp.style.display=hp.style.display==='none'?'block':'none'; }
     else if (e.key === 'n' || e.key === 'N') { e.preventDefault(); switchTab('topics');addTopic();toast('\u2795 \u05E0\u05D5\u05E9\u05D0 \u05D7\u05D3\u05E9',1200); }
+    else if (e.key === 'o' || e.key === 'O') { e.preventDefault(); speakOutro();toast('\uD83C\uDFC1 \u05E7\u05E8\u05D9\u05D9\u05E0\u05D5\u05EA \u05E1\u05D9\u05D5\u05DD',1500); }
     else if (e.key === 'w' || e.key === 'W') { e.preventDefault(); raiseHand(); }
     else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
