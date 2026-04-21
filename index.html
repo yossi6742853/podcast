@@ -65,7 +65,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 @keyframes connectedPulse{0%{box-shadow:0 0 0 rgba(39,174,96,0)}30%{box-shadow:0 0 30px rgba(39,174,96,0.4)}100%{box-shadow:0 0 8px rgba(39,174,96,0.2)}}
 .video-box.rec-active::after{content:'\25CF REC';position:absolute;top:8px;left:8px;background:var(--red);color:#fff;padding:2px 8px;border-radius:12px;font-size:0.65rem;font-weight:900;animation:recBlink 1s infinite;z-index:5}
 .video-box video,.video-box canvas{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
-.video-label{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.75);padding:4px 12px;border-radius:8px;font-size:0.8rem;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08)}
+.video-label{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.75);padding:4px 12px;border-radius:8px;font-size:0.8rem;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:6px}
+.mini-level{width:3px;height:12px;border-radius:1px;background:rgba(255,255,255,0.15);display:inline-block;transition:height 0.08s}
 .video-label.me{color:var(--gold)}.video-label.remote{color:var(--blue)}
 .video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 .mute-indicator{position:absolute;bottom:8px;left:8px;background:rgba(231,76,60,0.85);color:#fff;padding:3px 8px;border-radius:6px;font-size:0.65rem;font-weight:700;display:none;z-index:5;animation:recBlink 1.5s infinite}
@@ -249,13 +250,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <i class="bi bi-person-circle no-video-icon" id="local-no-vid"></i>
                 <div class="status-dot" title="&#x05de;&#x05d7;&#x05d5;&#x05d1;&#x05e8;"></div>
                 <div class="mute-indicator" id="mute-ind"><i class="bi bi-mic-mute-fill"></i> MUTE</div>
-                <div class="video-label me" id="label-local">&#x05d0;&#x05e0;&#x05d9;</div>
+                <div class="video-label me" id="label-local"><span id="mini-level-local" class="mini-level"></span> &#x05d0;&#x05e0;&#x05d9;</div>
             </div>
             <div class="video-box" id="remote-box">
                 <video id="remoteVideo" playsinline autoplay></video>
                 <i class="bi bi-person-circle no-video-icon" id="remote-no-vid"></i>
                 <div id="remote-quality" style="position:absolute;top:8px;left:8px;font-size:0.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.6);color:var(--green);display:none"></div>
-                <div class="video-label remote" id="label-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</div>
+                <div class="video-label remote" id="label-remote"><span id="mini-level-remote" class="mini-level"></span> &#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</div>
+                <button onclick="pipRemote()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--muted);font-size:0.6rem;padding:2px 6px;cursor:pointer;z-index:4" title="PiP"><i class="bi bi-pip"></i></button>
             </div>
         </div>
 
@@ -439,7 +441,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 447 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 449 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -483,6 +485,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 // Global error handler
 window.addEventListener('error',e=>{try{dlog('\u274C '+e.message+' ('+e.filename+':'+e.lineno+')','err');}catch(ex){}});
 window.addEventListener('unhandledrejection',e=>{try{dlog('\u274C Promise: '+e.reason,'err');}catch(ex){}});
+// Page visibility — resume audio when tab becomes visible
+document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden&&isConnected){
+        if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+        if(remoteAudioCtx&&remoteAudioCtx.state==='suspended')remoteAudioCtx.resume();
+    }
+});
 // Online/offline detection
 window.addEventListener('offline',()=>{dlog('\u26A0 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05E0\u05D5\u05EA\u05E7!','err');if(isConnected)showStatus('studio-status','\u26A0 \u05D0\u05D9\u05DF \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u2014 \u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E2\u05DC\u05D5\u05DC \u05DC\u05D4\u05D9\u05E0\u05EA\u05E7','error');});
 window.addEventListener('online',()=>{dlog('\u2705 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05D7\u05D6\u05E8!','ok');if(isConnected)showStatus('studio-status','\u2705 \u05D0\u05D9\u05E0\u05D8\u05E8\u05E0\u05D8 \u05D7\u05D6\u05E8 \u2014 \u05DE\u05E0\u05E1\u05D4 \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9','success');});
@@ -1061,6 +1070,10 @@ function animateMeters(){
     _ml.parentElement.title=Math.round(ll)+'%';
     _mr.style.height=rl+'%';
     _mr.parentElement.title=Math.round(rl)+'%';
+    // Mini level bars in video labels
+    const mll=document.getElementById('mini-level-local'),mlr=document.getElementById('mini-level-remote');
+    if(mll){const h=Math.max(3,ll/100*14);mll.style.height=h+'px';mll.style.background=ll>70?'var(--red)':ll>30?'var(--green)':'rgba(255,255,255,0.15)';}
+    if(mlr){const h=Math.max(3,rl/100*14);mlr.style.height=h+'px';mlr.style.background=rl>70?'var(--red)':rl>30?'var(--green)':'rgba(255,255,255,0.15)';}
     // Peak hold with slow decay
     if(ll>peakLocal)peakLocal=ll;else peakLocal=Math.max(0,peakLocal-peakDecay);
     if(rl>peakRemote)peakRemote=rl;else peakRemote=Math.max(0,peakRemote-peakDecay);
@@ -1831,6 +1844,12 @@ function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightnes
 function toggleHelp(){const h=document.getElementById('help-overlay');h.style.display=h.style.display==='none'?'block':'none';}
 
 // === FULLSCREEN ===
+function pipRemote(){
+    const v=document.getElementById('remoteVideo');
+    if(!v){dlog('No remote video','warn');return;}
+    if(document.pictureInPictureElement){document.exitPictureInPicture().catch(()=>{});}
+    else{v.requestPictureInPicture().catch(e=>dlog('PiP: '+e.message,'warn'));}
+}
 function toggleStudioFS(){
     if(document.fullscreenElement)document.exitFullscreen();
     else document.documentElement.requestFullscreen().catch(()=>{});
@@ -2028,6 +2047,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'g' || e.key === 'G') { e.preventDefault(); const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'; }
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
+    else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
     else if (e.key === '2') { e.preventDefault(); switchTab('music'); }
     else if (e.key === '3') { e.preventDefault(); switchTab('topics'); }
