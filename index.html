@@ -231,13 +231,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- STUDIO PANEL -->
     <div class="panel" id="panel-studio" style="display:none">
-        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value})">
+        <input id="episode-title" placeholder="&#x05e9;&#x05dd; &#x05d4;&#x05e4;&#x05e8;&#x05e7;..." style="width:100%;padding:8px 14px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--gold);font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center" oninput="document.title=this.value?('\u2705 '+this.value+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8'):'\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';if(conn&&conn.open)conn.send({type:'episode_title',title:this.value});const be=document.getElementById('banner-episode');if(be){be.textContent=this.value?'\uD83C\uDFA4 '+this.value:'';be.style.display=this.value?'inline':'none';}">
         <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
             <span style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite"><i class="bi bi-soundwave"></i></span>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:var(--blue);font-weight:700" id="banner-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</span><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block"></span></span>
             <span style="color:var(--muted);font-size:0.75rem;margin-right:8px" id="banner-time"></span>
+            <span id="banner-episode" style="color:var(--gold);font-size:0.7rem;font-weight:500;opacity:0.7;display:none"></span>
             <button id="banner-copy-code" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:var(--muted);font-size:0.65rem;padding:2px 8px;cursor:pointer;font-family:inherit" onclick="const rid=document.getElementById('room-id').value;if(rid)navigator.clipboard.writeText(rid).then(()=>{this.textContent='\u2705';setTimeout(()=>this.innerHTML='<i class=\'bi bi-clipboard\'></i> \u05E7\u05D5\u05D3',2000)})" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8;"><i class="bi bi-clipboard"></i> &#x05e7;&#x05d5;&#x05d3;</button>
         </div>
         <div class="video-grid">
@@ -442,7 +443,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <h2 style="color:var(--gold);margin-bottom:15px">&#x05e2;&#x05d6;&#x05e8;&#x05d4; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d4;</h2>
         <div style="columns:2;column-gap:30px">
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
-            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
+            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
             &#x2022; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; 24kHz &#x05d3;&#x05e8;&#x05da; Data Channel<br>
             &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV + WebM<br>
@@ -1239,7 +1240,9 @@ function startRecording(){
     if(!isConnected)return;chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;
     // Record local mic directly (high quality)
     const las=new MediaStream(localStream.getAudioTracks());
-    mediaRecLocal=new MediaRecorder(las,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:256000});
+    const mimeType=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'';
+    mediaRecLocal=new MediaRecorder(las,mimeType?{mimeType:mimeType,audioBitsPerSecond:256000}:{audioBitsPerSecond:256000});
+    dlog('MediaRecorder: '+(mimeType||'default'),'ok');
     mediaRecLocal.ondataavailable=e=>{if(e.data.size>0)chunksLocal.push(e.data);};
     mediaRecLocal.start(1000);
     // Auto-save every 30 seconds to prevent data loss
@@ -1252,6 +1255,8 @@ function startRecording(){
     const rb=document.getElementById('btn-rec');rb.innerHTML='<span class="rec-dot"></span> \u05E2\u05D5\u05E6\u05E8';rb.classList.add('btn-rec-active');
     document.getElementById('timer').classList.add('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('rec-active'));
+    // Red recording favicon
+    try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23e74c3c'/><circle cx='8' cy='8' r='3' fill='white'/></svg>";}catch(e){}
     showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
     recLog.push({event:'start',time:new Date().toLocaleTimeString(),recNum:recordingCount+1});
     document.getElementById('btn-pause').style.display='inline-flex';
@@ -1321,6 +1326,8 @@ function stopRecording(){
     document.getElementById('timer').classList.remove('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.remove('rec-active'));
     document.getElementById('btn-pause').style.display='none';
+    // Restore normal favicon
+    try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>\uD83C\uDF99\uFE0F</text></svg>";}catch(e){}
     // Release wake lock
     try{if(window._wakeLock){window._wakeLock.release();window._wakeLock=null;dlog('Wake lock released','ok');}}catch(e){}
     document.title='\u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO';
@@ -1381,7 +1388,7 @@ function addDL(name,blob,dur){
     document.getElementById('downloads').appendChild(d);
     // Update summary
     const rs=document.getElementById('rec-summary');
-    if(rs){const files=document.querySelectorAll('#downloads .download-item').length;rs.style.display='block';rs.innerHTML='<i class="bi bi-disc"></i> '+files+' \u05E7\u05D1\u05E6\u05D9\u05DD \u2022 '+(totalRecBytes/1048576).toFixed(1)+' MB \u05E1\u05D4\"\u05DB \u2022 '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA';}
+    if(rs){const files=document.querySelectorAll('#downloads .download-item').length;const totalDur=recLog.filter(r=>r.duration).map(r=>r.duration).join(', ');rs.style.display='block';rs.innerHTML='<i class="bi bi-disc"></i> '+files+' \u05E7\u05D1\u05E6\u05D9\u05DD \u2022 '+(totalRecBytes/1048576).toFixed(1)+' MB \u2022 '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA'+(totalDur?' \u2022 '+totalDur:'');}
 }
 let previewAudio=null;
 function playPreview(id,url,btn){
@@ -1829,7 +1836,8 @@ function addChatMsg(name, text, isMe) {
     const msg = document.createElement('div');
     msg.style.cssText = 'margin-bottom:6px;padding:6px 10px;border-radius:8px;animation:tabFadeIn 0.3s;' +
         (isMe ? 'background:rgba(212,175,55,0.1);border-right:3px solid var(--gold);' : 'background:rgba(41,128,185,0.1);border-right:3px solid var(--blue);');
-    msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.75rem">' + new Date().toLocaleTimeString() + '</span><br>' + escHtml(text).replace(/\n/g,'<br>');
+    const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>');
+    msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.75rem">' + new Date().toLocaleTimeString() + '</span><br>' + linkedText;
     box.appendChild(msg);totalChatMsgs++;
     // Auto-scroll only if near bottom
     if(box.scrollHeight-box.scrollTop-box.clientHeight<100)box.scrollTop=box.scrollHeight;
