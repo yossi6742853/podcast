@@ -156,6 +156,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .topic-item input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
 .topic-item .done{color:var(--green);cursor:pointer;font-size:1.1rem}
 .topic-item.completed input{text-decoration:line-through;color:var(--muted)}
+.topic-item.completed{opacity:0.5;border-color:var(--green)}
+.topic-item.completed .done{color:var(--green)}
 
 @media(max-width:700px){
     .video-grid{flex-direction:column}
@@ -586,7 +588,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 523 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 524 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1307,7 +1309,7 @@ function showConnected() {
         document.getElementById('rec-status-stat').style.color = isRecording ? 'var(--red)' : 'var(--green)';
         // Live talk ratio
         const ts=speakTimeLocal+speakTimeRemote;
-        if(ts>120){const tr=document.getElementById('talk-ratio');if(tr){const lm=Math.round(speakTimeLocal/3600),rm=Math.round(speakTimeRemote/3600);tr.textContent='\u05D3\u05D9\u05D1\u05D5\u05E8: '+Math.round(speakTimeLocal/ts*100)+'%/'+Math.round(speakTimeRemote/ts*100)+'% ('+lm+'m/'+rm+'m)';}}
+        if(ts>120){const tr=document.getElementById('talk-ratio');if(tr){const lPct=Math.round(speakTimeLocal/ts*100),rPct=100-lPct;tr.innerHTML='<span style="color:var(--gold)">'+lPct+'%</span> <span style="display:inline-block;width:60px;height:4px;background:var(--blue);border-radius:2px;vertical-align:middle"><span style="display:block;height:100%;width:'+lPct+'%;background:var(--gold);border-radius:2px"></span></span> <span style="color:var(--blue)">'+rPct+'%</span>';}}
         // Session milestones (every 30 min)
         if(connStartTime){const connMins=Math.round((Date.now()-connStartTime)/60000);
             if(connMins>0&&connMins%30===0&&!window['_mile'+connMins]){window['_mile'+connMins]=true;dlog('\u23F0 '+connMins+' \u05D3\u05E7\u05D5\u05EA \u05DE\u05D7\u05D5\u05D1\u05E8\u05D9\u05DD','ok');playBeep(600,0.1);}
