@@ -570,6 +570,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;... (Enter=&#x05e9;&#x05dc;&#x05d7;)" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="sendTyping()">
                 <button class="btn btn-sm btn-gold" onclick="sendChat()"><i class="bi bi-send"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="exportChat()" title="&#x05d9;&#x05d9;&#x05e6;&#x05d0; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-download"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="const cm=document.getElementById('chat-messages');if(cm)navigator.clipboard.writeText(cm.textContent).then(()=>toast('\u2705 \u05E6\u05D0\u05D8 \u05D4\u05D5\u05E2\u05EA\u05E7'))" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-clipboard"></i></button>
                 <button class="btn btn-sm btn-red" onclick="document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0" title="&#x05e0;&#x05e7;&#x05d4; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-trash3"></i></button>
             </div>
         </div>
@@ -577,7 +578,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 503 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 505 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -586,7 +587,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <h2 style="color:var(--gold);margin-bottom:15px">&#x05e2;&#x05d6;&#x05e8;&#x05d4; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d4;</h2>
         <div style="columns:2;column-gap:30px">
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
-            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>H = &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05de;&#x05d0;&#x05e8;&#x05d7;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
+            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>N = &#x05e0;&#x05d5;&#x05e9;&#x05d0; &#x05d7;&#x05d3;&#x05e9;<br>W = &#x05d9;&#x05d3; &#x05dc;&#x05de;&#x05e2;&#x05dc;&#x05d4;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>H = &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05de;&#x05d0;&#x05e8;&#x05d7;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>C = &#x05e7;&#x05d5;&#x05de;&#x05e4;&#x05e7;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
             &#x2022; &#x05e9;&#x05de;&#x05e2; 48kHz &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05d0;&#x05d5;&#x05dc;&#x05e4;&#x05df;<br>
             &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd; + &#x05de;&#x05d9;&#x05e7;&#x05e1;&#x05e8;<br>
@@ -2947,6 +2948,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === 'h' || e.key === 'H') { e.preventDefault(); const hp=document.getElementById('host-panel');if(hp&&isHost)hp.style.display=hp.style.display==='none'?'block':'none'; }
+    else if (e.key === 'n' || e.key === 'N') { e.preventDefault(); switchTab('topics');addTopic();toast('\u2795 \u05E0\u05D5\u05E9\u05D0 \u05D7\u05D3\u05E9',1200); }
     else if (e.key === 'w' || e.key === 'W') { e.preventDefault(); raiseHand(); }
     else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
