@@ -224,7 +224,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div id="room-status"></div>
         <div class="settings-row"><label><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</label><select id="mic-select" onchange="if(isConnected)switchMicLive()"></select></div>
         <div class="settings-row"><label><i class="bi bi-camera-video"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;:</label><select id="cam-select"></select></div>
-        <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap"><i class="bi bi-clock-history"></i> <span id="recent-rooms-list"></span><span onclick="localStorage.removeItem('podcast_recent_rooms');this.parentElement.style.display='none'" style="cursor:pointer;color:var(--red);opacity:0.5;font-size:0.65rem" title="&#x05e0;&#x05e7;&#x05d4;">&#x2715;</span></div>
+        <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted);align-items:center;gap:4px;flex-wrap:wrap"><i class="bi bi-clock-history"></i> <span id="recent-rooms-list"></span><span onclick="localStorage.removeItem('podcast_recent_rooms');this.parentElement.style.display='none'" style="cursor:pointer;color:var(--red);opacity:0.5;font-size:0.65rem" title="&#x05e0;&#x05e7;&#x05d4;">&#x2715;</span></div>
         <div style="position:relative">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <span style="font-size:0.7rem;color:var(--muted);cursor:pointer" onclick="const dl=document.getElementById('debug-log');dl.style.display=dl.style.display==='none'?'block':'none'"><i class="bi bi-terminal"></i> &#x05dc;&#x05d5;&#x05d2;</span>
@@ -292,6 +292,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <button class="btn btn-sm btn-blue" onclick="toggleCompact()" id="btn-compact" title="&#x05de;&#x05e6;&#x05d1; &#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;"><i class="bi bi-layout-text-sidebar-reverse"></i></button>
             <button class="btn btn-sm btn-blue" onclick="const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'" title="&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;"><i class="bi bi-gear"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleHelp()" title="&#x05e2;&#x05d6;&#x05e8;&#x05d4;"><i class="bi bi-question-circle"></i></button>
+            <button class="btn btn-sm btn-blue" onclick="toggleScreenShare()" id="btn-screen" title="&#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05de;&#x05e1;&#x05da;"><i class="bi bi-display"></i></button>
             <button class="btn btn-sm btn-green" onclick="quickReconnect()" title="&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8; &#x05de;&#x05d7;&#x05d3;&#x05e9;"><i class="bi bi-arrow-repeat"></i></button>
             <button class="btn btn-sm btn-red" onclick="doDisconnect()"><i class="bi bi-x-circle"></i> &#x05e0;&#x05ea;&#x05e7;</button>
         </div>
@@ -480,7 +481,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
                 <button class="btn btn-sm btn-gold" onclick="addTopic()"><i class="bi bi-plus"></i> &#x05d4;&#x05d5;&#x05e1;&#x05e3;</button>
                 <button class="btn btn-sm btn-blue" onclick="shareTopics()"><i class="bi bi-share"></i> &#x05e9;&#x05dc;&#x05d7;</button>
-                <button class="btn btn-sm btn-red" onclick="clearCompletedTopics()"><i class="bi bi-check2-all"></i> &#x05e0;&#x05e7;&#x05d4; &#x05e9;&#x05d4;&#x05d5;&#x05e9;&#x05dc;&#x05de;&#x05d5;</button>
+                <button class="btn btn-sm btn-blue" onclick="importTopics()" title="&#x05d9;&#x05d9;&#x05d1;&#x05d0; &#x05de;&#x05dc;&#x05d5;&#x05d7;"><i class="bi bi-clipboard-plus"></i></button>
+                <button class="btn btn-sm btn-red" onclick="clearCompletedTopics()"><i class="bi bi-check2-all"></i> &#x05e0;&#x05e7;&#x05d4;</button>
             </div>
         </div>
 
@@ -509,7 +511,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 461 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 465 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1812,6 +1814,18 @@ function shareTopics(){
     addChatMsg(userName,'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n'),true);
     dlog('Topics synced + shared ('+topics.length+')','ok');
 }
+async function importTopics(){
+    try{
+        const text=await navigator.clipboard.readText();
+        if(!text.trim()){dlog('Clipboard empty','warn');return;}
+        const lines=text.split('\n').map(l=>l.replace(/^\d+[\.\)\-\s]*/,'').trim()).filter(l=>l);
+        if(lines.length===0)return;
+        lines.forEach(l=>addTopic(l));
+        updateTopicBadge();
+        dlog('Imported '+lines.length+' topics from clipboard','ok');
+        showStatus('studio-status','\u05D9\u05D5\u05D1\u05D0\u05D5 '+lines.length+' \u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05DE\u05D4\u05DC\u05D5\u05D7','success');
+    }catch(e){dlog('Import: '+e.message,'warn');showStatus('studio-status','\u05DC\u05D0 \u05E0\u05D9\u05EA\u05DF \u05DC\u05E7\u05E8\u05D5\u05D0 \u05DE\u05D4\u05DC\u05D5\u05D7','error');}
+}
 function clearCompletedTopics(){
     document.querySelectorAll('.topic-item.completed').forEach(el=>el.remove());
     updateTopicBadge();dlog('Completed topics cleared','ok');
@@ -2002,6 +2016,7 @@ function doDisconnect(){
     if(remoteAudioCtx&&remoteAudioCtx.state!=='closed'){try{remoteAudioCtx.close();}catch(e){}}remoteAudioCtx=null;
     localAnalyser=null;remoteAnalyser=null;remoteGainNode=null;
     noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;musicSourceNode=null;
+    if(screenStream){screenStream.getTracks().forEach(t=>t.stop());screenStream=null;}
     connStartTime=null;bytesSent=0;bytesReceived=0;recRemoteChunks=[];_countdownActive=false;
     pingsSent=0;pongsReceived=0;isPaused=false;silenceSegments=[];currentSilenceStart=null;lastPongTime=0;joinRetryCount=0;
     _ml=_mr=_pl=_pr=_lb=_rb=null;
@@ -2151,6 +2166,29 @@ function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightnes
 function toggleHelp(){const h=document.getElementById('help-overlay');h.style.display=h.style.display==='none'?'block':'none';}
 
 // === FULLSCREEN ===
+// === SCREEN SHARE ===
+let screenStream=null;
+async function toggleScreenShare(){
+    const btn=document.getElementById('btn-screen');
+    if(screenStream){
+        screenStream.getTracks().forEach(t=>t.stop());screenStream=null;
+        document.getElementById('localVideo').srcObject=localStream;
+        btn.innerHTML='<i class="bi bi-display"></i>';btn.className='btn btn-sm btn-blue';
+        dlog('Screen share stopped','ok');return;
+    }
+    try{
+        screenStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+        document.getElementById('localVideo').srcObject=screenStream;
+        document.getElementById('local-no-vid').style.display='none';
+        btn.innerHTML='<i class="bi bi-display-fill"></i>';btn.className='btn btn-sm btn-green';
+        screenStream.getVideoTracks()[0].onended=()=>{
+            screenStream=null;document.getElementById('localVideo').srcObject=localStream;
+            btn.innerHTML='<i class="bi bi-display"></i>';btn.className='btn btn-sm btn-blue';
+        };
+        dlog('Screen sharing active','ok');
+    }catch(e){dlog('Screen share: '+e.message,'warn');}
+}
+
 function pipRemote(){
     const v=document.getElementById('remoteVideo');
     if(!v){dlog('No remote video','warn');return;}
@@ -2472,7 +2510,7 @@ try{
     const recentRooms=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');
     if(recentRooms.length>0){
         const rr=document.getElementById('recent-rooms'),rl=document.getElementById('recent-rooms-list');
-        if(rr&&rl){rr.style.display='block';rl.innerHTML=recentRooms.slice(0,5).map(r=>'<span style="cursor:pointer;color:var(--gold);margin:0 3px;padding:1px 6px;background:rgba(212,175,55,0.1);border-radius:4px" onclick="document.getElementById(\'room-id\').value=\''+r+'\'">'+r.substring(0,10)+'</span>').join('');}
+        if(rr&&rl){rr.style.display='flex';rl.innerHTML=recentRooms.slice(0,5).map(r=>'<span style="cursor:pointer;color:var(--gold);margin:0 3px;padding:1px 6px;background:rgba(212,175,55,0.1);border-radius:4px" onclick="document.getElementById(\'room-id\').value=\''+r+'\'">'+r.substring(0,10)+'</span>').join('');}
     }
     const lastConn=localStorage.getItem('podcast_last_connect');
     const sesCount=localStorage.getItem('podcast_session_count');
