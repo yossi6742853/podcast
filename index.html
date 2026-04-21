@@ -229,6 +229,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <span style="color:var(--muted);font-size:0.8rem;padding:0 4px">&#x05d0;&#x05d5;</span>
             <button class="btn btn-blue" id="btn-join" onclick="joinRoom()" title="&#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3; &#x05dc;&#x05d7;&#x05d3;&#x05e8; &#x05e7;&#x05d9;&#x05d9;&#x05dd; &#x05e2;&#x05dd; &#x05d4;&#x05e7;&#x05d5;&#x05d3;"><i class="bi bi-box-arrow-in-left"></i> &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</button>
             <button class="btn btn-sm btn-green" onclick="testMic()"><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;</button>
+            <button class="btn btn-sm btn-red" onclick="quickStart()" title="&#x05e6;&#x05d5;&#x05e8; &#x05d7;&#x05d3;&#x05e8; + &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;&#x05ea;"><i class="bi bi-lightning"></i> &#x05de;&#x05d4;&#x05d9;&#x05e8;</button>
             <button class="btn btn-sm btn-blue" onclick="soundTest()"><i class="bi bi-headphones"></i> &#x05e9;&#x05de;&#x05e2;</button>
             <button class="btn btn-sm btn-gold" onclick="preTest()" title="&#x05d1;&#x05d3;&#x05d9;&#x05e7;&#x05ea; &#x05de;&#x05d5;&#x05db;&#x05e0;&#x05d5;&#x05ea;"><i class="bi bi-check2-circle"></i> &#x05d1;&#x05d3;&#x05d5;&#x05e7;</button>
         </div>
@@ -578,7 +579,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 505 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 506 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -846,6 +847,12 @@ function setupDataConn(c) {
     });
 }
 
+function quickStart(){
+    // Set auto-record and create room
+    const ar=document.getElementById('auto-record');if(ar)ar.checked=true;
+    createRoom();
+    toast('\u26A1 \u05DE\u05E6\u05D1 \u05DE\u05D4\u05D9\u05E8 \u2014 \u05D4\u05E7\u05DC\u05D8\u05D4 \u05EA\u05EA\u05D7\u05D9\u05DC \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA',2500);
+}
 async function createRoom() {
     userName = document.getElementById('user-name').value.trim();
     if(!userName){document.getElementById('user-name').focus();document.getElementById('user-name').style.borderColor='var(--red)';showStatus('room-status','\u05D4\u05DB\u05E0\u05E1 \u05D0\u05EA \u05E9\u05DE\u05DA','error');return;}
@@ -3116,6 +3123,11 @@ function saveSessionHistory(){
         const session={date:new Date().toLocaleDateString('he-IL'),time:new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'}),duration:connStartTime?fmtTime(Date.now()-connStartTime):'--',recordings:recordingCount,score:0,participants:participants.size+1};
         history.unshift(session);if(history.length>20)history.length=20;
         localStorage.setItem('podcast_history',JSON.stringify(history));
+        // Lifetime stats
+        const ls=JSON.parse(localStorage.getItem('podcast_lifetime')||'{"sessions":0,"recordings":0,"minutes":0}');
+        ls.sessions++;ls.recordings+=recordingCount;
+        if(connStartTime)ls.minutes+=Math.round((Date.now()-connStartTime)/60000);
+        localStorage.setItem('podcast_lifetime',JSON.stringify(ls));
     }catch(e){}
 }
 
@@ -3131,7 +3143,9 @@ try{
     if(hist.length>0){
         const shEl=document.getElementById('session-history');
         if(shEl){shEl.style.display='block';
-        shEl.innerHTML='<div style="margin-bottom:3px;font-weight:700;color:var(--gold)"><i class="bi bi-clock-history"></i> \u05D4\u05D9\u05E1\u05D8\u05D5\u05E8\u05D9\u05D4:</div>'+hist.slice(0,3).map(s=>'<div style="padding:2px 0;opacity:0.7">'+s.date+' '+s.time+' \u2022 '+s.duration+' \u2022 '+s.recordings+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA \u2022 '+s.participants+' \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD</div>').join('');}
+        const ls=JSON.parse(localStorage.getItem('podcast_lifetime')||'{}');
+        const statsLine=ls.sessions?'<div style="padding:4px 8px;background:rgba(212,175,55,0.05);border-radius:6px;margin-bottom:4px;display:flex;gap:12px;justify-content:center"><span>\uD83C\uDFA4 '+ls.sessions+' \u05E1\u05E9\u05E0\u05D9\u05DD</span><span>\uD83D\uDD34 '+(ls.recordings||0)+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</span><span>\u23F1 '+(ls.minutes||0)+' \u05D3\u05E7\u05D5\u05EA</span></div>':'';
+        shEl.innerHTML=statsLine+'<div style="margin-bottom:3px;font-weight:700;color:var(--gold);font-size:0.75rem"><i class="bi bi-clock-history"></i> \u05D0\u05D7\u05E8\u05D5\u05E0\u05D9\u05DD:</div>'+hist.slice(0,3).map(s=>'<div style="padding:2px 0;opacity:0.7">'+s.date+' '+s.time+' \u2022 '+s.duration+' \u2022 '+s.recordings+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div>').join('');}
     }
 }catch(e){}
 
