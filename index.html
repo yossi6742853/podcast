@@ -278,6 +278,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
         <!-- Recordings tab -->
         <div class="tab-content active" id="tab-recordings">
+            <div id="rec-summary" style="display:none;padding:6px 12px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15);border-radius:8px;margin-bottom:6px;font-size:0.8rem;color:var(--muted);text-align:center"></div>
             <div id="downloads"><div style="text-align:center;padding:20px;color:var(--muted);opacity:0.5"><i class="bi bi-record-circle" style="font-size:2rem;display:block;margin-bottom:8px"></i>&#x05dc;&#x05d7;&#x05e5; "&#x05d4;&#x05ea;&#x05d7;&#x05dc; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;" &#x05d0;&#x05d5; R &#x05dc;&#x05d4;&#x05ea;&#x05d7;&#x05dc;&#x05d4;</div></div>
             <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                 <button class="btn btn-sm btn-blue" onclick="exportMarkersSRT()"><i class="bi bi-file-text"></i> SRT</button>
@@ -350,9 +351,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-list-check"></i> &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; &#x05dc;&#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8;</div>
             <div id="topic-progress" style="height:4px;background:var(--border);border-radius:2px;margin-bottom:8px;overflow:hidden"><div id="topic-progress-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div></div>
             <div id="topic-list" class="topic-list"></div>
-            <div style="display:flex;gap:6px;margin-top:8px">
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
                 <button class="btn btn-sm btn-gold" onclick="addTopic()"><i class="bi bi-plus"></i> &#x05d4;&#x05d5;&#x05e1;&#x05e3;</button>
-                <button class="btn btn-sm btn-blue" onclick="shareTopics()"><i class="bi bi-share"></i> &#x05e9;&#x05dc;&#x05d7; &#x05dc;&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</button>
+                <button class="btn btn-sm btn-blue" onclick="shareTopics()"><i class="bi bi-share"></i> &#x05e9;&#x05dc;&#x05d7;</button>
+                <button class="btn btn-sm btn-red" onclick="clearCompletedTopics()"><i class="bi bi-check2-all"></i> &#x05e0;&#x05e7;&#x05d4; &#x05e9;&#x05d4;&#x05d5;&#x05e9;&#x05dc;&#x05de;&#x05d5;</button>
             </div>
         </div>
 
@@ -372,6 +374,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div style="display:flex;gap:6px">
                 <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;..." style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter')sendChat()" oninput="sendTyping()">
                 <button class="btn btn-sm btn-gold" onclick="sendChat()"><i class="bi bi-send"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="exportChat()" title="&#x05d9;&#x05d9;&#x05e6;&#x05d0; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-download"></i></button>
                 <button class="btn btn-sm btn-red" onclick="document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0" title="&#x05e0;&#x05e7;&#x05d4; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-trash3"></i></button>
             </div>
         </div>
@@ -1211,9 +1214,20 @@ function addDL(name,blob,dur){
     const url=URL.createObjectURL(blob);const sz=(blob.size/1024/1024).toFixed(1);
     const timeStamp=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
     const uid='dl_'+Date.now()+'_'+Math.random().toString(36).substr(2,4);
+    // Type badge
+    const ext=name.split('.').pop().toUpperCase();
+    const isLocal=name.includes('\u05DE\u05E7\u05D5\u05DE\u05D9');
+    const isRemote=name.includes('\u05DE\u05E8\u05D5\u05D7\u05E7');
+    const isMixed=name.includes('\u05DE\u05E9\u05D5\u05DC\u05D1');
+    const badgeColor=isMixed?'var(--green)':isLocal?'var(--gold)':isRemote?'var(--blue)':'var(--muted)';
+    const badgeText=isMixed?'\u05DE\u05E9\u05D5\u05DC\u05D1':isLocal?'\u05DE\u05E7\u05D5\u05DE\u05D9':isRemote?'\u05DE\u05E8\u05D5\u05D7\u05E7':ext;
+    const badge='<span style="display:inline-block;background:'+badgeColor+';color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:900;margin-right:4px">'+badgeText+'</span><span style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;font-size:0.6rem;color:var(--muted)">'+ext+'</span>';
     const d=document.createElement('div');d.className='download-item';
-    d.innerHTML='<div class="info"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:var(--gold)"></i><div><b>'+name+'</b><div class="size">'+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-sm btn-blue" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i> \u05D4\u05D5\u05E8\u05D3</a></div>';
+    d.innerHTML='<div class="info"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:'+badgeColor+'"></i><div><b>'+name+'</b><div class="size">'+badge+' '+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-sm btn-blue" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i> \u05D4\u05D5\u05E8\u05D3</a></div>';
     document.getElementById('downloads').appendChild(d);
+    // Update summary
+    const rs=document.getElementById('rec-summary');
+    if(rs){const files=document.querySelectorAll('#downloads .download-item').length;rs.style.display='block';rs.innerHTML='<i class="bi bi-disc"></i> '+files+' \u05E7\u05D1\u05E6\u05D9\u05DD \u2022 '+(totalRecBytes/1048576).toFixed(1)+' MB \u05E1\u05D4\"\u05DB \u2022 '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA';}
 }
 let previewAudio=null;
 function playPreview(id,url,btn){
@@ -1340,8 +1354,17 @@ function updateTopicBadge(){
 function removeTopic(n){const el=document.getElementById('topic-'+n);if(el)el.remove();}
 let currentTopicStart=0;
 function setCurrentTopic(n){
-    // Save time on previous topic
-    if(currentTopicStart>0){const prev=document.querySelector('.topic-item.current .num');if(prev){const elapsed=Math.round((Date.now()-currentTopicStart)/1000);prev.title=elapsed+'s';}}
+    // Save time on previous topic and show it
+    if(currentTopicStart>0){
+        const prev=document.querySelector('.topic-item.current');
+        if(prev){
+            const elapsed=Math.round((Date.now()-currentTopicStart)/1000);
+            const numEl=prev.querySelector('.num');if(numEl)numEl.title=elapsed+'s';
+            let badge=prev.querySelector('.topic-time');
+            if(!badge){badge=document.createElement('span');badge.className='topic-time';badge.style.cssText='font-size:0.65rem;color:var(--muted);margin-right:4px';prev.appendChild(badge);}
+            badge.textContent=elapsed>=60?Math.floor(elapsed/60)+'m'+elapsed%60+'s':elapsed+'s';
+        }
+    }
     document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('current'));
     const el=document.getElementById('topic-'+n);if(el)el.classList.add('current');
     currentTopicStart=Date.now();
@@ -1358,8 +1381,22 @@ function shareTopics(){
     addChatMsg(userName,'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n'),true);
     dlog('Topics shared ('+topics.length+')','ok');
 }
+function clearCompletedTopics(){
+    document.querySelectorAll('.topic-item.completed').forEach(el=>el.remove());
+    updateTopicBadge();dlog('Completed topics cleared','ok');
+}
+function exportChat(){
+    const msgs=document.getElementById('chat-messages');
+    if(!msgs||!msgs.textContent.trim()){dlog('No chat to export','warn');return;}
+    const lines=[];
+    msgs.querySelectorAll('div').forEach(d=>{lines.push(d.textContent);});
+    const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='\u05E6\u05D0\u05D8_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    dlog('Chat exported ('+lines.length+' messages)','ok');
+}
 
-// === BACKGROUND REMOVAL ===
 // === NOTIFICATION SOUNDS ===
 function playBeep(freq, duration, vol) {
     try {
@@ -1385,6 +1422,7 @@ function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.
 function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i> \u05DE\u05D5\u05E9\u05EA\u05E7':'<i class="bi bi-mic-fill"></i> \u05D4\u05E9\u05EA\u05E7';b.className='btn btn-sm '+(isMuted?'btn-red':'btn-blue');}
 function toggleCam(){if(!localStream)return;const vt=localStream.getVideoTracks();if(!vt.length)return;isCamOff=!isCamOff;vt.forEach(t=>t.enabled=!isCamOff);document.getElementById('local-no-vid').style.display=isCamOff?'block':'none';const b=document.getElementById('btn-cam');b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i> \u05DB\u05D1\u05D5\u05D9':'<i class="bi bi-camera-video-fill"></i> \u05DE\u05E6\u05DC\u05DE\u05D4';b.className='btn btn-sm '+(isCamOff?'btn-red':'btn-blue');}
 function doDisconnect(){
+    if(isRecording&&!confirm('\u05D9\u05E9 \u05D4\u05E7\u05DC\u05D8\u05D4 \u05E4\u05E2\u05D9\u05DC\u05D4! \u05DC\u05E0\u05EA\u05E7?'))return;
     // Session summary
     if(connStartTime){
         const dur=fmtTime(Date.now()-connStartTime);
