@@ -24,7 +24,7 @@ html{scroll-behavior:smooth;scrollbar-color:rgba(212,175,55,0.2) var(--bg);scrol
 ::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,0.4)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
 :root{--bg:#0a0a14;--card:#111120;--card2:#161630;--border:#1e1e35;--gold:#d4af37;--gold2:#f7e98e;--green:#27ae60;--red:#e74c3c;--blue:#2980b9;--text:#e0e0e0;--muted:#666;--glow:rgba(212,175,55,0.08);--radius:8px}
-body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:15px;animation:bodyFadeIn 0.8s ease-out;background-image:radial-gradient(ellipse at 20% 50%,rgba(30,30,80,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(80,50,20,0.1) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(212,175,55,0.03) 0%,transparent 50%)}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:15px;animation:bodyFadeIn 0.8s ease-out;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;background-image:radial-gradient(ellipse at 20% 50%,rgba(30,30,80,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(80,50,20,0.1) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(212,175,55,0.03) 0%,transparent 50%)}
 h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradient(135deg,#d4af37 0%,#f7e98e 25%,#d4af37 50%,#f7e98e 75%,#d4af37 100%);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerTitle 6s linear infinite;filter:drop-shadow(0 0 15px rgba(212,175,55,0.3))}
 @keyframes bodyFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shimmerTitle{0%{background-position:0% 0%}100%{background-position:300% 0%}}
@@ -591,7 +591,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 530 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 533 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2058,7 +2058,7 @@ function updateTopicBadge(){
     const tab=document.querySelector('.tab:nth-child(3)');
     if(tab)tab.innerHTML='<i class="bi bi-list-check"></i> \u05E0\u05D5\u05E9\u05D0\u05D9\u05DD'+(remaining>0?' <span style="background:var(--blue);color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem">'+remaining+'</span>':' \u2705');
     const pb=document.getElementById('topic-progress-bar');
-    if(pb&&total>0)pb.style.width=Math.round(done/total*100)+'%';
+    if(pb&&total>0){pb.style.width=Math.round(done/total*100)+'%';pb.title=done+'/'+total+' \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5';}
     if(done===total&&total>0){dlog('\u05DB\u05DC \u05D4\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5! \u2705','ok');showStatus('studio-status','\uD83C\uDF89 \u05DB\u05DC \u05D4\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5!','success');playBeep(800,0.1);setTimeout(()=>playBeep(1000,0.1),100);setTimeout(()=>playBeep(1200,0.15),200);}
 }
 function removeTopic(n){const el=document.getElementById('topic-'+n);if(el)el.remove();}
