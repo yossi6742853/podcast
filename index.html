@@ -49,6 +49,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .btn-red{background:linear-gradient(135deg,var(--red),#e95e50);color:#fff}.btn-red:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(231,76,60,0.3)}
 .btn-blue{background:linear-gradient(135deg,var(--blue),#3498db);color:#fff}.btn-blue:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(41,128,185,0.3)}
 .btn-sm{padding:6px 14px;font-size:0.85rem}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 .status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:0.9rem;animation:statusFadeIn 0.4s ease-out}
 @keyframes statusFadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes loadingSpin{to{transform:rotate(360deg)}}
@@ -202,9 +203,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div class="toggle-row">
             <label><input type="checkbox" id="use-video"> <i class="bi bi-camera-video"></i> &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5;</label>
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-            <button class="btn btn-gold" onclick="createRoom()"><i class="bi bi-plus-circle"></i> &#x05e6;&#x05d5;&#x05e8; &#x05d7;&#x05d3;&#x05e8;</button>
-            <button class="btn btn-blue" onclick="joinRoom()"><i class="bi bi-box-arrow-in-left"></i> &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</button>
+        <div id="room-buttons" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn btn-gold" id="btn-create" onclick="createRoom()"><i class="bi bi-plus-circle"></i> &#x05e6;&#x05d5;&#x05e8; &#x05d7;&#x05d3;&#x05e8;</button>
+            <button class="btn btn-blue" id="btn-join" onclick="joinRoom()"><i class="bi bi-box-arrow-in-left"></i> &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</button>
             <button class="btn btn-sm btn-green" onclick="testMic()"><i class="bi bi-mic"></i> &#x05d1;&#x05d3;&#x05d5;&#x05e7; &#x05de;&#x05d9;&#x05e7;</button>
             <button class="btn btn-sm btn-blue" onclick="soundTest()"><i class="bi bi-headphones"></i> &#x05d4;&#x05e9;&#x05de;&#x05e2; &#x05d0;&#x05ea; &#x05e2;&#x05e6;&#x05de;&#x05da;</button>
         </div>
@@ -313,6 +314,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="exportMarkersSRT()"><i class="bi bi-file-text"></i> SRT</button>
                 <button class="btn btn-sm btn-blue" onclick="exportChaptersYT()"><i class="bi bi-youtube"></i> &#x05e4;&#x05e8;&#x05e7;&#x05d9;&#x05dd;</button>
                 <button class="btn btn-sm btn-green" onclick="exportSessionLog()"><i class="bi bi-journal-text"></i> &#x05d9;&#x05d5;&#x05de;&#x05df;</button>
+                <button class="btn btn-sm btn-green" onclick="copySessionLog()" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05d9;&#x05d5;&#x05de;&#x05df;"><i class="bi bi-clipboard-check"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="copyDebugLog()"><i class="bi bi-clipboard"></i> &#x05dc;&#x05d5;&#x05d2;</button>
                 <button class="btn btn-sm btn-gold" onclick="downloadAll()"><i class="bi bi-download"></i> &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;</button>
                 <button class="btn btn-sm btn-red" onclick="clearDownloads()"><i class="bi bi-trash"></i> &#x05e0;&#x05e7;&#x05d4;</button>
@@ -629,8 +631,11 @@ function setupDataConn(c) {
 
 async function createRoom() {
     userName = document.getElementById('user-name').value.trim() || '\u05DE\u05D0\u05E8\u05D7';
+    // Disable buttons during connection
+    const bc=document.getElementById('btn-create'),bj=document.getElementById('btn-join');
+    if(bc)bc.disabled=true;if(bj)bj.disabled=true;
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
-    try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
+    try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); if(bc)bc.disabled=false;if(bj)bj.disabled=false; return; }
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05E9\u05E8\u05EA...', 'waiting');
     const myId = 'pod_' + Math.random().toString(36).substring(2, 8);
     peer = makePeer(myId);
@@ -699,8 +704,10 @@ async function joinRoom() {
     const remoteId = document.getElementById('room-id').value.trim();
     userName = document.getElementById('user-name').value.trim() || '\u05D0\u05D5\u05E8\u05D7';
     if (!remoteId) { showStatus('room-status', '\u05D4\u05DB\u05E0\u05E1 \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8', 'error'); return; }
+    const bc2=document.getElementById('btn-create'),bj2=document.getElementById('btn-join');
+    if(bc2)bc2.disabled=true;if(bj2)bj2.disabled=true;
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
-    try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
+    try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); if(bc2)bc2.disabled=false;if(bj2)bj2.disabled=false; return; }
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05D7\u05D3\u05E8...', 'waiting');
     const myId = 'pod_' + Math.random().toString(36).substring(2, 8);
     peer = makePeer(myId);
@@ -1117,6 +1124,9 @@ function draw(){
             markers.forEach(m=>{const x=(m.ms/elapsed)*w;if(x>0&&x<w){ctx.strokeStyle='rgba(212,175,55,0.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}});
         }
     }
+    // Horizontal zero-line
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
     // Center divider with gradient
     const divGrad=ctx.createLinearGradient(w/2,0,w/2,h);
     divGrad.addColorStop(0,'transparent');divGrad.addColorStop(0.5,'rgba(255,255,255,0.15)');divGrad.addColorStop(1,'transparent');
@@ -1598,6 +1608,20 @@ function doDisconnect(){
         if(activeS>0)dlog('\u05D6\u05DE\u05DF \u05E4\u05E2\u05D9\u05DC: '+activeS+'s | \u05E1\u05E8\u05E7: '+Math.max(0,idleS)+'s | \u05E9\u05E7\u05D8\u05D9\u05DD: '+silenceSegments.length,'ok');
         dlog('\u05E6\u05D9\u05D5\u05DF \u05E1\u05E9\u05DF: '+score+'/100 '+stars,'ok');
         recLog.forEach(r=>dlog('  '+r.event+' #'+r.recNum+' @ '+r.time+(r.duration?' ('+r.duration+')':''),'ok'));
+        // Visual session summary card
+        const summaryCard=document.createElement('div');
+        summaryCard.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,rgba(17,17,32,0.97),rgba(22,22,48,0.95));border:1px solid var(--gold);border-radius:16px;padding:25px;z-index:250;max-width:400px;width:90%;backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.8);animation:tabFadeIn 0.4s';
+        summaryCard.innerHTML='<div style="text-align:center;margin-bottom:15px"><div style="font-size:2rem">'+stars+'</div><div style="color:var(--gold);font-size:1.2rem;font-weight:900">\u05E1\u05D9\u05DB\u05D5\u05DD \u05E1\u05E9\u05DF</div><div style="color:var(--muted);font-size:0.8rem">'+score+'/100</div></div>'
+            +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem">'
+            +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DE\u05E9\u05DA</div><div style="color:var(--gold);font-weight:700">'+dur+'</div></div>'
+            +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05E0\u05EA\u05D5\u05E0\u05D9\u05DD</div><div style="color:var(--blue);font-weight:700">'+totalMB+' MB</div></div>'
+            +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div><div style="color:var(--red);font-weight:700">'+recordingCount+'</div></div>'
+            +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DC\u05D8\u05E0\u05E1\u05D9</div><div style="font-weight:700;color:'+(avgLatency<100?'var(--green)':'#f39c12')+'">'+avgLatency+'ms</div></div>'
+            +'</div>'
+            +'<div style="text-align:center;margin-top:15px"><button class="btn btn-gold" onclick="this.parentElement.parentElement.remove()">\u05E1\u05D2\u05D5\u05E8</button></div>';
+        document.body.appendChild(summaryCard);
+        // Auto-dismiss after 10s
+        setTimeout(()=>{if(summaryCard.isConnected)summaryCard.remove();},10000);
         // Auto-export session log if recordings were made
         if(recordingCount>0){try{exportSessionLog();dlog('Session log auto-exported','ok');}catch(e){}}
     }
@@ -1848,6 +1872,20 @@ function exportSessionLog() {
     dlog('Session log exported', 'ok');
 }
 
+function copySessionLog(){
+    // Build same content as exportSessionLog but copy to clipboard
+    const lines=[];
+    const epTitle=document.getElementById('episode-title')?.value||'';
+    lines.push('\u05D9\u05D5\u05DE\u05DF \u05E1\u05E9\u05DF \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8');
+    if(epTitle)lines.push('\u05E4\u05E8\u05E7: '+epTitle);
+    lines.push('\u05EA\u05D0\u05E8\u05D9\u05DA: '+new Date().toLocaleDateString('he-IL'));
+    if(connStartTime)lines.push('\u05DE\u05E9\u05DA: '+fmtTime(Date.now()-connStartTime));
+    if(avgLatency>0)lines.push('\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms');
+    lines.push('\u05D4\u05E7\u05DC\u05D8\u05D5\u05EA: '+recordingCount+' | \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length);
+    markers.forEach((m,i)=>lines.push('  #'+(i+1)+' @ '+m.time+' - '+m.label));
+    document.querySelectorAll('.topic-item input').forEach((inp,i)=>{const done=inp.closest('.topic-item').classList.contains('completed');lines.push((done?'\u2713':'\u25CB')+' '+(inp.value||''));});
+    navigator.clipboard.writeText(lines.join('\n')).then(()=>{dlog('Session log copied!','ok');showStatus('studio-status','\u05D9\u05D5\u05DE\u05DF \u05D4\u05D5\u05E2\u05EA\u05E7!','success');});
+}
 function downloadAll(){
     const links=document.querySelectorAll('#downloads a[download]');
     if(links.length===0){dlog('No downloads','warn');return;}
