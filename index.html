@@ -407,10 +407,16 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="playSFX('whoosh')" title="&#x05d5;&#x05d5;&#x05e9;"><i class="bi bi-wind"></i></button>
                 <button class="btn btn-sm btn-gold" onclick="playSFX('intro')" title="&#x05d2;&#x05d9;&#x05e0;&#x05d2;&#x05dc; &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;"><i class="bi bi-play-circle"></i> &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;</button>
                 <button class="btn btn-sm btn-red" onclick="playSFX('outro')" title="&#x05d2;&#x05d9;&#x05e0;&#x05d2;&#x05dc; &#x05e1;&#x05d9;&#x05d5;&#x05dd;"><i class="bi bi-stop-circle"></i> &#x05e1;&#x05d9;&#x05d5;&#x05dd;</button>
-                <button class="btn btn-sm btn-gold" onclick="playBGLoop('chill')" title="&#x05e8;&#x05d2;&#x05d5;&#x05e2;"><i class="bi bi-cloud"></i></button>
-                <button class="btn btn-sm btn-blue" onclick="playBGLoop('upbeat')" title="&#x05d0;&#x05e0;&#x05e8;&#x05d2;&#x05d8;&#x05d9;"><i class="bi bi-lightning"></i></button>
-                <button class="btn btn-sm btn-green" onclick="playBGLoop('ambient')" title="&#x05d0;&#x05de;&#x05d1;&#x05d9;&#x05e0;&#x05d8;"><i class="bi bi-water"></i></button>
-                <button class="btn btn-sm btn-blue" onclick="stopBGLoop()" title="&#x05e2;&#x05e6;&#x05d5;&#x05e8; &#x05e8;&#x05e7;&#x05e2;"><i class="bi bi-stop-btn"></i></button>
+                <button class="btn btn-sm btn-gold" onclick="speakIntro()" title="&#x05e7;&#x05e8;&#x05d9;&#x05d9;&#x05e0;&#x05d5;&#x05ea; &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;"><i class="bi bi-megaphone"></i> &#x05e7;&#x05e8;&#x05d9;&#x05d9;&#x05e0;&#x05d5;&#x05ea;</button>
+            </div>
+            <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">
+                <span style="font-size:0.75rem;color:var(--muted);margin-left:4px">&#x05e8;&#x05e7;&#x05e2;:</span>
+                <button class="btn btn-sm btn-gold" onclick="playBGLoop('chill')" title="&#x05e8;&#x05d2;&#x05d5;&#x05e2;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-cloud"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="playBGLoop('upbeat')" title="&#x05d0;&#x05e0;&#x05e8;&#x05d2;&#x05d8;&#x05d9;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-lightning"></i></button>
+                <button class="btn btn-sm btn-green" onclick="playBGLoop('ambient')" title="&#x05d0;&#x05de;&#x05d1;&#x05d9;&#x05e0;&#x05d8;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-water"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="playBGLoop('dramatic')" title="&#x05d3;&#x05e8;&#x05de;&#x05d8;&#x05d9;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-exclamation-triangle"></i></button>
+                <button class="btn btn-sm btn-gold" onclick="playBGLoop('jazz')" title="&#x05d2;'&#x05d0;&#x05d6;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-music-note"></i></button>
+                <button class="btn btn-sm btn-red" onclick="stopBGLoop()" title="&#x05e2;&#x05e6;&#x05d5;&#x05e8;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-stop-btn"></i></button>
             </div>
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-music-note-beamed"></i> &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2;</div>
             <div class="settings-row">
@@ -1930,16 +1936,29 @@ function playSFX(type){
         // Longer cinematic whoosh
         const o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();o.type='sawtooth';f.type='lowpass';f.frequency.setValueAtTime(200,now);f.frequency.exponentialRampToValueAtTime(8000,now+0.3);f.frequency.exponentialRampToValueAtTime(200,now+0.8);o.frequency.setValueAtTime(80,now);o.frequency.exponentialRampToValueAtTime(2000,now+0.4);o.frequency.exponentialRampToValueAtTime(80,now+0.8);g.gain.setValueAtTime(0.06,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.8);o.connect(f);f.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.8);
     }else if(type==='intro'){
-        // Professional podcast intro jingle (3 seconds)
-        const melody=[{f:440,t:0,d:0.3},{f:523,t:0.3,d:0.3},{f:659,t:0.6,d:0.3},{f:784,t:0.9,d:0.6},{f:659,t:1.5,d:0.2},{f:784,t:1.7,d:0.2},{f:1047,t:1.9,d:0.8}];
-        melody.forEach(n=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=n.f;g.gain.setValueAtTime(0.1,now+n.t);g.gain.exponentialRampToValueAtTime(0.001,now+n.t+n.d);o.connect(g);g.connect(ctx.destination);o.start(now+n.t);o.stop(now+n.t+n.d+0.1);});
-        // Bass pad
-        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='triangle';bass.frequency.value=110;bg.gain.setValueAtTime(0.06,now);bg.gain.exponentialRampToValueAtTime(0.001,now+2.8);bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+3);
+        // Professional podcast intro (5 seconds) — rich layered melody + bass + shimmer
+        const melody=[{f:330,t:0,d:0.4},{f:392,t:0.3,d:0.4},{f:440,t:0.6,d:0.3},{f:523,t:0.9,d:0.5},{f:659,t:1.4,d:0.4},{f:784,t:1.8,d:0.3},{f:880,t:2.1,d:0.4},{f:1047,t:2.5,d:0.8},{f:880,t:3.3,d:0.3},{f:1047,t:3.6,d:1.2}];
+        melody.forEach(n=>{
+            ['sine','triangle'].forEach((type,ti)=>{
+                const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=n.f*(ti===1?2:1);
+                g.gain.setValueAtTime(ti===0?0.08:0.03,now+n.t);g.gain.exponentialRampToValueAtTime(0.001,now+n.t+n.d);
+                o.connect(g);g.connect(ctx.destination);o.start(now+n.t);o.stop(now+n.t+n.d+0.1);
+            });
+        });
+        // Deep bass pad
+        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='triangle';bass.frequency.setValueAtTime(55,now);bass.frequency.linearRampToValueAtTime(110,now+2);bass.frequency.setValueAtTime(110,now+2);bg.gain.setValueAtTime(0.05,now);bg.gain.exponentialRampToValueAtTime(0.001,now+4.8);bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+5);
+        // Shimmer (high frequency sparkle)
+        for(let i=0;i<8;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=2000+Math.random()*2000;g.gain.setValueAtTime(0.01,now+i*0.6);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.6+0.3);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.6);o.stop(now+i*0.6+0.35);}
     }else if(type==='outro'){
-        // Podcast outro (descending + fade)
-        const melody=[{f:1047,t:0,d:0.4},{f:784,t:0.4,d:0.3},{f:659,t:0.7,d:0.3},{f:523,t:1.0,d:0.3},{f:440,t:1.3,d:0.5},{f:349,t:1.8,d:0.8}];
-        melody.forEach(n=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=n.f;g.gain.setValueAtTime(0.08,now+n.t);g.gain.exponentialRampToValueAtTime(0.001,now+n.t+n.d);o.connect(g);g.connect(ctx.destination);o.start(now+n.t);o.stop(now+n.t+n.d+0.1);});
-        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='triangle';bass.frequency.value=110;bg.gain.setValueAtTime(0.05,now);bg.gain.exponentialRampToValueAtTime(0.001,now+2.7);bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+3);
+        // Professional outro (4 seconds) — descending + soft resolution
+        const melody=[{f:1047,t:0,d:0.5},{f:880,t:0.4,d:0.4},{f:784,t:0.8,d:0.4},{f:659,t:1.2,d:0.4},{f:523,t:1.6,d:0.5},{f:440,t:2.1,d:0.5},{f:330,t:2.6,d:0.6},{f:261,t:3.2,d:1.0}];
+        melody.forEach(n=>{
+            const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=n.f;
+            g.gain.setValueAtTime(0.07,now+n.t);g.gain.exponentialRampToValueAtTime(0.001,now+n.t+n.d);
+            o.connect(g);g.connect(ctx.destination);o.start(now+n.t);o.stop(now+n.t+n.d+0.1);
+        });
+        // Warm bass resolution
+        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='triangle';bass.frequency.setValueAtTime(110,now);bass.frequency.linearRampToValueAtTime(65,now+3.5);bg.gain.setValueAtTime(0.04,now);bg.gain.exponentialRampToValueAtTime(0.001,now+4);bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+4.2);
     }
     // Send to remote (skip if received from remote to avoid loop)
     if(conn&&conn.open&&!window._sfxFromRemote)conn.send({type:'sfx',sfx:type});
@@ -1950,6 +1969,32 @@ function playSFX(type){
     document.body.appendChild(fl);setTimeout(()=>fl.remove(),1000);
     dlog('SFX: '+type,'ok');
 }
+// === TTS INTRO/OUTRO ===
+function speakIntro(){
+    if(!('speechSynthesis' in window)){dlog('TTS not supported','err');return;}
+    const epTitle=document.getElementById('episode-title')?.value||'\u05D4\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
+    // Play intro jingle first, then speak
+    playSFX('intro');
+    setTimeout(()=>{
+        const u=new SpeechSynthesisUtterance('\u05D1\u05E8\u05D5\u05DB\u05D9\u05DD \u05D4\u05D1\u05D0\u05D9\u05DD \u05DC'+epTitle+'! \u05D0\u05E0\u05D7\u05E0\u05D5 \u05DE\u05EA\u05D7\u05D9\u05DC\u05D9\u05DD.');
+        u.lang='he-IL';u.rate=0.9;u.pitch=1.0;u.volume=0.8;
+        // Try to find Hebrew voice
+        const voices=speechSynthesis.getVoices();
+        const heVoice=voices.find(v=>v.lang.startsWith('he'))||voices.find(v=>v.lang.startsWith('ar'))||null;
+        if(heVoice)u.voice=heVoice;
+        speechSynthesis.speak(u);
+        dlog('TTS intro: '+epTitle,'ok');
+    },2500); // After jingle
+}
+function speakCustom(text){
+    if(!('speechSynthesis' in window))return;
+    const u=new SpeechSynthesisUtterance(text);u.lang='he-IL';u.rate=0.9;u.pitch=1.0;u.volume=0.8;
+    const voices=speechSynthesis.getVoices();
+    const heVoice=voices.find(v=>v.lang.startsWith('he'))||null;
+    if(heVoice)u.voice=heVoice;
+    speechSynthesis.speak(u);
+}
+
 // === BACKGROUND MUSIC LOOPS ===
 let bgLoopOscs=[];
 function stopBGLoop(){bgLoopOscs.forEach(o=>{try{o.stop();}catch(e){}});bgLoopOscs=[];dlog('BG music stopped','ok');}
@@ -1970,6 +2015,17 @@ function playBGLoop(style){
     }else if(style==='ambient'){
         // Slow evolving tones
         [110,165,220,277].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;o.frequency.setValueAtTime(f,now);o.frequency.linearRampToValueAtTime(f*1.05,now+dur/2);o.frequency.linearRampToValueAtTime(f,now+dur);g.gain.value=0.015;o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+dur);bgLoopOscs.push(o);});
+    }else if(style==='dramatic'){
+        // Cinematic suspense — deep bass + high strings
+        const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='sawtooth';bass.frequency.value=55;bg.gain.value=0.03;bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+dur);bgLoopOscs.push(bass);
+        // High tension strings
+        [659,784,880,784].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.015,now+i*4);g.gain.exponentialRampToValueAtTime(0.001,now+i*4+3.5);o.connect(g);g.connect(ctx.destination);o.start(now+i*4);o.stop(now+i*4+4);bgLoopOscs.push(o);});
+    }else if(style==='jazz'){
+        // Jazz-style walking bass + chords
+        const bassNotes=[110,130,147,165,147,130,110,98];
+        bassNotes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0.04,now+i*2);g.gain.exponentialRampToValueAtTime(0.001,now+i*2+1.8);o.connect(g);g.connect(ctx.destination);o.start(now+i*2);o.stop(now+i*2+2);bgLoopOscs.push(o);});
+        // Soft chord stabs every 4 seconds
+        [[220,277,330,415],[196,247,294,370]].forEach((chord,ci)=>{chord.forEach(f=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.012,now+ci*8);g.gain.exponentialRampToValueAtTime(0.001,now+ci*8+3);o.connect(g);g.connect(ctx.destination);o.start(now+ci*8);o.stop(now+ci*8+3.5);bgLoopOscs.push(o);});});
     }
     dlog('BG loop: '+style+' ('+dur+'s)','ok');
     showStatus('studio-status','\uD83C\uDFB5 \u05DE\u05D5\u05D6\u05D9\u05E7\u05EA \u05E8\u05E7\u05E2: '+style,'success');
