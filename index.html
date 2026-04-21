@@ -118,7 +118,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .settings-row label{font-size:0.85rem;color:var(--muted)}
 .settings-row select,.settings-row input[type=file]{padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;max-width:220px;font-size:0.85rem}
-.download-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-top:6px;border:1px solid var(--border);font-size:0.9rem;animation:tabFadeIn 0.4s}
+.download-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-top:6px;border:1px solid var(--border);font-size:0.9rem;animation:tabFadeIn 0.4s;transition:border-color 0.2s}
+.download-item:hover{border-color:rgba(212,175,55,0.2)}
 .download-item .info{display:flex;align-items:center;gap:8px;overflow:hidden;min-width:0}
 .download-item .info b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;display:block}
 .download-item .size{color:var(--muted);font-size:0.8rem}
@@ -585,7 +586,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 522 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 523 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1302,7 +1303,7 @@ function showConnected() {
         document.getElementById('total-data').textContent = (totalBytes/1048576).toFixed(1) + 'MB \u2191'+audioChunksOut+'\u2193'+audioChunksIn;
         const lr2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
         const ls=document.getElementById('loss-stat');if(ls){ls.textContent=lr2+'%';ls.style.color=lr2>5?'var(--red)':lr2>1?'#f39c12':'var(--green)';}
-        document.getElementById('rec-status-stat').textContent = isRecording ? '\u25CF REC' : 'Ready';
+        document.getElementById('rec-status-stat').textContent = isRecording ? '\u25CF REC' : (pingsSent>0?Math.round(pongsReceived/pingsSent*100)+'%':'Ready');
         document.getElementById('rec-status-stat').style.color = isRecording ? 'var(--red)' : 'var(--green)';
         // Live talk ratio
         const ts=speakTimeLocal+speakTimeRemote;
@@ -2843,7 +2844,8 @@ function sendChat() {
         if(cmd==='/clear'){document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0;input.value='';return;}
         if(cmd==='/topic'||cmd==='/t'){if(arg)addTopic(arg);switchTab('topics');input.value='';return;}
         if(cmd==='/sfx'&&arg){playSFX(arg);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/marker [name] /clear /topic [text] /sfx [type]',false);input.value='';return;}
+        if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/marker /clear /topic /sfx /stats /help',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
