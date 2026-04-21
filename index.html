@@ -216,7 +216,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <span id="conn-health" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px"></span> <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
-    <div class="panel" id="panel-room">
+    <div class="panel" id="panel-room" style="border-top:2px solid rgba(212,175,55,0.2)">
         <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.3 | 525</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
@@ -249,6 +249,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div class="settings-row"><label><i class="bi bi-camera-video"></i> &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;:</label><select id="cam-select"></select></div>
         <div id="recent-rooms" style="display:none;margin-top:6px;font-size:0.75rem;color:var(--muted);align-items:center;gap:4px;flex-wrap:wrap"><i class="bi bi-clock-history"></i> <span id="recent-rooms-list"></span><span onclick="localStorage.removeItem('podcast_recent_rooms');this.parentElement.style.display='none'" style="cursor:pointer;color:var(--red);opacity:0.5;font-size:0.65rem" title="&#x05e0;&#x05e7;&#x05d4;">&#x2715;</span></div>
         <div id="session-history" style="display:none;margin-top:6px;font-size:0.7rem;color:var(--muted)"></div>
+        <div id="pro-tip" style="margin-top:8px;padding:8px 12px;background:rgba(212,175,55,0.03);border-radius:8px;border:1px solid rgba(212,175,55,0.08);font-size:0.7rem;color:var(--muted)"></div>
         <div style="position:relative">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <span style="font-size:0.7rem;color:var(--muted);cursor:pointer" onclick="const dl=document.getElementById('debug-log');dl.style.display=dl.style.display==='none'?'block':'none'"><i class="bi bi-terminal"></i> &#x05dc;&#x05d5;&#x05d2;</span>
@@ -589,7 +590,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 525 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 526 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -3248,6 +3249,20 @@ try{
         shEl.innerHTML=statsLine+'<div style="margin-bottom:3px;font-weight:700;color:var(--gold);font-size:0.75rem"><i class="bi bi-clock-history"></i> \u05D0\u05D7\u05E8\u05D5\u05E0\u05D9\u05DD:</div>'+hist.slice(0,3).map(s=>'<div style="padding:2px 0;opacity:0.7">'+s.date+' '+s.time+' \u2022 '+s.duration+' \u2022 '+s.recordings+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA</div>').join('');}
     }
 }catch(e){}
+
+// Pro tips
+const tips=[
+    '\uD83C\uDFA4 Shift+R \u05DE\u05EA\u05D7\u05D9\u05DC \u05D4\u05E7\u05DC\u05D8\u05D4 \u05DE\u05D9\u05D9\u05D3\u05D9\u05EA (בלי ספירה)',
+    '\u2328 \u05DC\u05D7\u05E5 ? \u05DC\u05E8\u05D0\u05D5\u05EA 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9 \u05DE\u05E7\u05DC\u05D3\u05EA',
+    '\uD83D\uDD0A \u05DC\u05D7\u05E5 \u05E2\u05DC \u05D4\u05DC\u05D8\u05E0\u05E1\u05D9 \u05DC\u05E8\u05D0\u05D5\u05EA \u05E4\u05E8\u05D8\u05D9 \u05D7\u05D9\u05D1\u05D5\u05E8',
+    '\uD83C\uDFB5 J = Play/Pause \u05DE\u05D5\u05D6\u05D9\u05E7\u05D4',
+    '\uD83D\uDCCB /stats \u05D1\u05E6\u05D0\u05D8 \u05DC\u05E8\u05D0\u05D5\u05EA \u05E1\u05D8\u05D8\u05D9\u05E1\u05D8\u05D9\u05E7\u05D5\u05EA',
+    '\u270B W = \u05D9\u05D3 \u05DC\u05DE\u05E2\u05DC\u05D4 — \u05DC\u05E1\u05DE\u05DF \u05E9\u05D0\u05EA\u05D4 \u05E8\u05D5\u05E6\u05D4 \u05DC\u05D3\u05D1\u05E8',
+    '\uD83D\uDD07 \u05E8\u05D5\u05D5\u05D7 = Push-to-Talk \u05DB\u05E9\u05DE\u05D5\u05E9\u05EA\u05E7',
+    '\uD83C\uDFA7 \u05E4\u05E8\u05D9\u05E1\u05D8\u05D9 EQ: \u05E7\u05D5\u05DC, \u05D7\u05DD, \u05D1\u05D4\u05D9\u05E8, \u05E8\u05D3\u05D9\u05D5, \u05D8\u05DC\u05E4\u05D5\u05DF'
+];
+const ptEl=document.getElementById('pro-tip');
+if(ptEl)ptEl.innerHTML='\uD83D\uDCA1 <b>Tip:</b> '+tips[Math.floor(Math.random()*tips.length)];
 
 // Auto-focus: if name exists, focus room ID; otherwise focus name
 setTimeout(()=>{
