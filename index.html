@@ -598,7 +598,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 600 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; &#x1f389;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 605 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2858,12 +2858,16 @@ function sendChat() {
         if(cmd==='/sfx'&&arg){playSFX(arg);input.value='';return;}
         if(cmd==='/rec'||cmd==='/record'){toggleRecording();input.value='';return;}
         if(cmd==='/mute'){toggleMute();input.value='';return;}
+        if(cmd==='/intro'){speakIntro();input.value='';return;}
+        if(cmd==='/outro'){speakOutro();input.value='';return;}
+        if(cmd==='/compact'){toggleCompact();input.value='';return;}
+        if(cmd==='/dim'){toggleDim();input.value='';return;}
         if(cmd==='/test'){sendTestTone();input.value='';return;}
         if(cmd==='/ping'){addChatMsg('\uD83C\uDFD3','\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D9\u05E6\u05D9\u05D1\u05D5\u05EA: '+(pingsSent>0?Math.round(pongsReceived/pingsSent*100):0)+'%',false);input.value='';return;}
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/rec /mute /test /marker /clear /topic /sfx /stats /time /who /ping /help',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/rec /mute /test /intro /outro /marker /clear /topic /sfx /compact /dim /stats /time /who /ping',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
