@@ -559,13 +559,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             4. &#x05e8;&#x05e2;&#x05e0;&#x05df; &#x05d5;&#x05e0;&#x05e1;&#x05d4; &#x05e9;&#x05d5;&#x05d1;
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v9.4:</b><br>
-            &#x2022; &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05d4; &#x05dc;&#x05de;&#x05d0;&#x05e8;&#x05d7; (H)<br>
-            &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;<br>
-            &#x2022; &#x05d0;&#x05e4;&#x05e7;&#x05d8;&#x05d9;&#x05dd; &#x05e7;&#x05d5;&#x05dc;&#x05d9;&#x05d9;&#x05dd; + &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9;<br>
-            &#x2022; Push-to-Talk (&#x05e8;&#x05d5;&#x05d5;&#x05d7;)<br>
-            &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05e7;&#x05d5;&#x05de;&#x05e4;&#x05e7;&#x05d8;&#x05d9; (C)<br>
-            &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;&#x05ea; &#x05d1;&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8;
+            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v9.5:</b><br>
+            &#x2022; &#x05ea;&#x05d9;&#x05e7;&#x05d5;&#x05df; &#x05d3;&#x05d9;&#x05dc;&#x05d9;&#x05d9; &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1;<br>
+            &#x2022; &#x05e7;&#x05e8;&#x05d9;&#x05d9;&#x05e0;&#x05d5;&#x05ea; TTS &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4; + &#x05e1;&#x05d9;&#x05d5;&#x05dd;<br>
+            &#x2022; 5 &#x05e1;&#x05d2;&#x05e0;&#x05d5;&#x05e0;&#x05d5;&#x05ea; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2;<br>
+            &#x2022; &#x05e1;&#x05e4;&#x05e7;&#x05d8;&#x05e8;&#x05d5;&#x05d2;&#x05e8;&#x05dd; + &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05e9;&#x05de;&#x05e2;<br>
+            &#x2022; &#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05de;&#x05e1;&#x05da; + &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05d4; &#x05de;&#x05d0;&#x05e8;&#x05d7;<br>
+            &#x2022; &#x05d9;&#x05d9;&#x05d1;&#x05d5;&#x05d0; &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; &#x05de;&#x05dc;&#x05d5;&#x05d7;
         </div>
         <div style="margin-top:15px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
@@ -617,6 +617,8 @@ async function getLocalStream(){useVideo=document.getElementById('use-video').ch
 
 // === PeerJS + Audio over Data Channel ===
 // Strategy: PeerJS data channel for audio relay (bypasses NetFree media blocking)
+// Multi-participant support: connections stored in Map
+let participants = new Map(); // peerId -> {conn, name, audioCtx, gainNode, nextPlayTime, jitterBuf, ...}
 let audioSendInterval = null;
 let remoteAudioCtx = null;
 let remoteGainNode = null;
@@ -644,11 +646,17 @@ function makePeer(myId){
 }
 
 function setupDataConn(c) {
-    // Clean up old connection listeners
-    if (conn && conn !== c) { try { conn.removeAllListeners(); } catch(e) {} }
+    // Track in participants map
+    const pid = c.peer || ('p'+Date.now());
+    participants.set(pid, {conn:c, name:'\u05DE\u05E9\u05EA\u05EA\u05E3', joined:Date.now()});
+    dlog('Participant joined: '+pid+' (total: '+participants.size+')','ok');
+    updateParticipantsList();
+    // Keep backward compatibility: conn = last connected peer
     conn = c;
     c.on('data', function(d) {
         if (d.type === 'name') {
+            // Update participant name in map
+            const p=participants.get(pid);if(p){p.name=d.name;updateParticipantsList();}
             document.getElementById('name-remote').textContent = d.name;
             document.getElementById('label-remote').textContent = d.name;
             document.getElementById('banner-remote').textContent = d.name;
@@ -742,7 +750,8 @@ function setupDataConn(c) {
     });
     let reconnectAttempts = 0;
     c.on('close', function() {
-        dlog('Connection closed by remote', 'warn');
+        participants.delete(pid);updateParticipantsList();
+        dlog('Connection closed: '+pid+' (remaining: '+participants.size+')','warn');
         const badge = document.getElementById('latency-badge');
         if (badge) badge.className = 'disconnected';
         if (isConnected && reconnectAttempts < 5) {
@@ -939,7 +948,8 @@ function startAudioRelay() {
             samples[i] = Math.max(-32768, Math.min(32767, Math.round(s * 32767)));
         }
         try {
-            conn.send({type: 'a', s: samples, seq: chunkSeq++, sr: audioCtx.sampleRate});
+            const audioMsg={type: 'a', s: samples, seq: chunkSeq++, sr: audioCtx.sampleRate};
+            if(participants.size>1)broadcast(audioMsg); else if(conn&&conn.open)conn.send(audioMsg);
             bytesSent += samples.byteLength + 10;audioChunksOut++;chunksSentCount++;
             if(chunksSentCount===1)dlog('First audio chunk sent! sr='+audioCtx.sampleRate,'ok');
             if(chunksSentCount%1000===0)dlog('Audio: '+chunksSentCount+' chunks sent','ok');
@@ -2056,6 +2066,29 @@ function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
 function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.15), 150); }
 
+// === PARTICIPANTS ===
+function updateParticipantsList(){
+    const count=participants.size;
+    // Update guest status display
+    const gs=document.getElementById('guest-status');
+    if(gs){
+        if(count===0)gs.innerHTML='<span style="color:var(--muted)">\u05D0\u05D9\u05DF \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD</span>';
+        else{
+            const names=[];participants.forEach(p=>names.push(p.name));
+            gs.innerHTML='<i class="bi bi-circle-fill" style="font-size:0.5rem;color:var(--green)"></i> '+names.join(', ')+' ('+count+')';
+        }
+    }
+    // Update banner if multi
+    if(count>1){
+        const br=document.getElementById('banner-remote');
+        if(br){const names=[];participants.forEach(p=>names.push(p.name));br.textContent=names.join(' + ');}
+    }
+}
+// Broadcast to all participants
+function broadcast(data){
+    participants.forEach(p=>{if(p.conn&&p.conn.open)try{p.conn.send(data);}catch(e){}});
+}
+
 // === HOST COMMANDS ===
 function hostCmd(cmd,val){
     if(!conn||!conn.open){dlog('Not connected','warn');return;}
@@ -2172,6 +2205,8 @@ function doDisconnect(){
     if(autoSaveInterval){clearInterval(autoSaveInterval);autoSaveInterval=null;}
     if(relayProcessor){relayProcessor.disconnect();relayProcessor=null;}
     if(activeCall){activeCall.close();activeCall=null;}
+    // Close all participant connections
+    participants.forEach(p=>{try{p.conn.close();}catch(e){}});participants.clear();
     if(conn){conn.close();conn=null;}
     if(peer){peer.destroy();peer=null;}
     if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}
