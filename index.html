@@ -61,7 +61,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .status.info{background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.3);color:var(--blue)}
 .video-grid{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .video-box{flex:1;min-width:250px;position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:16/9;border:2px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:border-color 0.3s}
-.video-box:hover{border-color:rgba(212,175,55,0.3)}
+.video-box:hover{border-color:rgba(212,175,55,0.3);box-shadow:0 4px 25px rgba(0,0,0,0.5),0 0 8px rgba(212,175,55,0.1)}
 .video-box.speaking{border-color:var(--green);box-shadow:0 0 20px rgba(39,174,96,0.4);transition:border-color 0.15s,box-shadow 0.15s}
 .video-box.connected-glow{box-shadow:0 0 8px rgba(39,174,96,0.2);animation:connectedPulse 3s ease-in-out}
 @keyframes connectedPulse{0%{box-shadow:0 0 0 rgba(39,174,96,0)}30%{box-shadow:0 0 30px rgba(39,174,96,0.4)}100%{box-shadow:0 0 8px rgba(39,174,96,0.2)}}
@@ -73,12 +73,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 .mute-indicator{position:absolute;bottom:8px;left:8px;background:rgba(231,76,60,0.85);color:#fff;padding:3px 8px;border-radius:6px;font-size:0.65rem;font-weight:700;display:none;z-index:5;animation:recBlink 1.5s infinite}
 .no-video-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;color:var(--muted);opacity:0.3}
-.avatar-initials{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;opacity:0.6}
+.avatar-initials{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75px;height:75px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:900;opacity:0.7;transition:opacity 0.3s,transform 0.3s}
+.video-box:hover .avatar-initials{opacity:0.9;transform:translate(-50%,-50%) scale(1.05)}
 .avatar-initials.me{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(212,175,55,0.1));color:var(--gold);border:2px solid rgba(212,175,55,0.3)}
 .avatar-initials.remote{background:linear-gradient(135deg,rgba(41,128,185,0.3),rgba(41,128,185,0.1));color:var(--blue);border:2px solid rgba(41,128,185,0.3)}
 .meter-box{text-align:center;max-width:60px}
 .meter-bar-wrap{height:60px;width:20px;background:var(--bg);border-radius:10px;margin:0 auto;position:relative;overflow:hidden;border:2px solid var(--border)}
-.meter-bar{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,var(--green),#f39c12,var(--red));border-radius:0 0 8px 8px;transition:height 0.08s ease-out}
+.meter-bar{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,var(--green) 0%,var(--green) 50%,#f39c12 75%,var(--red) 100%);border-radius:0 0 8px 8px;transition:height 0.06s ease-out}
 .meter-peak{position:absolute;width:100%;height:2px;background:var(--gold);transition:bottom 0.1s;box-shadow:0 0 4px var(--gold)}
 .meter-bar-wrap.clipping{border-color:var(--red);animation:clipFlash 0.3s}
 @keyframes clipFlash{0%{box-shadow:0 0 10px var(--red)}100%{box-shadow:none}}
@@ -132,7 +133,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .tab:hover{color:var(--text);background:rgba(255,255,255,0.03)}
 .tab:focus-visible{color:var(--gold);background:rgba(212,175,55,0.08)}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(212,175,55,0.05)}
-.tab-content{display:none}.tab-content.active{display:block}
+.tab-content{display:none;opacity:0;transition:opacity 0.2s}.tab-content.active{display:block;opacity:1}
 
 /* Music panel */
 .music-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
@@ -1144,8 +1145,8 @@ function drainJitterBuffer() {
 function showConnected() {
     const pr=document.getElementById('panel-room'),ps=document.getElementById('panel-studio');
     pr.style.opacity='0';pr.style.transition='opacity 0.4s';
-    setTimeout(()=>{pr.style.display='none';ps.style.display='block';ps.style.opacity='0';ps.style.transition='opacity 0.4s';
-    setTimeout(()=>{ps.style.opacity='1';window.scrollTo({top:0,behavior:'smooth'});},50);},400);
+    setTimeout(()=>{pr.style.display='none';ps.style.display='block';ps.style.opacity='0';ps.style.transform='scale(0.98)';ps.style.transition='opacity 0.4s,transform 0.4s';
+    setTimeout(()=>{ps.style.opacity='1';ps.style.transform='scale(1)';window.scrollTo({top:0,behavior:'smooth'});},50);},400);
     document.getElementById('name-local').textContent = userName;
     document.getElementById('label-local').textContent = userName;
     document.getElementById('banner-local').textContent = userName + (isHost?' (\u05DE\u05D0\u05E8\u05D7)':' (\u05D0\u05D5\u05E8\u05D7)');
@@ -2137,8 +2138,19 @@ function playBGLoop(style){
         // Hi-hat rhythm
         for(let i=0;i<dur*4;i++){const buf=ctx.createBuffer(1,ctx.sampleRate*0.03,ctx.sampleRate);const d=buf.getChannelData(0);for(let j=0;j<d.length;j++)d[j]=(Math.random()*2-1)*Math.exp(-j/d.length*8);const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=buf;g.gain.value=i%2===0?0.02:0.01;s.connect(g);g.connect(ctx.destination);s.start(now+i*0.25);bgLoopOscs.push(s);}
     }else if(style==='ambient'){
-        // Slow evolving tones
-        [110,165,220,277].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;o.frequency.setValueAtTime(f,now);o.frequency.linearRampToValueAtTime(f*1.05,now+dur/2);o.frequency.linearRampToValueAtTime(f,now+dur);g.gain.value=0.015;o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+dur);bgLoopOscs.push(o);});
+        // Rich evolving tones with filtered noise + binaural
+        [110,165,220,277].forEach((f,i)=>{
+            const o=ctx.createOscillator(),g=ctx.createGain(),flt=ctx.createBiquadFilter();
+            o.type='sine';o.frequency.setValueAtTime(f,now);o.frequency.linearRampToValueAtTime(f*1.06,now+dur/2);o.frequency.linearRampToValueAtTime(f*0.97,now+dur);
+            flt.type='lowpass';flt.frequency.setValueAtTime(300,now);flt.frequency.linearRampToValueAtTime(800,now+8);flt.frequency.linearRampToValueAtTime(300,now+dur);
+            g.gain.value=0.012;o.connect(flt);flt.connect(g);g.connect(ctx.destination);o.start(now+i*1);o.stop(now+dur);bgLoopOscs.push(o);
+        });
+        // Gentle noise wash (ocean-like)
+        const nBuf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);const nd=nBuf.getChannelData(0);
+        for(let i=0;i<nd.length;i++)nd[i]=(Math.random()*2-1)*0.5*(1+Math.sin(i/ctx.sampleRate*0.3))*0.5;
+        const ns=ctx.createBufferSource(),ng=ctx.createGain(),nf=ctx.createBiquadFilter();
+        ns.buffer=nBuf;nf.type='bandpass';nf.frequency.value=800;nf.Q.value=0.3;ng.gain.value=0.008;
+        ns.connect(nf);nf.connect(ng);ng.connect(ctx.destination);ns.start(now);bgLoopOscs.push(ns);
     }else if(style==='dramatic'){
         // Cinematic suspense — deep bass + high strings
         const bass=ctx.createOscillator(),bg=ctx.createGain();bass.type='sawtooth';bass.frequency.value=55;bg.gain.value=0.03;bass.connect(bg);bg.connect(ctx.destination);bass.start(now);bass.stop(now+dur);bgLoopOscs.push(bass);
