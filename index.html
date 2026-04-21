@@ -327,7 +327,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
         <!-- Host Control Panel -->
         <div id="host-panel" style="display:none;margin-top:8px;padding:10px;background:rgba(212,175,55,0.05);border-radius:8px;border:1px solid rgba(212,175,55,0.2)">
-            <div style="font-size:0.8rem;font-weight:700;color:var(--gold);margin-bottom:6px"><i class="bi bi-shield-check"></i> &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05ea; &#x05de;&#x05d0;&#x05e8;&#x05d7;</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:0.8rem;font-weight:700;color:var(--gold)"><i class="bi bi-shield-check"></i> &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05ea; &#x05de;&#x05d0;&#x05e8;&#x05d7;</span>
+                <span id="guest-status" style="font-size:0.7rem;color:var(--green)"><i class="bi bi-circle-fill" style="font-size:0.5rem"></i> &#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05de;&#x05d7;&#x05d5;&#x05d1;&#x05e8;</span>
+            </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
                 <button class="btn btn-sm btn-red" onclick="hostCmd('mute')"><i class="bi bi-mic-mute"></i> &#x05d4;&#x05e9;&#x05ea;&#x05e7; &#x05d0;&#x05d5;&#x05e8;&#x05d7;</button>
                 <button class="btn btn-sm btn-green" onclick="hostCmd('unmute')"><i class="bi bi-mic"></i> &#x05d1;&#x05d8;&#x05dc; &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;</button>
@@ -497,7 +500,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 458 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 461 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1058,6 +1061,8 @@ function showConnected() {
     if(rid){let rr=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');rr=rr.filter(r=>r!==rid);rr.unshift(rid);if(rr.length>10)rr.length=10;localStorage.setItem('podcast_recent_rooms',JSON.stringify(rr));}
     dlog('\u05E1\u05E9\u05DF #'+sc,'ok');}catch(e){}
     startWaveform();
+    // Apply guest mode restrictions if applicable
+    if(window._applyGuestMode)setTimeout(window._applyGuestMode,500);
     // Update connection stats every second
     let lastBytes = 0;
     allIntervals.push(setInterval(() => {
@@ -1559,11 +1564,16 @@ function updateTimer(){
 function fmtTime(ms){const s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sec=String(s%60).padStart(2,'0');return h+':'+m+':'+sec;}
 
 // === MUSIC ===
+let musicSourceNode=null;
 function loadMusic(input){
     const f=input.files[0];if(!f)return;
     const mp=document.getElementById('musicPlayer');
     mp.src=URL.createObjectURL(f);
     document.getElementById('music-name').textContent='\u05E7\u05D5\u05D1\u05E5: '+f.name;
+    // Connect music to audio context for recording mix
+    if(audioCtx&&!musicSourceNode){
+        try{musicSourceNode=audioCtx.createMediaElementSource(mp);musicSourceNode.connect(audioCtx.destination);dlog('Music routed to audio output','ok');}catch(e){dlog('Music routing: '+e.message,'warn');}
+    }
     dlog('Music loaded: '+f.name,'ok');
 }
 function toggleMusic(){
@@ -2324,6 +2334,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'c' || e.key === 'C') { e.preventDefault(); toggleCompact(); }
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
+    else if (e.key === 'h' || e.key === 'H') { e.preventDefault(); const hp=document.getElementById('host-panel');if(hp&&isHost)hp.style.display=hp.style.display==='none'?'block':'none'; }
     else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
     else if (e.key === '2') { e.preventDefault(); switchTab('music'); }
@@ -2455,9 +2466,24 @@ const isGuestMode=urlParams.get('role')==='guest';
 if(isGuestMode){
     document.querySelector('h1').innerHTML='<i class="bi bi-mic-fill"></i> \u05D0\u05D5\u05E8\u05D7 \u05D1\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
     document.querySelector('.subtitle').textContent='\u05D2\u05E8\u05E1\u05D4 \u05DE\u05E6\u05D5\u05DE\u05E6\u05DE\u05EA \u2014 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05E9\u05D5\u05DC\u05D8';
-    // Hide host-only elements
+    // Hide host-only elements in room panel
     document.getElementById('btn-create')?.remove();
-    document.querySelector('.room-row span')?.remove(); // "או"
+    // Hide host-only controls in studio (will apply when studio shows)
+    window._guestHideApplied=false;
+    const origShowConnected=showConnected;
+    // Override showConnected to apply guest mode after
+    window._applyGuestMode=function(){
+        if(window._guestHideApplied)return;window._guestHideApplied=true;
+        // Hide: recording btn, markers, SFX, music tab content, topics edit buttons
+        const hideIds=['btn-rec','btn-marker','btn-compact','btn-transcribe','episode-title','quick-settings'];
+        hideIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+        // Hide tabs except chat
+        document.querySelectorAll('.tab').forEach((t,i)=>{if(i!==3)t.style.opacity='0.3';});
+        // Auto-switch to chat
+        switchTab('chat');
+        dlog('Guest mode: simplified studio','ok');
+    };
+    setTimeout(()=>{if(isConnected)window._applyGuestMode();},2000);
     dlog('Guest mode active','ok');
 }
 
