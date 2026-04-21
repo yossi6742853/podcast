@@ -156,12 +156,15 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);transition:all 0.3s;animation:tabFadeIn 0.3s;cursor:grab}
 .topic-item:hover{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);transform:translateX(2px)}
 .topic-item:active{cursor:grabbing;opacity:0.7}
-.topic-item .num{color:var(--gold);font-weight:900;min-width:25px;cursor:pointer}
+.topic-item .num{color:var(--gold);font-weight:900;min-width:25px;cursor:pointer;transition:transform 0.2s}
+.topic-item .num:hover{transform:scale(1.2)}
+.topic-item.current .num{color:#fff;background:var(--gold);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.75rem}
 .topic-item.current{border-color:var(--gold);background:rgba(212,175,55,0.08)}
 .topic-item input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
-.topic-item .done{color:var(--green);cursor:pointer;font-size:1.1rem}
+.topic-item .done{color:var(--green);cursor:pointer;font-size:1.1rem;transition:transform 0.2s,color 0.2s}
+.topic-item .done:hover{transform:scale(1.3);color:#2ecc71}
 .topic-item.completed input{text-decoration:line-through;color:var(--muted)}
-.topic-item.completed{opacity:0.5;border-color:var(--green)}
+.topic-item.completed{opacity:0.5;border-color:var(--green);transition:opacity 0.5s,border-color 0.3s}
 .topic-item.completed .done{color:var(--green)}
 
 @media(max-width:700px){
@@ -594,7 +597,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 580 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 585 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
