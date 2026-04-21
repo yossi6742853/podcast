@@ -537,6 +537,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-gold" onclick="addTopic()"><i class="bi bi-plus"></i> &#x05d4;&#x05d5;&#x05e1;&#x05e3;</button>
                 <button class="btn btn-sm btn-blue" onclick="shareTopics()"><i class="bi bi-share"></i> &#x05e9;&#x05dc;&#x05d7;</button>
                 <button class="btn btn-sm btn-blue" onclick="importTopics()" title="&#x05d9;&#x05d9;&#x05d1;&#x05d0; &#x05de;&#x05dc;&#x05d5;&#x05d7;"><i class="bi bi-clipboard-plus"></i></button>
+                <select onchange="if(this.value)loadTopicTemplate(this.value);this.value=''" style="padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:inherit;font-size:0.75rem">
+                    <option value="">&#x05ea;&#x05d1;&#x05e0;&#x05d9;&#x05ea;...</option>
+                    <option value="interview">&#x05e8;&#x05d0;&#x05d9;&#x05d5;&#x05df;</option>
+                    <option value="discussion">&#x05d3;&#x05d9;&#x05d5;&#x05df;</option>
+                    <option value="story">&#x05e1;&#x05d9;&#x05e4;&#x05d5;&#x05e8;</option>
+                    <option value="review">&#x05e1;&#x05e7;&#x05d9;&#x05e8;&#x05d4;</option>
+                </select>
                 <button class="btn btn-sm btn-red" onclick="clearCompletedTopics()"><i class="bi bi-check2-all"></i> &#x05e0;&#x05e7;&#x05d4;</button>
             </div>
         </div>
@@ -606,7 +613,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             &#x2022; &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e3; (kick)<br>
             &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1; &#x05de;&#x05d5;&#x05ea;&#x05d0;&#x05dd;
         </div>
-        <div style="margin-top:15px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
+        <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.2 | 3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 500+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
+        <div style="margin-top:10px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
 </div>
 <script>
@@ -1271,7 +1279,8 @@ function showConnected() {
         if(afs){
             const flowing=audioChunksOut>0||audioChunksIn>0;
             const ctxState=audioCtx?audioCtx.state:'none';
-            afs.textContent=flowing?'\u2191'+audioChunksOut+' \u2193'+audioChunksIn:'\u26A0 '+ctxState;
+            const chain=flowing?['\u2191'+audioChunksOut,'\u2193'+audioChunksIn,remoteCompressor?'C':'',reverbNode?'R':'',eqBass&&eqBass.gain.value!==0?'EQ':''].filter(x=>x).join(' '):'';
+            afs.textContent=flowing?chain:'\u26A0 '+ctxState;
         }
         // Audio quality score
         const aqsEl=document.getElementById('audio-quality-score');
@@ -2026,6 +2035,18 @@ function shareTopics(){
     conn.send({type:'msg',name:userName,text:'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n')});
     addChatMsg(userName,'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n'),true);
     dlog('Topics synced + shared ('+topics.length+')','ok');
+}
+function loadTopicTemplate(type){
+    const templates={
+        interview:['\u05E4\u05EA\u05D9\u05D7\u05D4 \u05D5\u05D4\u05E6\u05D2\u05EA \u05D4\u05D0\u05D5\u05E8\u05D7','\u05E8\u05E7\u05E2 \u05D0\u05D9\u05E9\u05D9','\u05E0\u05D5\u05E9\u05D0 \u05DE\u05E8\u05DB\u05D6\u05D9','\u05E9\u05D0\u05DC\u05D5\u05EA \u05DE\u05D4\u05E7\u05D4\u05DC','\u05E1\u05D9\u05DB\u05D5\u05DD \u05D5\u05DE\u05E1\u05E8\u05D9\u05DD'],
+        discussion:['\u05E4\u05EA\u05D9\u05D7\u05D4 + \u05D4\u05E6\u05D2\u05EA \u05D4\u05E0\u05D5\u05E9\u05D0','\u05E0\u05E7\u05D5\u05D3\u05EA \u05DE\u05D1\u05D8 \u05E8\u05D0\u05E9\u05D5\u05DF','\u05E0\u05E7\u05D5\u05D3\u05EA \u05DE\u05D1\u05D8 \u05E9\u05E0\u05D9\u05D4','\u05D3\u05E2\u05D5\u05EA \u05E0\u05D2\u05D3\u05D9\u05D5\u05EA','\u05E1\u05D9\u05DB\u05D5\u05DD'],
+        story:['\u05E4\u05EA\u05D9\u05D7\u05D4','\u05D4\u05E8\u05E7\u05E2','\u05D4\u05E1\u05D9\u05E4\u05D5\u05E8','\u05E0\u05E7\u05D5\u05D3\u05EA \u05DE\u05E4\u05E0\u05D4','\u05D4\u05E1\u05D9\u05D5\u05DD + \u05DC\u05E7\u05D7\u05D9\u05DD'],
+        review:['\u05D4\u05E6\u05D2\u05EA \u05D4\u05E0\u05D5\u05E9\u05D0','\u05E0\u05E7\u05D5\u05D3\u05D5\u05EA \u05D7\u05D9\u05D5\u05D1\u05D9\u05D5\u05EA','\u05E0\u05E7\u05D5\u05D3\u05D5\u05EA \u05E9\u05DC\u05D9\u05DC\u05D9\u05D5\u05EA','\u05D4\u05E9\u05D5\u05D5\u05D0\u05D4','\u05E6\u05D9\u05D5\u05DF \u05E1\u05D5\u05E4\u05D9']
+    };
+    const t=templates[type];if(!t)return;
+    t.forEach(topic=>addTopic(topic));updateTopicBadge();
+    dlog('Template loaded: '+type+' ('+t.length+' topics)','ok');
+    showStatus('studio-status','\uD83D\uDCCB \u05EA\u05D1\u05E0\u05D9\u05EA \u05E0\u05D8\u05E2\u05E0\u05D4: '+t.length+' \u05E0\u05D5\u05E9\u05D0\u05D9\u05DD','success');
 }
 async function importTopics(){
     try{
