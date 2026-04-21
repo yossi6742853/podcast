@@ -192,7 +192,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
     <!-- ROOM PANEL -->
     <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s">
-        <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
+        <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
     <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
@@ -665,6 +665,10 @@ function setupDataConn(c) {
             if(rb2){let rav=rb2.querySelector('.avatar-initials');if(!rav){rav=document.createElement('div');rav.className='avatar-initials remote';rb2.appendChild(rav);}rav.textContent=d.name.substring(0,2);}
         } else if (d.type === 'a') {
             playRemoteAudio(d.s, d.seq, d.sr);
+            // Host relays audio to all OTHER participants (star topology)
+            if(isHost&&participants.size>1){
+                participants.forEach((p,id)=>{if(id!==pid&&p.conn&&p.conn.open)try{p.conn.send(d);}catch(e){}});
+            }
         } else if (d.type === 'typing') {
             const ti=document.getElementById('typing-ind');
             if(ti){ti.textContent=d.name+' \u05DE\u05E7\u05DC\u05D9\u05D3...';ti.style.display='block';
@@ -704,6 +708,7 @@ function setupDataConn(c) {
             if(gs)gs.innerHTML='<i class="bi bi-circle-fill" style="font-size:0.5rem;color:'+(d.muted?'var(--red)':'var(--green)')+'"></i> '+(d.name||'\u05D0\u05D5\u05E8\u05D7')+(d.muted?' \uD83D\uDD07':'')+(d.rec?' \uD83D\uDD34':'');
         } else if (d.type === 'sfx') {
             window._sfxFromRemote=true;playSFX(d.sfx);window._sfxFromRemote=false;
+            if(isHost&&participants.size>1){participants.forEach((p,id)=>{if(id!==pid&&p.conn&&p.conn.open)try{p.conn.send(d);}catch(e){}});}
         } else if (d.type === 'host_cmd') {
             // Host remote control commands
             if(d.cmd==='mute'){toggleMute();dlog('Host muted you','warn');showStatus('studio-status','\uD83D\uDD07 \u05D4\u05DE\u05D0\u05E8\u05D7 \u05D4\u05E9\u05EA\u05D9\u05E7 \u05D0\u05D5\u05EA\u05DA','waiting');}
@@ -716,6 +721,8 @@ function setupDataConn(c) {
             if(et&&d.title){et.value=d.title;document.title='\u2705 '+d.title+' \u2014 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';dlog('\u05E9\u05DD \u05E4\u05E8\u05E7: '+d.title,'ok');}
         } else if (d.type === 'msg') {
             addChatMsg(d.name || '\u05DE\u05E8\u05D5\u05D7\u05E7', d.text, false);
+            // Relay chat to other participants
+            if(isHost&&participants.size>1){participants.forEach((p,id)=>{if(id!==pid&&p.conn&&p.conn.open)try{p.conn.send(d);}catch(e){}});}
         } else if (d.type === 'ping') {
             conn.send({type: 'pong', t: d.t});
         } else if (d.type === 'pong') {
@@ -2069,6 +2076,7 @@ function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.
 // === PARTICIPANTS ===
 function updateParticipantsList(){
     const count=participants.size;
+    const pc=document.getElementById('participant-count');if(pc)pc.textContent=count+1; // +1 for self
     // Update guest status display
     const gs=document.getElementById('guest-status');
     if(gs){
@@ -2418,8 +2426,9 @@ function sendReaction(emoji) {
 function sendChat() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
-    if (!text || !conn || !conn.open) return;
-    conn.send({type: 'msg', name: userName, text: text});
+    if (!text) return;
+    const msg={type: 'msg', name: userName, text: text};
+    if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
     addChatMsg(userName, text, true);
     input.value = '';
 }
