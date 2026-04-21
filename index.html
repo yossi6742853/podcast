@@ -518,6 +518,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button onclick="sendReaction('\uD83D\uDD25')" aria-label="&#x05d0;&#x05e9;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f525;</button>
                 <button onclick="sendReaction('\uD83C\uDF89')" aria-label="&#x05d7;&#x05d2;&#x05d9;&#x05d2;&#x05d4;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f389;</button>
                 <button onclick="sendReaction('\uD83E\uDD14')" aria-label="&#x05d7;&#x05d5;&#x05e9;&#x05d1;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f914;</button>
+                <button onclick="raiseHand()" aria-label="&#x05d9;&#x05d3; &#x05dc;&#x05de;&#x05e2;&#x05dc;&#x05d4;" style="background:none;border:1px solid rgba(212,175,55,0.3);font-size:1.1rem;cursor:pointer;padding:2px 8px;border-radius:6px;transition:background 0.2s" title="&#x05d9;&#x05d3; &#x05dc;&#x05de;&#x05e2;&#x05dc;&#x05d4;">&#x270B;</button>
             </div>
             <div style="display:flex;gap:6px">
                 <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;... (Enter=&#x05e9;&#x05dc;&#x05d7;)" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="sendTyping()">
@@ -541,15 +542,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
             R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>H = &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05de;&#x05d0;&#x05e8;&#x05d7;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
-            &#x2022; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; 24kHz &#x05d3;&#x05e8;&#x05da; Data Channel<br>
-            &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV + WebM<br>
-            &#x2022; &#x05e1;&#x05d9;&#x05de;&#x05e0;&#x05d9;&#x05dd; + &#x05d9;&#x05d9;&#x05e6;&#x05d5;&#x05d0; SRT<br>
-            &#x2022; &#x05e6;&#x05d0;&#x05d8; + &#x05e8;&#x05d9;&#x05d0;&#x05e7;&#x05e6;&#x05d9;&#x05d5;&#x05ea;<br>
-            &#x2022; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2; + auto-duck<br>
-            &#x2022; EQ &#x05d1;&#x05d0;&#x05e1;/&#x05d8;&#x05e8;&#x05d1;&#x05dc;<br>
-            &#x2022; &#x05e1;&#x05d9;&#x05e0;&#x05d5;&#x05df; &#x05e8;&#x05e2;&#x05e9;&#x05d9;&#x05dd;<br>
-            &#x2022; &#x05d6;&#x05d9;&#x05d4;&#x05d5;&#x05d9; &#x05e9;&#x05e7;&#x05d8;<br>
-            &#x2022; &#x05d9;&#x05d5;&#x05de;&#x05df; &#x05e1;&#x05e9;&#x05df;<br>
+            &#x2022; &#x05e9;&#x05de;&#x05e2; 48kHz &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05d0;&#x05d5;&#x05dc;&#x05e4;&#x05df;<br>
+            &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd; + &#x05de;&#x05d9;&#x05e7;&#x05e1;&#x05e8;<br>
+            &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV+WebM+&#x05de;&#x05e9;&#x05d5;&#x05dc;&#x05d1;<br>
+            &#x2022; &#x05d0;&#x05e4;&#x05e7;&#x05d8;&#x05d9;&#x05dd; + &#x05d2;'&#x05d9;&#x05e0;&#x05d2;&#x05dc;&#x05d9;&#x05dd; + &#x05e7;&#x05e8;&#x05d9;&#x05d9;&#x05e0;&#x05d5;&#x05ea;<br>
+            &#x2022; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2; (5 &#x05e1;&#x05d2;&#x05e0;&#x05d5;&#x05e0;&#x05d5;&#x05ea;)<br>
+            &#x2022; De-esser + Presence + EQ<br>
+            &#x2022; &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9; + &#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05de;&#x05e1;&#x05da;<br>
+            &#x2022; &#x05e6;&#x05d0;&#x05d8; + &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; + &#x05e1;&#x05d9;&#x05de;&#x05e0;&#x05d9;&#x05dd;<br>
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
             <b style="color:var(--red)">&#x05d0;&#x05d9;&#x05df; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5;?</b><br>
@@ -705,6 +705,8 @@ function setupDataConn(c) {
                 showStatus('studio-status','\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E2\u05D5\u05D3\u05DB\u05E0\u05D5 \u05DE\u05D4\u05DE\u05D0\u05E8\u05D7','success');
             }
         } else if (d.type === 'guest_status') {
+            // Store status in participant map
+            const p=participants.get(pid);if(p){p.muted=d.muted;p.rec=d.rec;p.name=d.name||p.name;}
             const gs=document.getElementById('guest-status');
             if(gs)gs.innerHTML='<i class="bi bi-circle-fill" style="font-size:0.5rem;color:'+(d.muted?'var(--red)':'var(--green)')+'"></i> '+(d.name||'\u05D0\u05D5\u05E8\u05D7')+(d.muted?' \uD83D\uDD07':'')+(d.rec?' \uD83D\uDD34':'');
         } else if (d.type === 'sfx') {
@@ -2145,8 +2147,8 @@ function updateParticipantsList(){
         participants.forEach((p,pid)=>{
             const dur=Math.round((Date.now()-p.joined)/60000);
             html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:6px;animation:tabFadeIn 0.3s">';
-            html+='<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>';
-            html+='<span style="color:var(--blue);font-weight:700;font-size:0.8rem;min-width:50px" title="'+dur+'m">'+escHtml(p.name)+'</span>';
+            html+='<span style="width:8px;height:8px;border-radius:50%;background:'+(p.muted?'var(--red)':'var(--green)')+';flex-shrink:0"></span>';
+            html+='<span style="color:var(--blue);font-weight:700;font-size:0.8rem;min-width:50px" title="'+dur+'m">'+escHtml(p.name)+(p.muted?' \uD83D\uDD07':'')+(p.rec?' \uD83D\uDD34':'')+'</span>';
             html+='<button class="btn btn-sm btn-red" style="padding:1px 5px;font-size:0.65rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'mute\'})" title="\u05D4\u05E9\u05EA\u05E7"><i class="bi bi-mic-mute"></i></button>';
             html+='<button class="btn btn-sm btn-green" style="padding:1px 5px;font-size:0.65rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'unmute\'})" title="\u05D1\u05D8\u05DC"><i class="bi bi-mic"></i></button>';
             html+='<input type="range" min="0" max="200" value="100" style="flex:1;min-width:50px;height:4px" oninput="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'gain\',val:parseInt(this.value)})">';
@@ -2501,6 +2503,15 @@ function toggleStudioFS(){
 let lastTypingSent=0;
 let joinRetryCount=0;
 function sendTyping(){if(!conn||!conn.open||Date.now()-lastTypingSent<1500)return;lastTypingSent=Date.now();conn.send({type:'typing',name:userName});}
+function raiseHand(){
+    if(!conn||!conn.open)return;
+    const msg={type:'msg',name:userName,text:'\u270B \u05D9\u05D3 \u05DC\u05DE\u05E2\u05DC\u05D4!'};
+    if(participants.size>0)broadcast(msg);else conn.send(msg);
+    addChatMsg(userName,'\u270B \u05D9\u05D3 \u05DC\u05DE\u05E2\u05DC\u05D4!',true);
+    playBeep(1000,0.15,0.1);
+    // Visual notification
+    const fl=document.createElement('div');fl.textContent='\u270B';fl.style.cssText='position:fixed;top:40%;left:50%;transform:translateX(-50%);font-size:5rem;z-index:300;pointer-events:none;animation:floatUp 2s ease-out forwards';document.body.appendChild(fl);setTimeout(()=>fl.remove(),2000);
+}
 function sendReaction(emoji) {
     if(!conn||!conn.open)return;
     conn.send({type:'msg',name:userName,text:emoji});
@@ -2516,6 +2527,15 @@ function sendChat() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
+    // Chat commands
+    if(text.startsWith('/')){
+        const cmd=text.split(' ')[0].toLowerCase(),arg=text.substring(cmd.length+1).trim();
+        if(cmd==='/marker'||cmd==='/m'){addMarker(arg||undefined);input.value='';return;}
+        if(cmd==='/clear'){document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0;input.value='';return;}
+        if(cmd==='/topic'||cmd==='/t'){if(arg)addTopic(arg);switchTab('topics');input.value='';return;}
+        if(cmd==='/sfx'&&arg){playSFX(arg);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/marker [name] /clear /topic [text] /sfx [type]',false);input.value='';return;}
+    }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
     addChatMsg(userName, text, true);
