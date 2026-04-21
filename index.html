@@ -592,7 +592,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 550 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 555 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -629,7 +629,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1; &#x05de;&#x05d5;&#x05ea;&#x05d0;&#x05dd;
         </div>
         <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.3 | 3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 525+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
-        <div style="margin-top:10px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
+        <div style="margin-top:10px;text-align:center"><button class="btn btn-gold" onclick="toggleHelp()" style="padding:8px 30px"><i class="bi bi-x-lg"></i> &#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
 </div>
 <script>
@@ -2778,7 +2778,7 @@ function showConnectionInfo(){
     ov.innerHTML='<div style="color:var(--gold);font-weight:900;font-size:1rem;margin-bottom:10px;text-align:center"><i class="bi bi-reception-4"></i> \u05DE\u05D9\u05D3\u05E2 \u05D7\u05D9\u05D1\u05D5\u05E8</div>'+items.map(i=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)"><span style="color:var(--muted);font-size:0.85rem">'+i.l+'</span><span style="color:'+i.c+';font-weight:700;font-size:0.85rem">'+i.v+'</span></div>').join('')+'<div style="text-align:center;margin-top:12px"><button class="btn btn-sm btn-gold" onclick="this.closest(\'div\').remove()">OK</button></div>';
     document.body.appendChild(ov);
 }
-function toggleHelp(){const h=document.getElementById('help-overlay');h.style.display=h.style.display==='none'?'block':'none';}
+function toggleHelp(){const h=document.getElementById('help-overlay');if(h.style.display==='block'){h.style.opacity='0';h.style.transition='opacity 0.3s';setTimeout(()=>{h.style.display='none';h.style.opacity='1';},300);}else{h.style.display='block';h.style.opacity='0';setTimeout(()=>{h.style.opacity='1';h.style.transition='opacity 0.3s';},10);}}
 
 // === FULLSCREEN ===
 // === SCREEN SHARE ===
