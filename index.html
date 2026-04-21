@@ -106,7 +106,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold)}
 .room-id-display{background:var(--bg);padding:12px 18px;border-radius:10px;border:2px solid var(--gold);color:var(--gold);font-size:1.3rem;font-weight:900;font-family:'Consolas','Courier New',monospace;text-align:center;margin-top:10px;letter-spacing:3px;direction:ltr;user-select:all;cursor:pointer;box-shadow:0 0 15px rgba(212,175,55,0.15);transition:box-shadow 0.3s}
 .room-id-display:hover{box-shadow:0 0 25px rgba(212,175,55,0.3)}
-#debug-log{background:#0a0a14;border:1px solid #2a2a3a;border-radius:8px;padding:8px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth}
+#debug-log{background:#0a0a14;border:1px solid #2a2a3a;border-radius:8px;padding:8px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth;display:none}
 #debug-log .err{color:#f66}#debug-log .warn{color:#fa0}#debug-log .ok{color:#6f6}
 
 /* Tabs */
@@ -175,7 +175,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <div id="latency-badge"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
         <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.1 | 430+</span></div>
-        <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
+        <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:10px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
@@ -219,6 +219,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <span style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite"><i class="bi bi-soundwave"></i></span>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:var(--blue);font-weight:700" id="banner-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</span><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block"></span></span>
             <span style="color:var(--muted);font-size:0.75rem;margin-right:8px" id="banner-time"></span>
+            <button id="banner-copy-code" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:var(--muted);font-size:0.65rem;padding:2px 8px;cursor:pointer;font-family:inherit" onclick="const rid=document.getElementById('room-id').value;if(rid)navigator.clipboard.writeText(rid).then(()=>{this.textContent='\u2705';setTimeout(()=>this.innerHTML='<i class=\'bi bi-clipboard\'></i> \u05E7\u05D5\u05D3',2000)})" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8;"><i class="bi bi-clipboard"></i> &#x05e7;&#x05d5;&#x05d3;</button>
         </div>
         <div class="video-grid">
             <div class="video-box" id="local-box">
@@ -409,6 +410,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
 </div>
 <script>
+// Global error handler
+window.addEventListener('error',e=>{try{dlog('\u274C '+e.message+' ('+e.filename+':'+e.lineno+')','err');}catch(ex){}});
+window.addEventListener('unhandledrejection',e=>{try{dlog('\u274C Promise: '+e.reason,'err');}catch(ex){}});
 let peer=null,conn=null,activeCall=null,localStream=null,remoteStream=null;
 let userName='',isHost=false,isConnected=false,isMuted=false,isCamOff=false,useVideo=false;
 let mediaRecLocal=null,mediaRecMixed=null,chunksLocal=[],chunksMixed=[];
@@ -428,7 +432,7 @@ let lastPongTime=0;
 let connStartTime=null;
 let bytesSent=0, bytesReceived=0;
 
-function dlog(msg,cls=''){const el=document.getElementById('debug-log');if(!el)return;const line=document.createElement('div');if(cls)line.className=cls;line.textContent=new Date().toLocaleTimeString()+' | '+msg;el.appendChild(line);el.scrollTop=el.scrollHeight;}
+function dlog(msg,cls=''){const el=document.getElementById('debug-log');if(!el)return;const line=document.createElement('div');if(cls)line.className=cls;line.textContent=new Date().toLocaleTimeString()+' | '+msg;el.appendChild(line);el.scrollTop=el.scrollHeight;if(cls==='err')el.style.display='block';}
 
 // === TABS ===
 function switchTab(name,evt){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));const tc=document.querySelector(`.tab-content#tab-${name}`);if(tc)tc.classList.add('active');if(evt&&evt.target)evt.target.closest('.tab')?.classList.add('active');
@@ -1728,6 +1732,13 @@ document.addEventListener('click', function resumeAudio() {
 
 // === PREVENT ACCIDENTAL CLOSE ===
 window.addEventListener('beforeunload', function(e) {
+    // Save session data
+    try{
+        const topics=[];document.querySelectorAll('.topic-item input').forEach(inp=>{if(inp.value.trim())topics.push(inp.value.trim());});
+        localStorage.setItem('podcast_topics',JSON.stringify(topics));
+        const notes=document.getElementById('episode-notes');if(notes&&notes.value)localStorage.setItem('podcast_notes',notes.value);
+        const title=document.getElementById('episode-title');if(title&&title.value)localStorage.setItem('podcast_episode_title',title.value);
+    }catch(ex){}
     if (isRecording || isConnected) {
         e.preventDefault();
         e.returnValue = '\u05D9\u05E9 \u05D4\u05E7\u05DC\u05D8\u05D4/\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E4\u05E2\u05D9\u05DC. \u05D1\u05D8\u05D5\u05D7 \u05E9\u05EA\u05E8\u05E6\u05D4 \u05DC\u05E6\u05D0\u05EA?';
@@ -1735,14 +1746,27 @@ window.addEventListener('beforeunload', function(e) {
     }
 });
 
-// Init with 3 empty topics
-addTopic();addTopic();addTopic();
+// Restore topics from localStorage or init with 3 empty
+try{
+    const savedTopics=JSON.parse(localStorage.getItem('podcast_topics')||'[]');
+    if(savedTopics.length>0){savedTopics.forEach(t=>addTopic(t));}
+    else{addTopic();addTopic();addTopic();}
+    const savedNotes=localStorage.getItem('podcast_notes');
+    if(savedNotes){const n=document.getElementById('episode-notes');if(n)n.value=savedNotes;}
+    const savedTitle=localStorage.getItem('podcast_episode_title');
+    if(savedTitle){const t=document.getElementById('episode-title');if(t)t.value=savedTitle;}
+}catch(e){addTopic();addTopic();addTopic();}
 
 // Welcome message
 dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.1 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
-// Check connectivity
-fetch('https://0.peerjs.com/').then(r=>{if(r.ok)dlog('PeerJS: \u2705','ok');else dlog('PeerJS: \u274C '+r.status,'err');}).catch(e=>dlog('PeerJS: \u274C \u05D7\u05E1\u05D5\u05DD!','err'));
+// Show share bar only on shareable URLs (not file:// or localhost)
+if(location.protocol==='https:'||location.hostname.includes('github.io')){
+    const sb=document.getElementById('share-url-bar');if(sb){sb.style.display='block';sb.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>';}
+}
+// Check connectivity with latency
+const pjsStart=Date.now();
+fetch('https://0.peerjs.com/').then(r=>{const lat=Date.now()-pjsStart;if(r.ok)dlog('PeerJS: \u2705 ('+lat+'ms)','ok');else dlog('PeerJS: \u274C '+r.status,'err');}).catch(e=>dlog('PeerJS: \u274C \u05D7\u05E1\u05D5\u05DD!','err'));
 // Check WebRTC support
 if(window.RTCPeerConnection)dlog('WebRTC: \u2705','ok');else dlog('WebRTC: \u274C \u05DC\u05D0 \u05E0\u05EA\u05DE\u05DA','err');
 
