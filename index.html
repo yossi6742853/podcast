@@ -58,6 +58,16 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 @keyframes loadingSpin{to{transform:rotate(360deg)}}
 .loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:loadingSpin 0.8s linear infinite;margin-left:6px;vertical-align:middle}
 .status.error .loading-spinner{border-color:var(--red);border-top-color:transparent}
+/* Sound wave animation */
+.sound-wave{display:inline-flex;align-items:center;gap:2px;height:16px;vertical-align:middle;margin-left:6px}
+.sound-wave span{display:inline-block;width:3px;background:var(--gold);border-radius:2px;animation:soundWave 0.6s ease-in-out infinite}
+.sound-wave span:nth-child(1){animation-delay:0s;height:6px}
+.sound-wave span:nth-child(2){animation-delay:0.1s;height:10px}
+.sound-wave span:nth-child(3){animation-delay:0.2s;height:14px}
+.sound-wave span:nth-child(4){animation-delay:0.1s;height:10px}
+.sound-wave span:nth-child(5){animation-delay:0s;height:6px}
+@keyframes soundWave{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+@keyframes progressGlow{0%,100%{box-shadow:0 0 4px rgba(231,76,60,0.3)}50%{box-shadow:0 0 12px rgba(231,76,60,0.6)}}
 .status.success{background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);color:var(--green)}
 .status.error{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red)}
 .status.waiting{background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold)}
@@ -309,7 +319,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div class="meter-box"><div class="meter-bar-wrap"><div class="meter-bar" id="meter-local" style="height:0%"></div><div class="meter-peak" id="peak-local" style="bottom:0%"></div></div><div class="meter-name me" id="name-local">&#x05d0;&#x05e0;&#x05d9;</div></div>
             <div>
                 <div class="timer" id="timer" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1; &#x05d8;&#x05d9;&#x05d9;&#x05de;&#x05e8;" ondblclick="toggleRecording()">00:00:00</div>
-                <div id="rec-progress-wrap" style="display:none;height:3px;background:var(--border);border-radius:2px;margin:4px auto;max-width:200px"><div id="rec-progress-bar" style="height:100%;width:0%;background:var(--red);border-radius:2px;transition:width 1s linear"></div></div>
+                <div id="rec-progress-wrap" style="display:none;height:4px;background:var(--border);border-radius:3px;margin:4px auto;max-width:200px;overflow:hidden"><div id="rec-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#f39c12,var(--red));border-radius:3px;transition:width 1s linear;animation:progressGlow 2s infinite"></div></div>
                 <div id="rec-num-display" style="text-align:center;font-size:0.7rem;color:var(--muted)"></div>
                 <div id="talk-ratio" style="text-align:center;font-size:0.65rem;color:var(--muted);opacity:0.6"></div>
             </div>
@@ -550,7 +560,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Topics tab -->
         <div class="tab-content" id="tab-topics">
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-list-check"></i> &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; &#x05dc;&#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8;</div>
-            <div id="topic-progress" style="height:4px;background:var(--border);border-radius:2px;margin-bottom:4px;overflow:hidden"><div id="topic-progress-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div></div>
+            <div id="topic-progress" style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;margin-bottom:4px;overflow:hidden"><div id="topic-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:3px;transition:width 0.5s;box-shadow:0 0 6px rgba(39,174,96,0.3)"></div></div>
             <div id="current-topic-timer" style="display:none;font-size:0.7rem;color:var(--gold);text-align:center;margin-bottom:6px;opacity:0.7"></div>
             <div id="topic-list" class="topic-list"></div>
             <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
@@ -599,7 +609,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 675 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 680 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1254,7 +1264,7 @@ function showConnected() {
     if(localAv)localAv.style.display=hasVid?'none':'flex';
     const connType=conn&&conn.reliable?'Reliable':'Best-effort';
     const actSR=audioCtx?audioCtx.sampleRate:48000;
-    showStatus('studio-status', '\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 S \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5, R \u05DC\u05D4\u05E7\u05DC\u05D8\u05D4', 'success');
+    showStatus('studio-status', '\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8! <span class="sound-wave"><span></span><span></span><span></span><span></span><span></span></span> '+(actSR/1000)+'kHz \u2022 S=\u05D8\u05E1\u05D8 R=\u05D4\u05E7\u05DC\u05D8\u05D4', 'success');
     playConnectSound();
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('connected-glow'));
     // Connection celebration
