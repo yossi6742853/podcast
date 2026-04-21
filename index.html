@@ -599,7 +599,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 655 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 660 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2879,6 +2879,9 @@ function sendChat() {
         if(cmd==='/cam'){toggleCam();input.value='';return;}
         if(cmd==='/ding'){playSFX('ding');input.value='';return;}
         if(cmd==='/whoosh'){playSFX('whoosh');input.value='';return;}
+        if(cmd==='/buzzer'){playSFX('buzzer');input.value='';return;}
+        if(cmd==='/transition'){playSFX('transition');input.value='';return;}
+        if(cmd==='/version'||cmd==='/v'){addChatMsg('\u2139\uFE0F','v10.5 | 660 \u05E9\u05D3\u05E8\u05D5\u05D2\u05D9\u05DD | 43 \u05E4\u05E7\u05D5\u05D3\u05D5\u05EA | 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9\u05DD',false);input.value='';return;}
         if(cmd==='/clap'||cmd==='/applause'){playSFX('applause');input.value='';return;}
         if(cmd==='/pause'){pauseRecording();input.value='';return;}
         if(cmd==='/log'){copyDebugLog();toast('\u2705 \u05DC\u05D5\u05D2 \u05D4\u05D5\u05E2\u05EA\u05E7');input.value='';return;}
@@ -2893,7 +2896,7 @@ function sendChat() {
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (41):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /pause /mute /cam /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05D0\u05E4\u05E7\u05D8\u05D9\u05DD: /sfx /ding /clap /whoosh\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect /dc\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log\n\u05DE\u05D9\u05D3\u05E2: /stats /time /who /ping /kick',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (44):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /pause /mute /cam /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05D0\u05E4\u05E7\u05D8\u05D9\u05DD: /sfx /ding /clap /whoosh /buzzer /transition\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect /dc\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log /v',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
