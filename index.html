@@ -274,11 +274,25 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <button class="btn btn-sm btn-green" onclick="sendTestTone()" title="&#x05e9;&#x05dc;&#x05d7; &#x05e6;&#x05dc;&#x05d9;&#x05dc; &#x05d8;&#x05e1;&#x05d8;"><i class="bi bi-broadcast"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleStudioFS()" title="&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;"><i class="bi bi-fullscreen"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleDim()" title="&#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;"><i class="bi bi-brightness-low"></i></button>
+            <button class="btn btn-sm btn-blue" onclick="const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'" title="&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;"><i class="bi bi-gear"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleHelp()" title="&#x05e2;&#x05d6;&#x05e8;&#x05d4;"><i class="bi bi-question-circle"></i></button>
             <button class="btn btn-sm btn-green" onclick="quickReconnect()" title="&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8; &#x05de;&#x05d7;&#x05d3;&#x05e9;"><i class="bi bi-arrow-repeat"></i></button>
             <button class="btn btn-sm btn-red" onclick="doDisconnect()"><i class="bi bi-x-circle"></i> &#x05e0;&#x05ea;&#x05e7;</button>
         </div>
         <div id="studio-status"></div>
+        <div id="quick-settings" style="display:none;margin-top:8px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border)">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--gold);margin-bottom:6px"><i class="bi bi-gear"></i> &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d5;&#x05ea;</div>
+            <div class="music-controls">
+                <span class="music-label" style="min-width:80px">&#x05e1;&#x05e3; &#x05e8;&#x05e2;&#x05e9;:</span>
+                <input type="range" id="noise-threshold" min="1" max="20" value="3" oninput="window._noiseThreshold=this.value/1000;document.getElementById('noise-val').textContent=this.value">
+                <span id="noise-val" style="min-width:20px;font-size:0.8rem;color:var(--muted)">3</span>
+            </div>
+            <div class="music-controls">
+                <span class="music-label" style="min-width:80px">&#x05d1;&#x05d0;&#x05e4;&#x05e8; (ms):</span>
+                <input type="range" id="jitter-setting" min="20" max="200" value="60" oninput="document.getElementById('jitter-val').textContent=this.value+'ms'">
+                <span id="jitter-val" style="min-width:40px;font-size:0.8rem;color:var(--muted)">60ms</span>
+            </div>
+        </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
             R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | P=&#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | S=&#x05d8;&#x05e1;&#x05d8; | B=&#x05e1;&#x05d9;&#x05de;&#x05df; | T=&#x05e6;&#x05d0;&#x05d8; | F=&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd; | ?=&#x05e2;&#x05d6;&#x05e8;&#x05d4;
         </div>
@@ -392,7 +406,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button onclick="sendReaction('\uD83E\uDD14')" aria-label="&#x05d7;&#x05d5;&#x05e9;&#x05d1;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f914;</button>
             </div>
             <div style="display:flex;gap:6px">
-                <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;..." style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter')sendChat()" oninput="sendTyping()">
+                <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;... (Enter=&#x05e9;&#x05dc;&#x05d7;)" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="sendTyping()">
                 <button class="btn btn-sm btn-gold" onclick="sendChat()"><i class="bi bi-send"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="exportChat()" title="&#x05d9;&#x05d9;&#x05e6;&#x05d0; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-download"></i></button>
                 <button class="btn btn-sm btn-red" onclick="document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0" title="&#x05e0;&#x05e7;&#x05d4; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-trash3"></i></button>
@@ -753,7 +767,9 @@ function startAudioRelay() {
         // Noise gate — skip silent chunks
         let peak = 0;
         for (let i = 0; i < input.length; i++) { const a = Math.abs(input[i]); if (a > peak) peak = a; }
-        if (peak < 0.003) return; // lowered threshold
+        const gateThresh=window._noiseThreshold||0.003;
+        if (peak < gateThresh) { window._gateCount=(window._gateCount||0)+1; return; } // gated
+        if(window._gateCount>50){dlog('Gate: '+window._gateCount+' chunks suppressed','ok');window._gateCount=0;}
 
         // Convert to Int16 (50% smaller than Float32)
         const samples = new Int16Array(input.length);
@@ -1045,7 +1061,7 @@ function startWaveform(){const canvas=document.getElementById('waveCanvas'),ctx=
 let _cw=0,_ch=0;
 function draw(){
     const ow=canvas.offsetWidth,oh=canvas.offsetHeight;
-    if(ow!==_cw||oh!==_ch){canvas.width=_cw=ow;canvas.height=_ch=oh;}
+    if(ow!==_cw||oh!==_ch||window._canvasDirty){canvas.width=_cw=ow;canvas.height=_ch=oh;window._canvasDirty=false;}
     const w=canvas.width,h=canvas.height;
     ctx.clearRect(0,0,w,h);
     // Draw frequency bars for both streams
@@ -1902,19 +1918,17 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'Escape') { e.preventDefault(); const h=document.getElementById('help-overlay');if(h.style.display==='block'){h.style.display='none';return;}doDisconnect(); }
 });
 
-// === WINDOW RESIZE — fix canvas ===
+// === WINDOW RESIZE — fix canvas (invalidate cache) ===
 window.addEventListener('resize', () => {
-    const canvas = document.getElementById('waveCanvas');
-    if (canvas && canvas.offsetWidth > 0) {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-    }
+    window._canvasDirty = true; // forces startWaveform cache refresh
 });
 
 // === RESUME AUDIO ON USER INTERACTION (Chrome autoplay policy) ===
 document.addEventListener('click', function resumeAudio() {
-    if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume();dlog('AudioCtx resumed by click','ok');}
-    if(remoteAudioCtx&&remoteAudioCtx.state==='suspended'){remoteAudioCtx.resume();dlog('RemoteCtx resumed by click','ok');}
+    let resumed=false;
+    if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume();resumed=true;}
+    if(remoteAudioCtx&&remoteAudioCtx.state==='suspended'){remoteAudioCtx.resume();resumed=true;}
+    if(resumed){dlog('Audio enabled by click','ok');if(isConnected)showStatus('studio-status','\uD83D\uDD0A \u05D0\u05D5\u05D3\u05D9\u05D5 \u05D4\u05D5\u05E4\u05E2\u05DC!','success');}
 }, {once: false});
 
 // === PREVENT ACCIDENTAL CLOSE ===
@@ -1949,6 +1963,14 @@ if('Notification' in window && Notification.permission==='default'){
     // Request on first user interaction to avoid browser blocking
     document.addEventListener('click',function reqNotif(){Notification.requestPermission();document.removeEventListener('click',reqNotif);},{once:true});
 }
+
+// Auto-save topics/notes every 30s (mobile beforeunload unreliable)
+setInterval(()=>{try{
+    const topics=[];document.querySelectorAll('.topic-item input').forEach(inp=>{if(inp.value.trim())topics.push(inp.value.trim());});
+    if(topics.length>0)localStorage.setItem('podcast_topics',JSON.stringify(topics));
+    const notes=document.getElementById('episode-notes');if(notes&&notes.value)localStorage.setItem('podcast_notes',notes.value);
+    const title=document.getElementById('episode-title');if(title&&title.value)localStorage.setItem('podcast_episode_title',title.value);
+}catch(e){}},30000);
 
 // Welcome message
 dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.2 ===','ok');
