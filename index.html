@@ -42,7 +42,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .panel{background:linear-gradient(145deg,rgba(17,17,32,0.9),rgba(22,22,48,0.85));border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;margin-bottom:15px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 1px rgba(212,175,55,0.1),inset 0 1px 0 rgba(255,255,255,0.04);backdrop-filter:blur(12px);transition:box-shadow 0.3s ease}
 .panel-title{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .room-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.room-row input{flex:1;min-width:140px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:0.95rem;font-family:inherit}
+.room-row input{flex:1;min-width:140px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:0.95rem;font-family:inherit;transition:border-color 0.3s,box-shadow 0.3s}
 .room-row input::placeholder{color:rgba(255,255,255,0.2)}
 .room-row input:focus{border-color:var(--gold);outline:none;box-shadow:0 0 10px rgba(212,175,55,0.15)}
 .btn{padding:8px 20px;border-radius:8px;border:none;font-size:0.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);display:inline-flex;align-items:center;gap:5px}
@@ -590,7 +590,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 526 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 527 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -618,7 +618,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             4. &#x05e8;&#x05e2;&#x05e0;&#x05df; &#x05d5;&#x05e0;&#x05e1;&#x05d4; &#x05e9;&#x05d5;&#x05d1;
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10.2 &#x1f389; &#x05e1;&#x05d1;&#x05d1; 500:</b><br>
+            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10.3:</b><br>
             &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd; + &#x05de;&#x05d9;&#x05e7;&#x05e1;&#x05e8;<br>
             &#x2022; &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05d0;&#x05d5;&#x05dc;&#x05e4;&#x05df; (HPF+De-esser+Presence)<br>
             &#x2022; QR &#x05dc;&#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;<br>
@@ -1303,7 +1303,7 @@ function showConnected() {
         const bps = Math.round((totalBytes - lastBytes) / 1024);
         lastBytes = totalBytes;
         document.getElementById('bandwidth').textContent = bps + ' KB/s';
-        const bd=document.getElementById('banner-data');if(bd)bd.textContent=(totalBytes/1048576).toFixed(1)+'MB';
+        const bd=document.getElementById('banner-data');if(bd){const mbTotal=(totalBytes/1048576).toFixed(1);bd.textContent=mbTotal+'MB \u2022 '+bps+'KB/s';}
         document.getElementById('total-data').textContent = (totalBytes/1048576).toFixed(1) + 'MB \u2191'+audioChunksOut+'\u2193'+audioChunksIn;
         const lr2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
         const ls=document.getElementById('loss-stat');if(ls){ls.textContent=lr2+'%';ls.style.color=lr2>5?'var(--red)':lr2>1?'#f39c12':'var(--green)';}
