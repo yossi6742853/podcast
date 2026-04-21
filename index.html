@@ -95,9 +95,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .download-item .play-active{color:var(--green)!important}
 .meter-name{font-weight:700;margin-top:4px;font-size:0.75rem}
 .meter-name.me{color:var(--gold)}.meter-name.remote{color:var(--blue)}
-.timer{font-size:2.2rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;transition:color 0.3s;letter-spacing:2px;direction:ltr;display:inline-block}
-.timer.recording{color:var(--red);text-shadow:0 0 20px rgba(231,76,60,0.4);animation:timerPulse 0.8s infinite}
-.timer.paused{color:#f39c12;text-shadow:0 0 15px rgba(243,156,18,0.3);animation:none}
+.timer{font-size:2.2rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;transition:all 0.3s;letter-spacing:2px;direction:ltr;display:inline-block;padding:4px 16px;border-radius:12px;background:rgba(0,0,0,0.2)}
+.timer.recording{color:var(--red);text-shadow:0 0 20px rgba(231,76,60,0.4);animation:timerPulse 0.8s infinite;background:rgba(231,76,60,0.08);box-shadow:0 0 20px rgba(231,76,60,0.1)}
+.timer.paused{color:#f39c12;text-shadow:0 0 15px rgba(243,156,18,0.3);animation:none;background:rgba(243,156,18,0.06)}
 @keyframes timerPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:0.7}}
 .rec-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .rec-dot{width:12px;height:12px;border-radius:50%;background:var(--red);display:inline-block;animation:recBlink 1s infinite}
@@ -182,11 +182,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     .settings-row{flex-wrap:wrap}
 }
 @media print{
-    body{background:#fff!important;color:#000!important}
-    .panel{box-shadow:none!important;border:1px solid #ccc!important;background:#fff!important}
-    #stats-bar,#latency-badge,#debug-log,.rec-controls,.btn{display:none!important}
-    .video-box{border:1px solid #ccc!important;background:#eee!important}
-    .timer{color:#000!important}
+    body{background:#fff!important;color:#000!important;padding:0!important}
+    .panel{box-shadow:none!important;border:1px solid #ccc!important;background:#fff!important;page-break-inside:avoid}
+    #stats-bar,#latency-badge,#debug-log,.rec-controls,.btn,.waveform,.video-grid,.tabs,#quick-settings,#host-panel{display:none!important}
+    .timer{color:#000!important;font-size:1.5rem!important}
+    h1{-webkit-text-fill-color:#000!important;background:none!important;filter:none!important}
+    .download-item{border:1px solid #ccc!important;background:#f9f9f9!important}
+    .topic-item{border:1px solid #ddd!important;background:#f9f9f9!important}
 }
 </style>
 </head>
@@ -561,7 +563,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 490 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 492 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2714,8 +2716,11 @@ function escHtml(s){const d=document.createElement('div');d.textContent=s;return
 function addChatMsg(name, text, isMe) {
     const box = document.getElementById('chat-messages');
     const msg = document.createElement('div');
+    // System messages styled differently
+    const isSystem=['\uD83D\uDCE5','\uD83D\uDCE4','\u26D4','\uD83C\uDFB5','\uD83D\uDCA1'].includes(name);
     msg.style.cssText = 'margin-bottom:6px;padding:6px 10px;border-radius:8px;animation:tabFadeIn 0.3s;' +
-        (isMe ? 'background:rgba(212,175,55,0.1);border-right:3px solid var(--gold);' : 'background:rgba(41,128,185,0.1);border-right:3px solid var(--blue);');
+        (isSystem ? 'background:rgba(255,255,255,0.03);border-right:3px solid var(--muted);font-size:0.8rem;opacity:0.7;' :
+        isMe ? 'background:rgba(212,175,55,0.1);border-right:3px solid var(--gold);' : 'background:rgba(41,128,185,0.1);border-right:3px solid var(--blue);');
     const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>').replace(/\*([^*]+)\*/g,'<b>$1</b>');
     const timeStr=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     const recTime=(isRecording&&recStartTime)?'<span style="color:var(--red);font-size:0.65rem"> \u25CF '+fmtTime(Date.now()-recStartTime)+'</span>':'';
