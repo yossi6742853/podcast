@@ -582,7 +582,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 518 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 519 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1215,9 +1215,15 @@ function showConnected() {
     document.getElementById('label-local').textContent = userName;
     document.getElementById('banner-local').textContent = userName + (isHost?' (\u05DE\u05D0\u05E8\u05D7)':' (\u05D0\u05D5\u05E8\u05D7)');
     document.getElementById('remote-no-vid').style.display = 'block';
-    // Auto-fill episode title with date if empty
+    // Auto-fill episode title with number + date if empty
     const et2=document.getElementById('episode-title');
-    if(et2&&!et2.value){const d=new Date();et2.value='\u05E4\u05E8\u05E7 '+d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});et2.dispatchEvent(new Event('input'));}
+    if(et2&&!et2.value){
+        const ls=JSON.parse(localStorage.getItem('podcast_lifetime')||'{}');
+        const epNum=(ls.sessions||0)+1;
+        const d=new Date();
+        et2.value='\u05E4\u05E8\u05E7 #'+epNum+' \u2022 '+d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});
+        et2.dispatchEvent(new Event('input'));
+    }
     // Show host panel for host only
     const hp=document.getElementById('host-panel');
     if(hp)hp.style.display=isHost?'block':'none';
@@ -1620,7 +1626,7 @@ function startRecording(){
     if(!isConnected){showStatus('studio-status','\u05DC\u05D0 \u05DE\u05D7\u05D5\u05D1\u05E8 \u2014 \u05D0\u05D9 \u05D0\u05E4\u05E9\u05E8 \u05DC\u05D4\u05E7\u05DC\u05D9\u05D8','error');dlog('Cannot record: not connected','err');return;}
     if(!localStream||localStream.getAudioTracks().length===0){showStatus('studio-status','\u05D0\u05D9\u05DF \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2014 \u05D1\u05D3\u05D5\u05E7 \u05D4\u05E8\u05E9\u05D0\u05D5\u05EA','error');dlog('Cannot record: no mic stream','err');return;}
     try{
-    chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;window._recWarned=false;window._rec50=false;
+    chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;window._recWarned=false;window._rec50=false;window._sizWarn=false;
     // Record local mic directly (high quality)
     const las=new MediaStream(localStream.getAudioTracks());
     const mimeType=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'';
@@ -1810,6 +1816,8 @@ function updateTimer(){
     const lossP2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
     document.getElementById('timer').title='~'+estMB+' MB | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP2)+'% | \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length;
     document.title='\uD83D\uDD34 '+t+' ('+estMB+'MB) \u2014 \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5';
+    // File size warning
+    if(parseFloat(estMB)>100&&!window._sizWarn){window._sizWarn=true;toast('\u26A0 \u05D2\u05D5\u05D3\u05DC \u05DE\u05E9\u05D5\u05E2\u05E8 100MB+',3000);dlog('Recording >100MB!','warn');}
     // Milestone notifications + auto-markers
     const mins=Math.floor(elapsed/60);
     if(mins>0&&mins%30===0&&elapsed%60<0.2)dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DB\u05D1\u05E8 '+mins+' \u05D3\u05E7\u05D5\u05EA!','warn');
