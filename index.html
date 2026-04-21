@@ -226,7 +226,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room" style="border-top:2px solid rgba(212,175,55,0.2)">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.4 | 600</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.5 | 650</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -599,7 +599,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 645 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 650 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; &#x1f389;
     </div>
 </div>
 
@@ -2875,6 +2875,9 @@ function sendChat() {
         if(cmd==='/reset'){resetAudioSettings();input.value='';return;}
         if(cmd==='/export'){exportSessionLog();input.value='';return;}
         if(cmd==='/reconnect'){quickReconnect();input.value='';return;}
+        if(cmd==='/disconnect'||cmd==='/dc'){doDisconnect();input.value='';return;}
+        if(cmd==='/cam'){toggleCam();input.value='';return;}
+        if(cmd==='/pause'){pauseRecording();input.value='';return;}
         if(cmd==='/log'){copyDebugLog();toast('\u2705 \u05DC\u05D5\u05D2 \u05D4\u05D5\u05E2\u05EA\u05E7');input.value='';return;}
         if(cmd==='/bt'){const cb=document.getElementById('bt-mode');if(cb){cb.checked=!cb.checked;setBTMode(cb.checked);}input.value='';return;}
         if(cmd==='/share'){const u=location.origin+location.pathname+'?join='+document.getElementById('room-id').value+'&role=guest';navigator.clipboard.writeText(u).then(()=>toast('\u2705 \u05E7\u05D9\u05E9\u05D5\u05E8 \u05D4\u05D5\u05E2\u05EA\u05E7!'));addChatMsg('\uD83D\uDD17',u,true);input.value='';return;}
@@ -2887,7 +2890,7 @@ function sendChat() {
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (35):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /mute /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /sfx /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log\n\u05DE\u05D9\u05D3\u05E2: /stats /time /who /ping /kick',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','\u05E4\u05E7\u05D5\u05D3\u05D5\u05EA (38):\n\u05D4\u05E7\u05DC\u05D8\u05D4: /rec /pause /mute /cam /test /hand\n\u05E9\u05DE\u05E2: /intro /outro /say /eq /music /vol /reverb\n\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD: /marker /topic /sfx /clear\n\u05EA\u05E6\u05D5\u05D2\u05D4: /compact /dim /fs /pip /qr /share /screen\n\u05D4\u05D2\u05D3\u05E8\u05D5\u05EA: /save /load /reset /bt /reconnect /dc\n\u05D9\u05D9\u05E6\u05D5\u05D0: /export /log\n\u05DE\u05D9\u05D3\u05E2: /stats /time /who /ping /kick',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
@@ -3163,7 +3166,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.4 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.5 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
