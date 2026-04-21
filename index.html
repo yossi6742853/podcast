@@ -599,7 +599,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 665 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 670 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1443,6 +1443,8 @@ function animateMeters(){
         else if(!bothSilent&&currentSilenceStart){
             const dur=Date.now()-recStartTime-currentSilenceStart;
             if(dur>3000)silenceSegments.push({start:fmtTime(currentSilenceStart),end:fmtTime(currentSilenceStart+dur),ms:dur});
+            // Auto-chapter: if silence > 10s, add auto marker (potential segment break)
+            if(dur>10000&&isRecording){addMarker('\u23F8 \u05D4\u05E4\u05E1\u05E7\u05D4 '+Math.round(dur/1000)+'s');dlog('Auto-chapter: '+Math.round(dur/1000)+'s silence','ok');}
             currentSilenceStart=null;
         }
     }
@@ -2927,6 +2929,10 @@ function sendChat() {
         if(cmd==='/ding'){playSFX('ding');input.value='';return;}
         if(cmd==='/whoosh'){playSFX('whoosh');input.value='';return;}
         if(cmd==='/buzzer'){playSFX('buzzer');input.value='';return;}
+        if(cmd==='/tag'){const tagName=arg||'\u05E1\u05D2\u05DE\u05E0\u05D8';const elapsed=recStartTime?fmtTime(Date.now()-recStartTime):'--';addMarker('\uD83C\uDFF7 '+tagName);addChatMsg('\uD83C\uDFF7',tagName+' @ '+elapsed,true);input.value='';return;}
+        if(cmd==='/ad'){addMarker('\uD83D\uDCE2 \u05E4\u05E8\u05E1\u05D5\u05DE\u05EA');toast('\uD83D\uDCE2 \u05E4\u05E8\u05E1\u05D5\u05DE\u05EA',1500);input.value='';return;}
+        if(cmd==='/stopwatch'){const sTime=Date.now();const si=setInterval(()=>{const el=Math.round((Date.now()-sTime)/1000);toast('\u23F1 '+fmtTime(el*1000),800);if(el>300)clearInterval(si);},1000);toast('\u23F1 \u05E1\u05D8\u05D5\u05E4\u05E8 \u05D4\u05EA\u05D7\u05D9\u05DC',1500);input.value='';return;}
+        if(cmd==='/countdown'){const n=parseInt(arg)||5;let c=n;const ci=setInterval(()=>{if(c>0){toast(c+'...',800);playBeep(600,0.1);c--;}else{clearInterval(ci);toast('GO!',1000);playBeep(900,0.2);}},1000);input.value='';return;}
         if(cmd==='/transition'){playSFX('transition');input.value='';return;}
         if(cmd==='/theme'&&arg){setTheme(arg);input.value='';return;}
         if(cmd==='/theme'){addChatMsg('\uD83C\uDFA8','gold | neon | ocean | sunset | purple | red',false);input.value='';return;}
