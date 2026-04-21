@@ -209,7 +209,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s">
         <span id="conn-health" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px"></span> <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
-    <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
+    <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
         <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 514</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
@@ -581,7 +581,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 516 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 517 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2723,6 +2723,26 @@ let dimmed=false;
 function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightness(0.6)':'none';dlog('Dim: '+(dimmed?'ON':'OFF'),'ok');toast(dimmed?'\uD83C\uDF19 \u05E2\u05DE\u05E2\u05D5\u05DD':'\u2600\uFE0F \u05E8\u05D2\u05D9\u05DC',1200);}
 
 // === HELP ===
+function showConnectionInfo(){
+    const lossR=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
+    const minL=latencyHistory.length>0?Math.min(...latencyHistory):0;
+    const maxL=latencyHistory.length>0?Math.max(...latencyHistory):0;
+    const dur=connStartTime?fmtTime(Date.now()-connStartTime):'--';
+    const totalMB=((bytesSent+bytesReceived)/1048576).toFixed(1);
+    const items=[
+        {l:'\u05DC\u05D8\u05E0\u05E1\u05D9 \u05DE\u05DE\u05D5\u05E6\u05E2',v:avgLatency+'ms',c:avgLatency<100?'var(--green)':'#f39c12'},
+        {l:'\u05D8\u05D5\u05D5\u05D7',v:minL+'-'+maxL+'ms',c:'var(--muted)'},
+        {l:'\u05D0\u05D9\u05DB\u05D5\u05EA',v:(100-lossR)+'%',c:lossR<2?'var(--green)':'var(--red)'},
+        {l:'\u05E0\u05EA\u05D5\u05E0\u05D9\u05DD',v:totalMB+' MB',c:'var(--blue)'},
+        {l:'\u05E0\u05E9\u05DC\u05D7/\u05D4\u05EA\u05E7\u05D1\u05DC',v:audioChunksOut+'/'+audioChunksIn,c:'var(--muted)'},
+        {l:'\u05DE\u05E9\u05DA',v:dur,c:'var(--gold)'},
+        {l:'\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD',v:participants.size+1,c:'var(--blue)'}
+    ];
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,rgba(17,17,32,0.97),rgba(22,22,48,0.95));border:1px solid var(--gold);border-radius:16px;padding:20px;z-index:300;min-width:250px;backdrop-filter:blur(15px);box-shadow:0 20px 60px rgba(0,0,0,0.8);animation:tabFadeIn 0.3s';
+    ov.innerHTML='<div style="color:var(--gold);font-weight:900;font-size:1rem;margin-bottom:10px;text-align:center"><i class="bi bi-reception-4"></i> \u05DE\u05D9\u05D3\u05E2 \u05D7\u05D9\u05D1\u05D5\u05E8</div>'+items.map(i=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03)"><span style="color:var(--muted);font-size:0.85rem">'+i.l+'</span><span style="color:'+i.c+';font-weight:700;font-size:0.85rem">'+i.v+'</span></div>').join('')+'<div style="text-align:center;margin-top:12px"><button class="btn btn-sm btn-gold" onclick="this.closest(\'div\').remove()">OK</button></div>';
+    document.body.appendChild(ov);
+}
 function toggleHelp(){const h=document.getElementById('help-overlay');h.style.display=h.style.display==='none'?'block':'none';}
 
 // === FULLSCREEN ===
