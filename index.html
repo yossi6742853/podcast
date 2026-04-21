@@ -113,6 +113,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--border)}
 .tab{padding:10px 20px;cursor:pointer;font-weight:700;font-size:0.9rem;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.3s;border-radius:8px 8px 0 0}
 .tab:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.tab:focus-visible{color:var(--gold);background:rgba(212,175,55,0.08)}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(212,175,55,0.05)}
 .tab-content{display:none}.tab-content.active{display:block}
 
@@ -359,12 +360,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div id="chat-messages" style="height:150px;overflow-y:auto;background:var(--bg);border-radius:8px;padding:8px;border:1px solid var(--border);margin-bottom:4px;font-size:0.9rem;direction:rtl;scroll-behavior:smooth"></div>
             <div id="typing-ind" style="display:none;font-size:0.75rem;color:var(--muted);margin-bottom:4px;font-style:italic"></div>
             <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
-                <button onclick="sendReaction('\uD83D\uDC4D')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f44d;</button>
-                <button onclick="sendReaction('\uD83D\uDE02')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f602;</button>
-                <button onclick="sendReaction('\u2764\uFE0F')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x2764;&#xFE0F;</button>
-                <button onclick="sendReaction('\uD83D\uDD25')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f525;</button>
-                <button onclick="sendReaction('\uD83C\uDF89')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f389;</button>
-                <button onclick="sendReaction('\uD83E\uDD14')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f914;</button>
+                <button onclick="sendReaction('\uD83D\uDC4D')" aria-label="&#x05dc;&#x05d9;&#x05d9;&#x05e7;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f44d;</button>
+                <button onclick="sendReaction('\uD83D\uDE02')" aria-label="&#x05e6;&#x05d7;&#x05d5;&#x05e7;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f602;</button>
+                <button onclick="sendReaction('\u2764\uFE0F')" aria-label="&#x05dc;&#x05d1;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x2764;&#xFE0F;</button>
+                <button onclick="sendReaction('\uD83D\uDD25')" aria-label="&#x05d0;&#x05e9;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f525;</button>
+                <button onclick="sendReaction('\uD83C\uDF89')" aria-label="&#x05d7;&#x05d2;&#x05d9;&#x05d2;&#x05d4;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f389;</button>
+                <button onclick="sendReaction('\uD83E\uDD14')" aria-label="&#x05d7;&#x05d5;&#x05e9;&#x05d1;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f914;</button>
             </div>
             <div style="display:flex;gap:6px">
                 <input id="chat-input" placeholder="&#x05db;&#x05ea;&#x05d5;&#x05d1; &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05d4;..." style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.9rem" onkeydown="if(event.key==='Enter')sendChat()" oninput="sendTyping()">
@@ -519,6 +520,7 @@ function setupDataConn(c) {
         }
     });
     c.on('open', function() {
+        reconnectAttempts = 0;
         conn.send({type: 'name', name: userName});
         dlog('Data channel open @ '+new Date().toLocaleTimeString('he-IL'), 'ok');
         startAudioRelay();
@@ -529,23 +531,27 @@ function setupDataConn(c) {
             if (conn && conn.open) {conn.send({type: 'ping', t: Date.now()});pingsSent++;}
         }, 3000));
     });
+    let reconnectAttempts = 0;
     c.on('close', function() {
         dlog('Connection closed by remote', 'warn');
         const badge = document.getElementById('latency-badge');
         if (badge) badge.className = 'disconnected';
-        if (isConnected) {
-            showStatus('studio-status', '\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05D5\u05EA\u05E7 \u2014 \u05DE\u05E0\u05E1\u05D4 \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9...', 'error');
-            // Auto-reconnect after 3 seconds
+        if (isConnected && reconnectAttempts < 5) {
+            reconnectAttempts++;
+            const delay = Math.min(3000 * reconnectAttempts, 15000); // exponential backoff, max 15s
+            showStatus('studio-status', '\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05D5\u05EA\u05E7 \u2014 \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF '+reconnectAttempts+'/5 \u05D1\u05E2\u05D5\u05D3 '+Math.round(delay/1000)+'s...', 'error');
             setTimeout(() => {
                 if (!conn || !conn.open) {
-                    dlog('Auto-reconnect attempt...', 'warn');
+                    dlog('Auto-reconnect #'+reconnectAttempts+'...', 'warn');
                     const remoteId = document.getElementById('room-id').value;
                     if (remoteId && peer && !peer.destroyed) {
                         const newConn = peer.connect(remoteId, {reliable: true, serialization: 'binary'});
                         setupDataConn(newConn);
                     }
-                }
-            }, 3000);
+                } else { reconnectAttempts = 0; }
+            }, delay);
+        } else if (reconnectAttempts >= 5) {
+            showStatus('studio-status', '\u05D4\u05D7\u05D9\u05D1\u05D5\u05E8 \u05E0\u05D5\u05EA\u05E7 \u05DC\u05D7\u05DC\u05D5\u05D8\u05D9\u05DF. \u05E0\u05E1\u05D4 \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9.', 'error');
         }
     });
     c.on('error', function(e) {
@@ -933,8 +939,10 @@ function animateMeters(){
 let vizMode='bars'; // 'bars' or 'wave'
 function toggleVizMode(){vizMode=vizMode==='bars'?'wave':'bars';dlog('Viz: '+vizMode,'ok');}
 function startWaveform(){const canvas=document.getElementById('waveCanvas'),ctx=canvas.getContext('2d');
+let _cw=0,_ch=0;
 function draw(){
-    canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;
+    const ow=canvas.offsetWidth,oh=canvas.offsetHeight;
+    if(ow!==_cw||oh!==_ch){canvas.width=_cw=ow;canvas.height=_ch=oh;}
     const w=canvas.width,h=canvas.height;
     ctx.clearRect(0,0,w,h);
     // Draw frequency bars for both streams
@@ -1052,7 +1060,7 @@ function toggleRecording(){
     if(conn&&conn.open)conn.send({type:'countdown',n:3});
 }
 function startRecording(){
-    if(!isConnected)return;chunksLocal=[];recRemoteChunks=[];
+    if(!isConnected)return;chunksLocal=[];recRemoteChunks=[];window._twoHourStopped=false;
     // Record local mic directly (high quality)
     const las=new MediaStream(localStream.getAudioTracks());
     mediaRecLocal=new MediaRecorder(las,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:256000});
@@ -1063,8 +1071,8 @@ function startRecording(){
         if (!isRecording || isPaused || chunksLocal.length === 0) return;
         const sz = chunksLocal.reduce((s,c)=>s+c.size,0);
         dlog('\u05D2\u05D9\u05D1\u05D5\u05D9: ' + (sz/1024).toFixed(0) + 'KB \u05DE\u05E7\u05D5\u05DE\u05D9 + ' + recRemoteChunks.length + ' chunks \u05DE\u05E8\u05D5\u05D7\u05E7', 'ok');
-    }, 30000);
-    isRecording=true;recStartTime=Date.now();timerInterval=setInterval(updateTimer,100);
+    }, 30000);allIntervals.push(autoSaveInterval);
+    isRecording=true;recStartTime=Date.now();timerInterval=setInterval(updateTimer,100);allIntervals.push(timerInterval);
     const rb=document.getElementById('btn-rec');rb.innerHTML='<span class="rec-dot"></span> \u05E2\u05D5\u05E6\u05E8';rb.classList.add('btn-rec-active');
     document.getElementById('timer').classList.add('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('rec-active'));
@@ -1155,6 +1163,7 @@ function stopRecording(){
 
 // Float32 to WAV Blob (proper WAV encoding)
 function float32ToWav(samples, sampleRate) {
+    if (!samples || samples.length === 0) return new Blob([], {type: 'audio/wav'});
     const buf = new ArrayBuffer(44 + samples.length * 2);
     const v = new DataView(buf);
     function ws(o, s) { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
@@ -1205,8 +1214,8 @@ function updateTimer(){
     // Milestone notifications + auto-markers
     const mins=Math.floor(elapsed/60);
     if(mins>0&&mins%30===0&&elapsed%60<0.2)dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DB\u05D1\u05E8 '+mins+' \u05D3\u05E7\u05D5\u05EA!','warn');
-    // Safety: auto-stop after 2 hours
-    if(mins>=120&&elapsed%60<0.2){dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05D4\u05D2\u05D9\u05E2\u05D4 \u05DC-2 \u05E9\u05E2\u05D5\u05EA \u2014 \u05E0\u05E2\u05E6\u05E8\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA','warn');playBeep(400,0.5);stopRecording();return;}
+    // Safety: auto-stop after 2 hours (guard flag prevents double-stop)
+    if(mins>=120&&!window._twoHourStopped){window._twoHourStopped=true;dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05D4\u05D2\u05D9\u05E2\u05D4 \u05DC-2 \u05E9\u05E2\u05D5\u05EA \u2014 \u05E0\u05E2\u05E6\u05E8\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA','warn');playBeep(400,0.5);stopRecording();return;}
     // Auto-marker every 10 minutes
     if(mins>0&&mins%10===0&&elapsed%60<0.2){
         const autoTime=fmtTime(elapsed*1000);
@@ -1669,7 +1678,7 @@ function exportMarkersSRT() {
         const nextMs = (i < markers.length-1) ? markers[i+1].ms : m.ms + 30000;
         const end = fmtTime(nextMs);
         srt += (i + 1) + '\n';
-        srt += '00:' + start + ',000 --> 00:' + end + ',000\n';
+        srt += start + ',000 --> ' + end + ',000\n';
         srt += m.label + '\n\n';
     });
     const blob = new Blob([srt], {type: 'text/plain;charset=utf-8'});
