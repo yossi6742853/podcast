@@ -1066,6 +1066,8 @@ function showConnected() {
     // Warn if still no audio after 10 seconds
     setTimeout(()=>{if(audioChunksIn===0&&isConnected){dlog('\u26A0 \u05DC\u05D0 \u05D4\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10\u05E9','err');showStatus('studio-status','\u26A0 \u05D0\u05D9\u05DF \u05D0\u05D5\u05D3\u05D9\u05D5 \u05DE\u05D4\u05E6\u05D3 \u05D4\u05E9\u05E0\u05D9 <button class="btn btn-sm btn-green" onclick="sendTestTone();if(audioCtx&&audioCtx.state===\'suspended\')audioCtx.resume();if(remoteAudioCtx&&remoteAudioCtx.state===\'suspended\')remoteAudioCtx.resume();dlog(\'Audio fix attempt\',\'ok\')" style="margin-right:6px"><i class="bi bi-wrench"></i> \u05EA\u05E7\u05DF</button> <button class="btn btn-sm btn-blue" onclick="quickReconnect()" style="margin-right:6px"><i class="bi bi-arrow-repeat"></i> \u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9</button>','error');}},10000);
     document.title='\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8 \u2014 \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8';
+    // Green connected favicon
+    try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%2327ae60'/><path d='M5 8l2 2 4-4' stroke='white' stroke-width='2' fill='none'/></svg>";}catch(e){}
     connStartTime = Date.now();
     try{localStorage.setItem('podcast_last_connect',new Date().toLocaleString('he-IL'));
     const sc=parseInt(localStorage.getItem('podcast_session_count')||'0')+1;
@@ -1559,7 +1561,8 @@ function updateTimer(){
     if(!recStartTime)return;
     const t=fmtTime(Date.now()-recStartTime);
     const elapsed=(Date.now()-recStartTime)/1000;
-    const estMB=((256000*elapsed)/8388608+(bytesReceived/1048576)).toFixed(1);
+    const br=window._recBitrate||256000;
+    const estMB=((br*elapsed)/8388608+(bytesReceived/1048576)).toFixed(1);
     document.getElementById('timer').textContent=t;
     const lossP2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
     document.getElementById('timer').title='~'+estMB+' MB | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP2)+'% | \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length;
@@ -1585,6 +1588,9 @@ function updateTimer(){
         }
     }
     document.getElementById('rec-status-stat').textContent='\u25CF REC '+estMB+'MB';
+    // Update rec display with size (store base text once)
+    const rndEl=document.getElementById('rec-num-display');
+    if(rndEl){if(!rndEl._base)rndEl._base=rndEl.textContent;rndEl.textContent=rndEl._base+' \u2022 ~'+estMB+'MB';}
     // Recording progress bar
     const rpw=document.getElementById('rec-progress-wrap'),rpb=document.getElementById('rec-progress-bar');
     const maxM=window._maxRecMins||120;
@@ -2254,12 +2260,13 @@ function addChatMsg(name, text, isMe) {
 
 // === MARKERS ===
 let markers = [];
-function addMarker() {
+function addMarker(customLabel) {
     if (!connStartTime) return;
     const elapsed = Date.now() - (recStartTime || connStartTime);
     const time = fmtTime(elapsed);
     const num = markers.length + 1;
-    markers.push({time: time, ms: elapsed, label: '\u05E1\u05D9\u05DE\u05DF ' + num});
+    const label = customLabel || '\u05E1\u05D9\u05DE\u05DF ' + num;
+    markers.push({time: time, ms: elapsed, label: label});
     dlog('Marker #' + num + ' at ' + time, 'ok');
     playBeep(1200,0.08,0.1); // quick marker beep
     const mb=document.getElementById('btn-marker');if(mb){mb.innerHTML='<i class="bi bi-bookmark-fill"></i> '+num;mb.style.transform='scale(1.2)';setTimeout(()=>mb.style.transform='',200);}
@@ -2399,6 +2406,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleMute(); }
     else if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleCam(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); pauseRecording(); }
+    else if (e.key === 'B' && e.shiftKey) { e.preventDefault(); const lbl=prompt('\u05E9\u05DD \u05E1\u05D9\u05DE\u05DF:');if(lbl)addMarker(lbl); }
     else if (e.key === 'b' || e.key === 'B') { e.preventDefault(); addMarker(); }
     else if (e.key === 's' || e.key === 'S') { e.preventDefault(); sendTestTone(); }
     else if (e.key === 't' || e.key === 'T') { e.preventDefault(); switchTab('chat'); document.getElementById('chat-input').focus(); }
@@ -2548,7 +2556,7 @@ if(isGuestMode){
     window._applyGuestMode=function(){
         if(window._guestHideApplied)return;window._guestHideApplied=true;
         // Hide: recording btn, markers, SFX, music tab content, topics edit buttons
-        const hideIds=['btn-rec','btn-marker','btn-compact','btn-transcribe','episode-title','quick-settings'];
+        const hideIds=['btn-rec','btn-marker','btn-compact','btn-transcribe','episode-title','quick-settings','btn-screen','host-panel','btn-pause'];
         hideIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
         // Hide tabs except chat
         document.querySelectorAll('.tab').forEach((t,i)=>{if(i!==3)t.style.opacity='0.3';});
