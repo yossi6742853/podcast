@@ -53,7 +53,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .btn-blue{background:linear-gradient(135deg,var(--blue),#3498db);color:#fff}.btn-blue:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(41,128,185,0.35)}
 .btn-sm{padding:6px 14px;font-size:0.85rem}
 .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
-.status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:0.9rem;animation:statusFadeIn 0.4s ease-out}
+.status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-top:8px;font-size:0.9rem;animation:statusFadeIn 0.4s ease-out;backdrop-filter:blur(4px)}
 @keyframes statusFadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes loadingSpin{to{transform:rotate(360deg)}}
 .loading-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:loadingSpin 0.8s linear infinite;margin-left:6px;vertical-align:middle}
@@ -129,7 +129,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .download-item .size{color:var(--muted);font-size:0.8rem}
 .toggle-row{display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap}
 .toggle-row label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.9rem}
-.toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold)}
+.toggle-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
 .room-id-display{background:linear-gradient(135deg,rgba(10,10,20,0.9),rgba(20,20,40,0.8));padding:14px 20px;border-radius:12px;border:2px solid var(--gold);color:var(--gold);font-size:1.4rem;font-weight:900;font-family:'Consolas','Courier New',monospace;text-align:center;margin-top:10px;letter-spacing:4px;direction:ltr;user-select:all;cursor:pointer;box-shadow:0 0 15px rgba(212,175,55,0.15),inset 0 0 30px rgba(212,175,55,0.03);transition:all 0.3s}
 .room-id-display:hover{box-shadow:0 0 30px rgba(212,175,55,0.35),inset 0 0 30px rgba(212,175,55,0.05);transform:scale(1.02)}
 #debug-log{background:#0a0a14;border:1px solid #2a2a3a;border-radius:8px;padding:8px;margin-top:12px;max-height:120px;overflow-y:auto;font-family:monospace;font-size:0.7rem;color:#8f8;direction:ltr;text-align:left;scroll-behavior:smooth;display:none}
@@ -215,7 +215,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <p class="subtitle" id="app-subtitle">&#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; + &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5; &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x2022; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05d4; &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd;</p>
 
     <!-- ROOM PANEL -->
-    <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s">
+    <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 12px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr;transition:border-color 0.3s;box-shadow:-4px 4px 15px rgba(0,0,0,0.3)">
         <span id="conn-health" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px;animation:dotPulse 3s infinite"></span> <i class="bi bi-people" style="opacity:0.5"></i><span id="participant-count">1</span> | <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
@@ -593,7 +593,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 560 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 565 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
