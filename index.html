@@ -441,6 +441,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="playBGLoop('dramatic')" title="&#x05d3;&#x05e8;&#x05de;&#x05d8;&#x05d9;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-exclamation-triangle"></i></button>
                 <button class="btn btn-sm btn-gold" onclick="playBGLoop('jazz')" title="&#x05d2;'&#x05d0;&#x05d6;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-music-note"></i></button>
                 <button class="btn btn-sm btn-red" onclick="stopBGLoop()" title="&#x05e2;&#x05e6;&#x05d5;&#x05e8;" style="padding:4px 8px;font-size:0.75rem"><i class="bi bi-stop-btn"></i></button>
+                <input type="range" id="bg-vol" min="0" max="100" value="50" style="width:60px;height:3px" oninput="setBGVol(this.value)" title="&#x05e2;&#x05e6;&#x05de;&#x05ea; &#x05e8;&#x05e7;&#x05e2;">
             </div>
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-music-note-beamed"></i> &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2;</div>
             <div class="settings-row">
@@ -513,7 +514,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Topics tab -->
         <div class="tab-content" id="tab-topics">
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-list-check"></i> &#x05e0;&#x05d5;&#x05e9;&#x05d0;&#x05d9;&#x05dd; &#x05dc;&#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8;</div>
-            <div id="topic-progress" style="height:4px;background:var(--border);border-radius:2px;margin-bottom:8px;overflow:hidden"><div id="topic-progress-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div></div>
+            <div id="topic-progress" style="height:4px;background:var(--border);border-radius:2px;margin-bottom:4px;overflow:hidden"><div id="topic-progress-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 0.5s"></div></div>
+            <div id="current-topic-timer" style="display:none;font-size:0.7rem;color:var(--gold);text-align:center;margin-bottom:6px;opacity:0.7"></div>
             <div id="topic-list" class="topic-list"></div>
             <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
                 <button class="btn btn-sm btn-gold" onclick="addTopic()"><i class="bi bi-plus"></i> &#x05d4;&#x05d5;&#x05e1;&#x05e3;</button>
@@ -1264,6 +1266,10 @@ function showConnected() {
         }
         // Send guest status to host (every 5s)
         if(!isHost&&conn&&conn.open&&Date.now()%5000<1100){conn.send({type:'guest_status',name:userName,muted:isMuted,rec:isRecording});}
+        // Update current topic timer
+        const ctt=document.getElementById('current-topic-timer');
+        if(ctt&&currentTopicStart>0){const ct=document.querySelector('.topic-item.current input');ctt.style.display='block';ctt.textContent='\u25B6 '+(ct?ct.value:'')+' \u2022 '+fmtTime(Date.now()-currentTopicStart);}
+        else if(ctt){ctt.style.display='none';}
         // Refresh mixer display (every 10s)
         if(isHost&&Date.now()%10000<1100)updateParticipantsList();
         // Audio flow check
@@ -2109,7 +2115,8 @@ function speakOutro(){
 
 // === BACKGROUND MUSIC LOOPS ===
 let bgLoopOscs=[];
-let _bgLoopStyle=null;
+let _bgLoopStyle=null,_bgGain=null;
+function setBGVol(v){if(_bgGain)_bgGain.gain.value=v/100;}
 function stopBGLoop(){_bgLoopStyle=null;bgLoopOscs.forEach(o=>{try{o.stop();}catch(e){}});bgLoopOscs=[];dlog('BG music stopped','ok');}
 function playBGLoop(style){
     stopBGLoop();
@@ -2117,6 +2124,9 @@ function playBGLoop(style){
     if(_beepCtx.state==='suspended')_beepCtx.resume();
     const ctx=_beepCtx,now=ctx.currentTime;
     const dur=16; // 16 second loop
+    // Master gain for BG volume
+    if(!_bgGain){_bgGain=ctx.createGain();_bgGain.gain.value=parseInt(document.getElementById('bg-vol')?.value||50)/100;_bgGain.connect(ctx.destination);}
+    const dest=_bgGain; // All BG goes through this gain
     if(style==='chill'){
         // Rich pad chords (Am-F-C-G) with slow filter sweep
         [[220,261,330],[174,220,261],[261,330,392],[196,247,294]].forEach((chord,ci)=>{
