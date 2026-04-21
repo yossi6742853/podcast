@@ -57,10 +57,11 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .status.success{background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);color:var(--green)}
 .status.error{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red)}
 .status.waiting{background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold)}
+.status.info{background:rgba(41,128,185,0.1);border:1px solid rgba(41,128,185,0.3);color:var(--blue)}
 .video-grid{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .video-box{flex:1;min-width:250px;position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:16/9;border:2px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:border-color 0.3s}
 .video-box:hover{border-color:rgba(212,175,55,0.3)}
-.video-box.speaking{border-color:var(--green);box-shadow:0 0 20px rgba(39,174,96,0.4)}
+.video-box.speaking{border-color:var(--green);box-shadow:0 0 20px rgba(39,174,96,0.4);transition:border-color 0.15s,box-shadow 0.15s}
 .video-box.connected-glow{box-shadow:0 0 8px rgba(39,174,96,0.2);animation:connectedPulse 3s ease-in-out}
 @keyframes connectedPulse{0%{box-shadow:0 0 0 rgba(39,174,96,0)}30%{box-shadow:0 0 30px rgba(39,174,96,0.4)}100%{box-shadow:0 0 8px rgba(39,174,96,0.2)}}
 .video-box.rec-active::after{content:'\25CF REC';position:absolute;top:8px;left:8px;background:var(--red);color:#fff;padding:2px 8px;border-radius:12px;font-size:0.65rem;font-weight:900;animation:recBlink 1s infinite;z-index:5}
@@ -85,11 +86,11 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .tab-content{animation:tabFadeIn 0.3s ease}
 @keyframes tabFadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .download-item{transition:background 0.2s,transform 0.2s}
-.download-item:hover{background:rgba(255,255,255,0.03);transform:translateX(-3px)}
+.download-item:hover{background:rgba(255,255,255,0.03);transform:translateX(3px)}
 .download-item .play-active{color:var(--green)!important}
 .meter-name{font-weight:700;margin-top:4px;font-size:0.75rem}
 .meter-name.me{color:var(--gold)}.meter-name.remote{color:var(--blue)}
-.timer{font-size:2.2rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;transition:color 0.3s}
+.timer{font-size:2.2rem;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;transition:color 0.3s;letter-spacing:2px;direction:ltr;display:inline-block}
 .timer.recording{color:var(--red);text-shadow:0 0 20px rgba(231,76,60,0.4);animation:timerPulse 0.8s infinite}
 .timer.paused{color:#f39c12;text-shadow:0 0 15px rgba(243,156,18,0.3);animation:none}
 @keyframes timerPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:0.7}}
@@ -1317,7 +1318,9 @@ function startRecording(){
     showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
     recLog.push({event:'start',time:new Date().toLocaleTimeString(),recNum:recordingCount+1});
     document.getElementById('btn-pause').style.display='inline-flex';
-    document.getElementById('rec-num-display').textContent='\u05D4\u05E7\u05DC\u05D8\u05D4 #'+(recordingCount+1);
+    const curTopic2=document.querySelector('.topic-item.current input');
+    const topicLabel=curTopic2&&curTopic2.value.trim()?' \u2022 '+curTopic2.value.trim():'';
+    document.getElementById('rec-num-display').textContent='\u05D4\u05E7\u05DC\u05D8\u05D4 #'+(recordingCount+1)+topicLabel;
     // Prevent screen sleep during recording
     try{if('wakeLock' in navigator)navigator.wakeLock.request('screen').then(wl=>{window._wakeLock=wl;dlog('Screen wake lock active','ok');}).catch(()=>{});}catch(e){}
     dlog('Recording started (local + remote buffer)', 'ok');
@@ -1672,6 +1675,12 @@ function setCurrentTopic(n){
     document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('current'));
     const el=document.getElementById('topic-'+n);if(el)el.classList.add('current');
     currentTopicStart=Date.now();
+    // Notify remote about topic change
+    const topicText=el?el.querySelector('input')?.value:'';
+    if(conn&&conn.open&&topicText)conn.send({type:'msg',name:userName,text:'\u27A1\uFE0F \u05E0\u05D5\u05E9\u05D0: '+topicText});
+    // Update rec display
+    const rnd=document.getElementById('rec-num-display');
+    if(rnd&&isRecording)rnd.textContent='\u05D4\u05E7\u05DC\u05D8\u05D4 #'+(recordingCount+1)+(topicText?' \u2022 '+topicText:'');
     // Auto-add marker for topic switch
     if(isRecording&&connStartTime)addMarker();
 }
@@ -1860,8 +1869,8 @@ function doDisconnect(){
     showStatus('room-status','\u05E1\u05E9\u05DF \u05E7\u05D5\u05D3\u05DD \u05D4\u05E1\u05EA\u05D9\u05D9\u05DD. '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA \u05E0\u05E9\u05DE\u05E8\u05D5.','success');
 }
 function showStatus(id,msg,type){let el=document.getElementById(id);if(!el){el=document.createElement('div');el.id=id;document.querySelector('.container').appendChild(el);}const icons={success:'check-circle',error:'exclamation-circle',waiting:'hourglass-split'};el.className='status '+type;el.innerHTML='<i class="bi bi-'+(icons[type]||'info-circle')+'"></i> '+msg;
-    // Auto-dismiss success messages after 5s
-    if(type==='success'){clearTimeout(el._dismissTO);el._dismissTO=setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.4s';setTimeout(()=>{el.style.opacity='1';el.innerHTML='';el.className='';},500);},5000);}
+    // Auto-dismiss success messages after 5s (only if message hasn't changed)
+    if(type==='success'){clearTimeout(el._dismissTO);const msgId=Date.now();el._msgId=msgId;el._dismissTO=setTimeout(()=>{if(el._msgId===msgId){el.style.opacity='0';el.style.transition='opacity 0.4s';setTimeout(()=>{if(el._msgId===msgId){el.style.opacity='1';el.innerHTML='';el.className='';}},500);}},5000);}
 }
 
 // === MIC TEST (before connecting) ===
