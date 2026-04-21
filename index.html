@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scrollbar-color:rgba(212,175,55,0.2) var(--bg);scrollbar-width:thin}
 ::selection{background:rgba(212,175,55,0.3);color:#fff}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -87,7 +87,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 @keyframes clipFlash{0%{box-shadow:0 0 10px var(--red)}100%{box-shadow:none}}
 /* Smooth transitions */
 .panel:hover{box-shadow:0 8px 40px rgba(0,0,0,0.5),0 0 2px rgba(212,175,55,0.15),inset 0 0 30px rgba(212,175,55,0.03)}
-.panel{animation:panelSlideIn 0.5s ease-out}
+.panel{animation:panelSlideIn 0.5s ease-out;transition:border-color 0.5s}
 @keyframes panelSlideIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 .tab-content{animation:tabFadeIn 0.3s ease}
 @keyframes tabFadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
@@ -1601,6 +1601,7 @@ function startRecording(){
     document.getElementById('timer').classList.add('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('rec-active'));
     const wfEl=document.querySelector('.waveform');if(wfEl)wfEl.style.boxShadow='0 0 15px rgba(231,76,60,0.2),inset 0 0 10px rgba(231,76,60,0.05)';
+    const sp=document.getElementById('panel-studio');if(sp)sp.style.borderColor='rgba(231,76,60,0.15)';
     // Red recording favicon
     try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23e74c3c'/><circle cx='8' cy='8' r='3' fill='white'/></svg>";}catch(e){}
     showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
@@ -1682,6 +1683,7 @@ function stopRecording(){
     document.getElementById('timer').classList.remove('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.remove('rec-active'));
     const wf=document.querySelector('.waveform');if(wf)wf.style.boxShadow='';
+    const sp2=document.getElementById('panel-studio');if(sp2)sp2.style.borderColor='';
     document.getElementById('btn-pause').style.display='none';
     const rpw2=document.getElementById('rec-progress-wrap');if(rpw2)rpw2.style.display='none';
     // Restore normal favicon
@@ -2425,7 +2427,7 @@ function quickReconnect(){
 
 // === CONTROLS ===
 function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i> <span class="hide-mobile">\u05DE\u05D5\u05E9\u05EA\u05E7</span>':'<i class="bi bi-mic-fill"></i> <span class="hide-mobile">\u05D4\u05E9\u05EA\u05E7</span>';b.className='btn btn-sm '+(isMuted?'btn-red':'btn-blue');const mi=document.getElementById('mute-ind');if(mi)mi.style.display=isMuted?'block':'none';toast(isMuted?'\uD83D\uDD07 \u05DE\u05D5\u05E9\u05EA\u05E7':'\uD83C\uDF99 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u05E4\u05E2\u05D9\u05DC',1500);}
-function toggleCam(){if(!localStream)return;const vt=localStream.getVideoTracks();if(!vt.length)return;isCamOff=!isCamOff;vt.forEach(t=>t.enabled=!isCamOff);document.getElementById('local-no-vid').style.display=isCamOff?'block':'none';const b=document.getElementById('btn-cam');b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i> \u05DB\u05D1\u05D5\u05D9':'<i class="bi bi-camera-video-fill"></i> \u05DE\u05E6\u05DC\u05DE\u05D4';b.className='btn btn-sm '+(isCamOff?'btn-red':'btn-blue');}
+function toggleCam(){if(!localStream)return;const vt=localStream.getVideoTracks();if(!vt.length){toast('\u05D0\u05D9\u05DF \u05DE\u05E6\u05DC\u05DE\u05D4',1500);return;}isCamOff=!isCamOff;vt.forEach(t=>t.enabled=!isCamOff);document.getElementById('local-no-vid').style.display=isCamOff?'block':'none';const b=document.getElementById('btn-cam');b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i> \u05DB\u05D1\u05D5\u05D9':'<i class="bi bi-camera-video-fill"></i> \u05DE\u05E6\u05DC\u05DE\u05D4';b.className='btn btn-sm '+(isCamOff?'btn-red':'btn-blue');toast(isCamOff?'\uD83D\uDCF7 \u05DE\u05E6\u05DC\u05DE\u05D4 \u05DB\u05D1\u05D5\u05D9\u05D4':'\uD83D\uDCF9 \u05DE\u05E6\u05DC\u05DE\u05D4 \u05E4\u05E2\u05D9\u05DC\u05D4',1500);}
 function doDisconnect(){
     if(isRecording&&!confirm('\u05D9\u05E9 \u05D4\u05E7\u05DC\u05D8\u05D4 \u05E4\u05E2\u05D9\u05DC\u05D4! \u05DC\u05E0\u05EA\u05E7?'))return;
     // Session summary
@@ -2670,7 +2672,7 @@ function toggleCompact(){
 
 // === DIM MODE ===
 let dimmed=false;
-function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightness(0.6)':'none';dlog('Dim: '+(dimmed?'ON':'OFF'),'ok');}
+function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightness(0.6)':'none';dlog('Dim: '+(dimmed?'ON':'OFF'),'ok');toast(dimmed?'\uD83C\uDF19 \u05E2\u05DE\u05E2\u05D5\u05DD':'\u2600\uFE0F \u05E8\u05D2\u05D9\u05DC',1200);}
 
 // === HELP ===
 function toggleHelp(){const h=document.getElementById('help-overlay');h.style.display=h.style.display==='none'?'block':'none';}
