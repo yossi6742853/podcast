@@ -257,7 +257,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div id="connected-banner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,0.08),rgba(41,128,185,0.08));border-radius:12px;border:1px solid rgba(39,174,96,0.15);backdrop-filter:blur(5px);position:relative;overflow:hidden;cursor:pointer;transition:max-height 0.3s,padding 0.3s" onclick="this.classList.toggle('collapsed');if(this.classList.contains('collapsed')){this.style.maxHeight='24px';this.style.padding='3px 20px';this.style.overflow='hidden';this.style.fontSize='0.7rem';this.style.justifyContent='flex-start';}else{this.style.maxHeight='none';this.style.padding='10px 20px';this.style.fontSize='';this.style.justifyContent='center';}">
             <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(212,175,55,0.05) 0%,transparent 50%),radial-gradient(circle at 80% 50%,rgba(41,128,185,0.05) 0%,transparent 50%);pointer-events:none"></div>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span><span style="color:var(--gold);font-weight:700" id="banner-local">&#x05d0;&#x05e0;&#x05d9;</span></span>
-            <span style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite"><i class="bi bi-soundwave"></i></span>
+            <span id="banner-soundwave" style="color:var(--green);font-size:1.1rem;animation:pulse 2s infinite;transition:color 0.5s"><i class="bi bi-soundwave"></i></span>
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:var(--blue);font-weight:700" id="banner-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</span><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block"></span></span>
             <span style="color:var(--muted);font-size:0.75rem;margin-right:8px" id="banner-time"></span>
             <span id="banner-episode" style="color:var(--gold);font-size:0.7rem;font-weight:500;opacity:0.7;display:none"></span>
@@ -580,7 +580,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 512 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 513 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -616,7 +616,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             &#x2022; &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e3; (kick)<br>
             &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1; &#x05de;&#x05d5;&#x05ea;&#x05d0;&#x05dd;
         </div>
-        <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.2 | 3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 500+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
+        <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.2 | 3,200+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 513+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
         <div style="margin-top:10px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
 </div>
@@ -1054,8 +1054,9 @@ function startAudioRelay() {
             samples[i] = Math.max(-32768, Math.min(32767, Math.round(s * 32767)));
         }
         try {
+            if(!conn||!conn.open){if(chunksSentCount>0&&chunksSentCount%500===0)dlog('No connection for audio send','warn');return;}
             const audioMsg={type: 'a', s: samples, seq: chunkSeq++, sr: audioCtx.sampleRate};
-            if(participants.size>1)broadcast(audioMsg); else if(conn&&conn.open)conn.send(audioMsg);
+            if(participants.size>1)broadcast(audioMsg); else conn.send(audioMsg);
             bytesSent += samples.byteLength + 10;audioChunksOut++;chunksSentCount++;
             if(chunksSentCount===1)dlog('First audio chunk sent! sr='+audioCtx.sampleRate,'ok');
             if(chunksSentCount%1000===0)dlog('Audio: '+chunksSentCount+' chunks sent','ok');
@@ -1321,6 +1322,9 @@ function showConnected() {
             aqsEl.style.color=qScore>80?'var(--green)':qScore>50?'#f39c12':'var(--red)';
         }
         if(afs)afs.style.color=(audioChunksOut>0||audioChunksIn>0)?'var(--green)':'var(--red)';
+        // Banner soundwave color based on live audio flow
+        const bsw=document.getElementById('banner-soundwave');
+        if(bsw){const recentAudio=lastAudioTime>0&&Date.now()-lastAudioTime<3000;bsw.style.color=recentAudio?'var(--green)':'var(--muted)';}
         // Remote quality badge
         const rq=document.getElementById('remote-quality');
         if(rq&&audioChunksIn>0){
