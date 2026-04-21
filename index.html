@@ -610,7 +610,19 @@ async function joinRoom() {
     });
     peer.on('error', function(e) {
         dlog('Error: '+e.type, 'err');
-        if (e.type === 'peer-unavailable') showStatus('room-status', '\u05D4\u05D7\u05D3\u05E8 \u05DC\u05D0 \u05E0\u05DE\u05E6\u05D0 \u2014 \u05D5\u05D3\u05D0 \u05E9\u05D4\u05DE\u05D0\u05E8\u05D7 \u05DC\u05D7\u05E5 "\u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8" \u05D5\u05E9\u05D4\u05E7\u05D5\u05D3 \u05E0\u05DB\u05D5\u05DF', 'error');
+        if (e.type === 'peer-unavailable') {
+            showStatus('room-status', '\u05D4\u05D7\u05D3\u05E8 \u05DC\u05D0 \u05E0\u05DE\u05E6\u05D0 \u2014 \u05DE\u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1 \u05D1\u05E2\u05D5\u05D3 3 \u05E9\u05E0\u05D9\u05D5\u05EA...', 'error');
+            // Auto-retry after 3 seconds (max 3 times)
+            joinRetryCount++;
+            if(joinRetryCount<=3){
+                setTimeout(() => {
+                    if(!isConnected){dlog('Auto-retry #'+joinRetryCount+'...','warn');joinRoom();}
+                }, 3000);
+            } else {
+                showStatus('room-status','\u05E0\u05DB\u05E9\u05DC \u05D0\u05D7\u05E8\u05D9 3 \u05E0\u05D9\u05E1\u05D9\u05D5\u05E0\u05D5\u05EA. \u05D5\u05D3\u05D0 \u05E9\u05D4\u05DE\u05D0\u05E8\u05D7 \u05DC\u05D7\u05E5 "\u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8" \u05D5\u05E0\u05E1\u05D4 \u05E9\u05D5\u05D1','error');
+                joinRetryCount=0;
+            }
+        }
         else showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.type, 'error');
     });
 }
@@ -1395,7 +1407,7 @@ function doDisconnect(){
     localAnalyser=null;remoteAnalyser=null;remoteGainNode=null;
     noiseFilter=null;eqBass=null;eqTreble=null;remoteCompressor=null;panNode=null;micGainNode=null;
     connStartTime=null;bytesSent=0;bytesReceived=0;recRemoteChunks=[];
-    pingsSent=0;pongsReceived=0;isPaused=false;silenceSegments=[];currentSilenceStart=null;lastPongTime=0;
+    pingsSent=0;pongsReceived=0;isPaused=false;silenceSegments=[];currentSilenceStart=null;lastPongTime=0;joinRetryCount=0;
     _ml=_mr=_pl=_pr=_lb=_rb=null;
     speakTimeLocal=0;speakTimeRemote=0;silenceCountLocal=0;silenceCountRemote=0;
     peakLocal=0;peakRemote=0;maxPeakLocal=0;maxPeakRemote=0;remoteSR=0;markers=[];recLog=[];unreadChat=0;totalChatMsgs=0;totalRecBytes=0;audioChunksIn=0;audioChunksOut=0;lastAudioTime=0;latencyHistory=[];avgLatency=0;packetsLost=0;currentTopicStart=0;lastTypingSent=0;
@@ -1514,6 +1526,7 @@ function toggleStudioFS(){
 
 // === CHAT ===
 let lastTypingSent=0;
+let joinRetryCount=0;
 function sendTyping(){if(!conn||!conn.open||Date.now()-lastTypingSent<1500)return;lastTypingSent=Date.now();conn.send({type:'typing',name:userName});}
 function sendReaction(emoji) {
     if(!conn||!conn.open)return;
