@@ -530,7 +530,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 474 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.5 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 476 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1240,6 +1240,8 @@ function showConnected() {
         }
         // Send guest status to host (every 5s)
         if(!isHost&&conn&&conn.open&&Date.now()%5000<1100){conn.send({type:'guest_status',name:userName,muted:isMuted,rec:isRecording});}
+        // Refresh mixer display (every 10s)
+        if(isHost&&Date.now()%10000<1100)updateParticipantsList();
         // Audio flow check
         if(lastAudioTime>0&&Date.now()-lastAudioTime>10000&&isConnected){
             showStatus('studio-status','\u05DC\u05D0 \u05DE\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10+ \u05E9\u05E0\u05D9\u05D5\u05EA','error');
@@ -2077,7 +2079,8 @@ function speakOutro(){
 
 // === BACKGROUND MUSIC LOOPS ===
 let bgLoopOscs=[];
-function stopBGLoop(){bgLoopOscs.forEach(o=>{try{o.stop();}catch(e){}});bgLoopOscs=[];dlog('BG music stopped','ok');}
+let _bgLoopStyle=null;
+function stopBGLoop(){_bgLoopStyle=null;bgLoopOscs.forEach(o=>{try{o.stop();}catch(e){}});bgLoopOscs=[];dlog('BG music stopped','ok');}
 function playBGLoop(style){
     stopBGLoop();
     if(!_beepCtx||_beepCtx.state==='closed')_beepCtx=new AudioContext();
@@ -2107,10 +2110,11 @@ function playBGLoop(style){
         // Soft chord stabs every 4 seconds
         [[220,277,330,415],[196,247,294,370]].forEach((chord,ci)=>{chord.forEach(f=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.012,now+ci*8);g.gain.exponentialRampToValueAtTime(0.001,now+ci*8+3);o.connect(g);g.connect(ctx.destination);o.start(now+ci*8);o.stop(now+ci*8+3.5);bgLoopOscs.push(o);});});
     }
+    _bgLoopStyle=style;
     dlog('BG loop: '+style+' ('+dur+'s)','ok');
     showStatus('studio-status','\uD83C\uDFB5 \u05DE\u05D5\u05D6\u05D9\u05E7\u05EA \u05E8\u05E7\u05E2: '+style,'success');
-    // Auto-restart loop
-    setTimeout(()=>{if(bgLoopOscs.length>0)playBGLoop(style);},dur*1000);
+    // Auto-restart loop (only if same style still active)
+    setTimeout(()=>{if(_bgLoopStyle===style)playBGLoop(style);},dur*1000);
 }
 
 function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900, 0.2), 150); }
@@ -2139,11 +2143,14 @@ function updateParticipantsList(){
     if(mixer&&isHost){
         let html='';
         participants.forEach((p,pid)=>{
-            html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:6px">';
-            html+='<span style="color:var(--blue);font-weight:700;font-size:0.8rem;min-width:60px">'+escHtml(p.name)+'</span>';
-            html+='<button class="btn btn-sm btn-red" style="padding:2px 6px;font-size:0.7rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'mute\'})"><i class="bi bi-mic-mute"></i></button>';
-            html+='<button class="btn btn-sm btn-green" style="padding:2px 6px;font-size:0.7rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'unmute\'})"><i class="bi bi-mic"></i></button>';
-            html+='<input type="range" min="0" max="200" value="100" style="flex:1;min-width:60px" oninput="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'gain\',val:parseInt(this.value)})">';
+            const dur=Math.round((Date.now()-p.joined)/60000);
+            html+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:6px;animation:tabFadeIn 0.3s">';
+            html+='<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>';
+            html+='<span style="color:var(--blue);font-weight:700;font-size:0.8rem;min-width:50px" title="'+dur+'m">'+escHtml(p.name)+'</span>';
+            html+='<button class="btn btn-sm btn-red" style="padding:1px 5px;font-size:0.65rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'mute\'})" title="\u05D4\u05E9\u05EA\u05E7"><i class="bi bi-mic-mute"></i></button>';
+            html+='<button class="btn btn-sm btn-green" style="padding:1px 5px;font-size:0.65rem" onclick="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'unmute\'})" title="\u05D1\u05D8\u05DC"><i class="bi bi-mic"></i></button>';
+            html+='<input type="range" min="0" max="200" value="100" style="flex:1;min-width:50px;height:4px" oninput="sendToParticipant(\''+pid+'\',{type:\'host_cmd\',cmd:\'gain\',val:parseInt(this.value)})">';
+            html+='<span style="font-size:0.6rem;color:var(--muted)">'+dur+'m</span>';
             html+='</div>';
         });
         mixer.innerHTML=html||'<div style="color:var(--muted);font-size:0.75rem;text-align:center">\u05D0\u05D9\u05DF \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD</div>';
