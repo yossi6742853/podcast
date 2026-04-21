@@ -370,6 +370,11 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <input type="range" id="music-vol" min="0" max="100" value="30" oninput="setMusicVol(this.value)">
                 <span id="music-vol-val">30%</span>
             </div>
+            <div class="music-controls">
+                <span class="music-label">Duck:</span>
+                <input type="range" id="duck-level" min="0" max="100" value="30" oninput="document.getElementById('duck-val').textContent=this.value+'%'" title="&#x05e2;&#x05d5;&#x05e6;&#x05de;&#x05ea; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05d4; &#x05d1;&#x05d6;&#x05de;&#x05df; &#x05d3;&#x05d9;&#x05d1;&#x05d5;&#x05e8;">
+                <span id="duck-val" style="min-width:30px;font-size:0.8rem;color:var(--muted)">30%</span>
+            </div>
             <div id="music-name" style="color:var(--muted);font-size:0.85rem;margin-top:5px"></div>
             <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
                 <div id="music-time" style="color:var(--muted);font-size:0.8rem;direction:ltr;min-width:90px"></div>
@@ -456,7 +461,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 450 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 454 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1130,7 +1135,8 @@ function animateMeters(){
     if(mp&&!mp.paused){
         const speaking=ll>20||rl>20;
         const baseVol=parseInt(document.getElementById('music-vol')?.value||30)/100;
-        mp.volume=speaking?baseVol*0.3:baseVol;
+        const duckRatio=parseInt(document.getElementById('duck-level')?.value||30)/100;
+        mp.volume=speaking?baseVol*duckRatio:baseVol;
     }
     // Silence warning after ~10s, mic failure alert after ~20s
     if(isRecording&&silenceCountLocal>600&&silenceCountLocal%300===0){
@@ -1244,6 +1250,7 @@ function pauseRecording(){
         btn.className='btn btn-sm btn-green';
         showStatus('studio-status','\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DE\u05D5\u05E9\u05D4\u05D9\u05EA','waiting');
         document.getElementById('timer').classList.replace('recording','paused');
+        playBeep(600,0.1);setTimeout(()=>playBeep(400,0.15),120);
         dlog('Recording paused','warn');
     }else{
         isPaused=false;
@@ -1252,6 +1259,7 @@ function pauseRecording(){
         btn.className='btn btn-sm btn-blue';
         showStatus('studio-status','\u05DE\u05E7\u05DC\u05D9\u05D8...','error');
         document.getElementById('timer').classList.replace('paused','recording');
+        playBeep(400,0.1);setTimeout(()=>playBeep(600,0.15),120);
         dlog('Recording resumed','ok');
     }
 }
@@ -1541,7 +1549,13 @@ function toggleTranscription(){
             if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';
             else interim=e.results[i][0].transcript;
         }
-        if(final){const span=document.createElement('span');span.textContent=final;txt.appendChild(span);txt.scrollTop=txt.scrollHeight;}
+        if(final){
+            const elapsed=connStartTime?fmtTime(Date.now()-connStartTime):'';
+            const span=document.createElement('div');
+            span.style.cssText='margin-bottom:4px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)';
+            span.innerHTML='<span style="color:var(--gold);font-size:0.7rem;font-weight:700;margin-left:6px;direction:ltr">'+elapsed+'</span> '+escHtml(final);
+            txt.appendChild(span);txt.scrollTop=txt.scrollHeight;
+        }
     };
     speechRec.onerror=function(e){dlog('Speech: '+e.error,'warn');if(e.error==='not-allowed')showStatus('studio-status','\u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u05E0\u05D3\u05D7\u05EA\u05D4 \u05DC\u05EA\u05DE\u05DC\u05D5\u05DC','error');};
     speechRec.onend=function(){if(isTranscribing)speechRec.start();}; // auto-restart
@@ -2017,6 +2031,8 @@ function addMarker() {
     playBeep(1200,0.08,0.1); // quick marker beep
     const mb=document.getElementById('btn-marker');if(mb){mb.innerHTML='<i class="bi bi-bookmark-fill"></i> '+num;mb.style.transform='scale(1.2)';setTimeout(()=>mb.style.transform='',200);}
     showStatus('studio-status', '\u05E1\u05D9\u05DE\u05DF #' + num + ' \u05E0\u05D5\u05E1\u05E3 \u05D1-' + time, 'success');
+    // Notify remote about marker
+    if(conn&&conn.open){conn.send({type:'msg',name:userName,text:'\uD83D\uDD16 \u05E1\u05D9\u05DE\u05DF #'+num+' @ '+time});}
     // Show markers list
     let ml = document.getElementById('markers-list');
     if (!ml) {
