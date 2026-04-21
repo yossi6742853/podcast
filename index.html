@@ -40,7 +40,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
 #latency-badge.bad::before{color:var(--red)}
 #latency-badge.disconnected{color:var(--red);border-color:rgba(231,76,60,0.3)}
 #latency-badge.disconnected::before{color:var(--red);animation:recBlink 1s infinite}
-.container{width:100%;max-width:1100px;padding:0 10px}
+.container{width:100%;max-width:1100px;padding:0 10px;position:relative;z-index:1}
 .panel{background:linear-gradient(145deg,rgba(17,17,32,0.85),rgba(22,22,48,0.75));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(212,175,55,0.05),inset 0 1px 0 rgba(255,255,255,0.06);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:all 0.3s ease}
 .panel-title{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;letter-spacing:0.3px}
 .room-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -231,9 +231,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
     .download-item{border:1px solid #ccc!important;background:#f9f9f9!important}
     .topic-item{border:1px solid #ddd!important;background:#f9f9f9!important}
 }
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes audioPulse{0%,100%{box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(39,174,96,0.1)}50%{box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 12px rgba(39,174,96,0.25)}}
+#panel-studio.audio-flowing:not(.rec-border){animation:audioPulse 3s ease-in-out infinite}
+#latency-badge.badge-enter{animation:statusFadeIn 0.5s ease-out}
 </style>
 </head>
 <body>
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.35"></canvas>
 <div class="container">
     <h1><i class="bi bi-mic-fill"></i> &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO</h1>
     <p class="subtitle" id="app-subtitle">&#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; + &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5; &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x2022; &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05d4; &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd;</p>
@@ -244,7 +249,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room" style="border-top:2px solid rgba(212,175,55,0.2)">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.6 | 682</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.7 | 684</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -617,7 +622,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.6 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 682 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.7 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 684 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -645,7 +650,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
             4. &#x05e8;&#x05e2;&#x05e0;&#x05df; &#x05d5;&#x05e0;&#x05e1;&#x05d4; &#x05e9;&#x05d5;&#x05d1;
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10.6:</b><br>
+            <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v10.7:</b><br>
             &#x2022; &#x05e8;&#x05d9;&#x05d1;&#x05d5;&#x05d9; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e4;&#x05d9;&#x05dd; + &#x05de;&#x05d9;&#x05e7;&#x05e1;&#x05e8;<br>
             &#x2022; &#x05d0;&#x05d9;&#x05db;&#x05d5;&#x05ea; &#x05d0;&#x05d5;&#x05dc;&#x05e4;&#x05df; (HPF+De-esser+Presence)<br>
             &#x2022; QR &#x05dc;&#x05e9;&#x05d9;&#x05ea;&#x05d5;&#x05e3; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;<br>
@@ -653,7 +658,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;color:var(--gold);backgr
             &#x2022; &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7; &#x05de;&#x05e9;&#x05ea;&#x05ea;&#x05e3; (kick)<br>
             &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d1;&#x05dc;&#x05d5;&#x05d8;&#x05d5;&#x05e1; &#x05de;&#x05d5;&#x05ea;&#x05d0;&#x05dd;
         </div>
-        <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.6 | 3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 525+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
+        <div style="margin-top:10px;text-align:center;font-size:0.7rem;color:var(--muted)">v10.7 | 3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; | 525+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; | Powered by Claude Code</div>
         <div style="margin-top:10px;text-align:center"><button class="btn btn-gold" onclick="toggleHelp()" style="padding:8px 30px"><i class="bi bi-x-lg"></i> &#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
 </div>
@@ -833,6 +838,10 @@ function setupDataConn(c) {
             let barsHtml = '';
             for(let i=1;i<=4;i++) barsHtml+='<span style="display:inline-block;width:3px;height:'+(4+i*3)+'px;background:'+(i<=bars?barColor:'rgba(255,255,255,0.15)')+';margin:0 1px;border-radius:1px;vertical-align:bottom"></span>';
             document.getElementById('signal-bars').innerHTML=barsHtml;}
+        } else if (d.type === 'marker_sync') {
+            // Remote marker sync — add to local markers array
+            const exists=markers.find(m=>Math.abs(m.ms-d.ms)<500);
+            if(!exists){markers.push({time:d.time,ms:d.ms,label:d.label+' ('+(d.from||'\u05DE\u05E8\u05D5\u05D7\u05E7')+')'});dlog('Remote marker: '+d.label+' @ '+d.time,'ok');toast('\uD83D\uDD16 '+d.label,1500);}
         }
     });
     c.on('open', function() {
@@ -971,6 +980,14 @@ async function createRoom() {
         isHost = true;
         // Auto-copy room code
         navigator.clipboard.writeText(id).then(()=>dlog('Room code auto-copied!','ok')).catch(()=>{});
+        // Waiting room visual
+        let wr=document.getElementById('waiting-room-banner');
+        if(!wr){wr=document.createElement('div');wr.id='waiting-room-banner';wr.style.cssText='margin-top:12px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,0.06),rgba(41,128,185,0.04));border:1px solid rgba(212,175,55,0.2);border-radius:14px;text-align:center;position:relative;overflow:hidden;animation:tabFadeIn 0.5s';
+        wr.innerHTML='<div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden" id="wr-particles"></div><div style="font-size:2.5rem;margin-bottom:8px;animation:pulse 2s infinite">\uD83C\uDFA4</div><div style="color:var(--gold);font-weight:700;font-size:1rem;margin-bottom:4px">\u05DE\u05DE\u05EA\u05D9\u05DF \u05DC\u05D0\u05D5\u05E8\u05D7...</div><div style="color:var(--muted);font-size:0.8rem;margin-bottom:12px">\u05E9\u05DC\u05D7 \u05D0\u05EA \u05D4\u05E7\u05D5\u05D3 <b style="color:var(--gold);font-family:monospace">'+id+'</b> \u05DC\u05D0\u05D5\u05E8\u05D7</div><div class="sound-wave"><span></span><span></span><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:0.7rem;color:var(--muted);opacity:0.5" id="wr-timer">00:00 \u05DE\u05DE\u05EA\u05D9\u05DF...</div>';
+        const rs=document.getElementById('room-status');if(rs)rs.after(wr);
+        const wrS=Date.now();window._wrTimer=setInterval(()=>{const el=document.getElementById('wr-timer');if(el)el.textContent=fmtTime(Date.now()-wrS)+' \u05DE\u05DE\u05EA\u05D9\u05DF...';},1000);
+        window._wrParticles=setInterval(()=>{const pp=document.getElementById('wr-particles');if(!pp)return;const em=document.createElement('div');em.textContent=['\uD83C\uDFA4','\uD83C\uDFB5','\u2728','\uD83C\uDF99'][Math.floor(Math.random()*4)];em.style.cssText='position:absolute;left:'+Math.round(Math.random()*90)+'%;bottom:0;font-size:'+(0.8+Math.random()*0.8).toFixed(1)+'rem;opacity:0.5;pointer-events:none;animation:floatUp '+(2+Math.random()*2).toFixed(1)+'s ease-out forwards';pp.appendChild(em);setTimeout(()=>em.remove(),4000);},1200);
+        }
     });
     peer.on('connection', function(c) { setupDataConn(c); });
     peer.on('error', function(e) { dlog('Error: '+e.type+' '+e.message, 'err'); showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); });
@@ -1243,6 +1260,9 @@ function drainJitterBuffer() {
 }
 
 function showConnected() {
+    // Dismiss waiting room
+    const wrB=document.getElementById('waiting-room-banner');if(wrB){wrB.style.transition='opacity 0.5s';wrB.style.opacity='0';setTimeout(()=>wrB.remove(),500);}
+    clearInterval(window._wrTimer);clearInterval(window._wrParticles);
     const pr=document.getElementById('panel-room'),ps=document.getElementById('panel-studio');
     pr.style.opacity='0';pr.style.transition='opacity 0.4s';
     setTimeout(()=>{pr.style.display='none';ps.style.display='block';ps.style.opacity='0';ps.style.transform='scale(0.98)';ps.style.transition='opacity 0.4s,transform 0.4s';
@@ -1342,7 +1362,7 @@ function showConnected() {
         if(ts>120){const tr=document.getElementById('talk-ratio');if(tr){const lPct=Math.round(speakTimeLocal/ts*100),rPct=100-lPct;tr.innerHTML='<span style="color:var(--gold)">'+lPct+'%</span> <span style="display:inline-block;width:60px;height:4px;background:var(--blue);border-radius:2px;vertical-align:middle"><span style="display:block;height:100%;width:'+lPct+'%;background:var(--gold);border-radius:2px"></span></span> <span style="color:var(--blue)">'+rPct+'%</span>';}}
         // Session milestones (every 30 min)
         if(connStartTime){const connMins=Math.round((Date.now()-connStartTime)/60000);
-            if(connMins>0&&connMins%30===0&&!window['_mile'+connMins]){window['_mile'+connMins]=true;dlog('\u23F0 '+connMins+' \u05D3\u05E7\u05D5\u05EA \u05DE\u05D7\u05D5\u05D1\u05E8\u05D9\u05DD','ok');playBeep(600,0.1);}
+            if(connMins>0&&connMins%30===0&&!window['_mile'+connMins]){window['_mile'+connMins]=true;celebrateMilestone(connMins+' \u05D3\u05E7\u05D5\u05EA \u05DE\u05D7\u05D5\u05D1\u05E8\u05D9\u05DD! \uD83C\uDFA4');}
         }
         // Audio flow status
         const afs=document.getElementById('audio-flow-status');
@@ -1482,6 +1502,8 @@ function animateMeters(){
         dlog('\u05E9\u05E7\u05D8 \u05DE\u05D4\u05DE\u05D9\u05E7 \u05E9\u05DC\u05DA \u05DB\u05D1\u05E8 '+Math.round(silenceCountLocal/60)+'s','warn');
         if(silenceCountLocal>1200){dlog('\u05D0\u05D6\u05D4\u05E8\u05D4: \u05D4\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u05DC\u05D0 \u05E4\u05E2\u05D9\u05DC?','err');playBeep(300,0.5,0.3);}
     }
+    // Studio panel pulse when audio flows
+    const _sp=document.getElementById('panel-studio');if(_sp&&!isRecording){_sp.classList.toggle('audio-flowing',ll>5||rl>5);}
     metersAnimFrame=requestAnimationFrame(animateMeters);
 }
 let vizMode='bars'; // 'bars', 'wave', or 'spectrum'
@@ -1785,6 +1807,7 @@ function stopRecording(){
     showStatus('studio-status',qualIcon+' \u05D4\u05E7\u05DC\u05D8\u05D4 #'+recordingCount+' '+recDur+' | '+silCount+' \u05E9\u05E7\u05D8\u05D9\u05DD | '+mkCount+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP)+'% <button class="btn btn-sm btn-red" onclick="toggleRecording()" style="margin-right:8px;padding:4px 12px"><i class="bi bi-record-circle"></i> \u05D4\u05E7\u05DC\u05D8 \u05E9\u05D5\u05D1</button>','success');
     // Auto-switch to recordings tab
     switchTab('recordings');playStopSound();
+    if(recordingCount===1)celebrateMilestone('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05D4\u05D5\u05E9\u05DC\u05DE\u05D4! \uD83D\uDD34');
     // Update recordings tab badge
     const recTab=document.querySelector('.tab:first-child');
     if(recTab)recTab.innerHTML='<i class="bi bi-file-earmark-music"></i> \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA <span style="background:var(--gold);color:#000;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-right:4px">'+recordingCount+'</span>';
@@ -1831,7 +1854,7 @@ function addDL(name,blob,dur){
     const badgeText=isMixed?'\u05DE\u05E9\u05D5\u05DC\u05D1':isLocal?'\u05DE\u05E7\u05D5\u05DE\u05D9':isRemote?'\u05DE\u05E8\u05D5\u05D7\u05E7':ext;
     const badge='<span style="display:inline-block;background:'+badgeColor+';color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:900;margin-right:4px">'+badgeText+'</span><span style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;font-size:0.6rem;color:var(--muted)">'+ext+'</span>';
     const d=document.createElement('div');d.className='download-item';
-    d.innerHTML='<div class="info"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:'+badgeColor+'"></i><div><b>'+name+'</b><div class="size">'+badge+' '+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div></div></div><div style="display:flex;gap:4px"><button class="btn btn-sm btn-blue" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i></a><button class="btn btn-sm btn-red" style="padding:4px 8px;opacity:0.6" onclick="this.closest(\'.download-item\').remove();dlog(\'Removed: '+name.replace(/'/g,"\\'")+'\',\'ok\')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></button></div>';
+    d.innerHTML='<div class="info" style="min-width:0;flex:1"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:'+badgeColor+';flex-shrink:0"></i><div style="min-width:0;flex:1"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">'+name+'</b><div class="size">'+badge+' '+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div><div id="seek-'+uid+'" style="display:none;margin-top:4px"><div style="display:flex;align-items:center;gap:6px"><span id="seek-cur-'+uid+'" style="font-size:0.65rem;color:var(--muted);direction:ltr;min-width:35px">0:00</span><div style="flex:1;height:4px;background:var(--border);border-radius:2px;cursor:pointer;position:relative" onclick="seekPreviewTo(event,\''+uid+'\')"><div id="seek-bar-'+uid+'" style="height:100%;width:0%;background:var(--gold);border-radius:2px;transition:width 0.1s"></div></div><span id="seek-dur-'+uid+'" style="font-size:0.65rem;color:var(--muted);direction:ltr;min-width:35px">--:--</span></div></div></div></div><div style="display:flex;gap:4px;flex-shrink:0"><button class="btn btn-sm btn-blue" id="play-btn-'+uid+'" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i></a><button class="btn btn-sm btn-red" style="padding:4px 8px;opacity:0.6" onclick="this.closest(\'.download-item\').remove();dlog(\'Removed: '+name.replace(/'/g,"\\'")+'\',\'ok\')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></button></div>';
     document.getElementById('downloads').appendChild(d);
     // Update summary
     const rs=document.getElementById('rec-summary');
@@ -1839,12 +1862,21 @@ function addDL(name,blob,dur){
 }
 let previewAudio=null;
 function playPreview(id,url,btn){
-    if(previewAudio&&!previewAudio.paused){previewAudio.pause();previewAudio=null;if(btn)btn.innerHTML='<i class="bi bi-play-fill"></i>';return;}
-    previewAudio=new Audio(url);previewAudio.play().catch(()=>{});
+    const seekEl=document.getElementById('seek-'+id),seekBar=document.getElementById('seek-bar-'+id),seekCur=document.getElementById('seek-cur-'+id),seekDur=document.getElementById('seek-dur-'+id);
+    if(previewAudio&&!previewAudio.paused){previewAudio.pause();previewAudio=null;if(btn)btn.innerHTML='<i class="bi bi-play-fill"></i>';if(seekEl)seekEl.style.display='none';return;}
+    // Stop any other preview
+    document.querySelectorAll('[id^="seek-"]').forEach(s=>{if(s.id.startsWith('seek-')&&!s.id.includes('bar')&&!s.id.includes('cur')&&!s.id.includes('dur'))s.style.display='none';});
+    document.querySelectorAll('[id^="play-btn-"]').forEach(b=>{b.innerHTML='<i class="bi bi-play-fill"></i>';});
+    previewAudio=new Audio(url);
+    if(seekEl)seekEl.style.display='block';
+    previewAudio.onloadedmetadata=()=>{const d=previewAudio.duration;if(seekDur)seekDur.textContent=Math.floor(d/60)+':'+String(Math.floor(d%60)).padStart(2,'0');};
+    previewAudio.ontimeupdate=()=>{const pct=previewAudio.currentTime/(previewAudio.duration||1)*100;if(seekBar)seekBar.style.width=pct+'%';const c=previewAudio.currentTime;if(seekCur)seekCur.textContent=Math.floor(c/60)+':'+String(Math.floor(c%60)).padStart(2,'0');};
+    previewAudio.play().catch(()=>{});
     btn.innerHTML='<i class="bi bi-stop-fill"></i>';
-    previewAudio.onended=()=>{if(btn&&btn.isConnected)btn.innerHTML='<i class="bi bi-play-fill"></i>';previewAudio=null;};
+    previewAudio.onended=()=>{if(btn&&btn.isConnected)btn.innerHTML='<i class="bi bi-play-fill"></i>';if(seekEl)seekEl.style.display='none';if(seekBar)seekBar.style.width='0%';previewAudio=null;};
     previewAudio.onerror=()=>{previewAudio=null;};
 }
+function seekPreviewTo(e,id){if(!previewAudio)return;const rect=e.currentTarget.getBoundingClientRect();const pct=(e.clientX-rect.left)/rect.width;previewAudio.currentTime=pct*previewAudio.duration;}
 function updateTimer(){
     if(!recStartTime)return;
     const t=fmtTime(Date.now()-recStartTime);
@@ -2962,7 +2994,7 @@ function sendChat() {
         if(cmd==='/theme'){addChatMsg('\uD83C\uDFA8','gold | neon | ocean | sunset | purple | red',false);input.value='';return;}
         if(cmd==='/voice'&&arg){setVoiceEffect(arg);input.value='';return;}
         if(cmd==='/voice'){addChatMsg('\uD83C\uDFA4','echo | robot | deep | none',false);input.value='';return;}
-        if(cmd==='/version'||cmd==='/v'){addChatMsg('\u2139\uFE0F','v10.6 | 683 \u05E9\u05D3\u05E8\u05D5\u05D2\u05D9\u05DD | 52 \u05E4\u05E7\u05D5\u05D3\u05D5\u05EA | 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9\u05DD',false);input.value='';return;}
+        if(cmd==='/version'||cmd==='/v'){addChatMsg('\u2139\uFE0F','v10.7 | 684 \u05E9\u05D3\u05E8\u05D5\u05D2\u05D9\u05DD | 52 \u05E4\u05E7\u05D5\u05D3\u05D5\u05EA | 31 \u05E7\u05D9\u05E6\u05D5\u05E8\u05D9\u05DD',false);input.value='';return;}
         if(cmd==='/note'&&arg){const n=document.getElementById('episode-notes');if(n){n.value+=(n.value?'\n':'')+new Date().toLocaleTimeString('he-IL')+' \u2014 '+arg;n.dispatchEvent(new Event('input'));}addChatMsg('\uD83D\uDCDD','\u05E0\u05D5\u05E1\u05E3: '+arg,false);input.value='';return;}
         if(cmd==='/silence'){if(silenceSegments.length===0){addChatMsg('\u23F8','\u05D0\u05D9\u05DF \u05E7\u05D8\u05E2\u05D9 \u05E9\u05E7\u05D8',false);}else{addChatMsg('\u23F8','\u05E7\u05D8\u05E2\u05D9 \u05E9\u05E7\u05D8: '+silenceSegments.length+' (\u05E1\u05D4\u05F4\u05DB: '+Math.round(silenceSegments.reduce((s,seg)=>s+seg.ms,0)/1000)+'s)',false);}input.value='';return;}
         if(cmd==='/snap'){const cv=document.getElementById('waveCanvas');if(cv){const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='waveform_'+new Date().toISOString().slice(11,19).replace(/:/g,'')+'.png';a.click();toast('\u2705 \u05E6\u05D9\u05DC\u05D5\u05DD \u05D2\u05DC \u05D4\u05E9\u05DE\u05E2');}input.value='';return;}
@@ -3036,8 +3068,9 @@ function addMarker(customLabel) {
     playBeep(1200,0.08,0.1); // quick marker beep
     const mb=document.getElementById('btn-marker');if(mb){mb.innerHTML='<i class="bi bi-bookmark-fill"></i> '+num;mb.style.transform='scale(1.2)';setTimeout(()=>mb.style.transform='',200);}
     showStatus('studio-status', '\u05E1\u05D9\u05DE\u05DF #' + num + ' \u05E0\u05D5\u05E1\u05E3 \u05D1-' + time, 'success');
-    // Notify remote about marker
+    // Notify remote about marker (chat + structured sync)
     if(conn&&conn.open){conn.send({type:'msg',name:userName,text:'\uD83D\uDD16 \u05E1\u05D9\u05DE\u05DF #'+num+' @ '+time});}
+    broadcast({type:'marker_sync',time:time,ms:elapsed,label:label,from:userName});
     // Show markers list
     let ml = document.getElementById('markers-list');
     if (!ml) {
@@ -3257,7 +3290,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.6 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.7 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
@@ -3422,6 +3455,29 @@ document.addEventListener('touchend',e=>{
     const newIdx=dx>0?Math.max(0,activeIdx-1):Math.min(tabs.length-1,activeIdx+1); // RTL: swipe right = previous
     if(newIdx!==activeIdx){switchTab(tabs[newIdx]);document.querySelectorAll('.tab')[newIdx]?.classList.add('active');}
 },{passive:true});
+
+// === MILESTONE CONFETTI ===
+function celebrateMilestone(label){
+    toast('\uD83C\uDF89 '+label,3000);playBeep(800,0.1);setTimeout(()=>playBeep(1000,0.1),100);setTimeout(()=>playBeep(1200,0.15),200);
+    const colors=['#d4af37','#27ae60','#2980b9','#ff6b35','#9b59b6','#e74c3c'];
+    const shapes=['\u25CF','\u25A0','\u25B2','\u2605','\u2666'];
+    for(let i=0;i<30;i++){const el=document.createElement('div');el.textContent=shapes[Math.floor(Math.random()*shapes.length)];el.style.cssText='position:fixed;top:-20px;left:'+Math.round(5+Math.random()*90)+'%;color:'+colors[Math.floor(Math.random()*colors.length)]+';font-size:'+(0.8+Math.random()*1.2).toFixed(1)+'rem;z-index:500;pointer-events:none;animation:confettiFall '+(1.5+Math.random()*2).toFixed(1)+'s linear forwards;animation-delay:'+Math.random().toFixed(2)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
+    const lbl=document.createElement('div');lbl.style.cssText='position:fixed;top:20%;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(17,17,32,0.95),rgba(22,22,48,0.9));border:1px solid var(--gold);border-radius:16px;padding:12px 28px;z-index:501;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 0 30px rgba(212,175,55,0.3);animation:statusFadeIn 0.4s;pointer-events:none';
+    lbl.innerHTML='<div style="text-align:center"><div style="font-size:1.8rem">\uD83C\uDF89</div><div style="color:var(--gold);font-weight:700;font-size:0.95rem">'+label+'</div></div>';
+    document.body.appendChild(lbl);setTimeout(()=>{lbl.style.opacity='0';lbl.style.transition='opacity 0.5s';setTimeout(()=>lbl.remove(),500);},3000);
+}
+
+// === ANIMATED BACKGROUND PARTICLES ===
+(function initBgParticles(){
+    const canvas=document.getElementById('bg-canvas');if(!canvas)return;
+    const ctx=canvas.getContext('2d');let W,H;const ps=[];const N=25;
+    function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+    resize();window.addEventListener('resize',resize);
+    class P{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=1+Math.random()*2.5;this.vx=(Math.random()-0.5)*0.3;this.vy=-0.1-Math.random()*0.2;this.life=0;this.maxLife=200+Math.random()*400;this.hue=Math.random()>0.7?43:210;}update(){this.x+=this.vx;this.y+=this.vy;this.life++;if(this.life>this.maxLife||this.y<-10)this.reset();}draw(){const a=Math.sin(this.life/this.maxLife*Math.PI)*0.4;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='hsla('+this.hue+',70%,60%,'+a.toFixed(2)+')';ctx.fill();}}
+    for(let i=0;i<N;i++){const p=new P();p.life=Math.floor(Math.random()*p.maxLife);ps.push(p);}
+    function draw(){ctx.clearRect(0,0,W,H);ps.forEach(p=>{p.update();p.draw();});requestAnimationFrame(draw);}
+    draw();
+})();
 </script>
 </body>
 </html>
