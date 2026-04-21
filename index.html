@@ -259,6 +259,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:var(--blue);font-weight:700" id="banner-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</span><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block"></span></span>
             <span style="color:var(--muted);font-size:0.75rem;margin-right:8px" id="banner-time"></span>
             <span id="banner-episode" style="color:var(--gold);font-size:0.7rem;font-weight:500;opacity:0.7;display:none"></span>
+            <span id="banner-data" style="color:var(--muted);font-size:0.6rem;opacity:0.4"></span>
             <button id="banner-copy-code" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:var(--muted);font-size:0.65rem;padding:2px 8px;cursor:pointer;font-family:inherit" onclick="const rid=document.getElementById('room-id').value;if(rid)navigator.clipboard.writeText(rid).then(()=>{this.textContent='\u2705';setTimeout(()=>this.innerHTML='<i class=\'bi bi-clipboard\'></i> \u05E7\u05D5\u05D3',2000)})" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8;"><i class="bi bi-clipboard"></i> &#x05e7;&#x05d5;&#x05d3;</button>
         </div>
         <div class="video-grid">
@@ -569,7 +570,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 500 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; &#x1f389;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 501 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -774,7 +775,9 @@ function setupDataConn(c) {
             avgLatency=Math.round(latencyHistory.reduce((a,b)=>a+b,0)/latencyHistory.length);
             if(badge){badge.style.display = 'block';
             const quality = lat < 50 ? '\u05DE\u05E2\u05D5\u05DC\u05D4' : lat < 100 ? '\u05D8\u05D5\u05D1' : lat < 200 ? '\u05D1\u05D9\u05E0\u05D5\u05E0\u05D9' : '\u05D7\u05DC\u05E9';
-            document.getElementById('latency-val').textContent = lat + ' (' + quality + ')';
+            // Trend arrow based on last 5 vs previous 5
+            let trend='';if(latencyHistory.length>10){const recent=latencyHistory.slice(-5).reduce((a,b)=>a+b,0)/5;const prev=latencyHistory.slice(-10,-5).reduce((a,b)=>a+b,0)/5;trend=recent<prev*0.8?' \u2197':recent>prev*1.2?' \u2198':'';}
+            document.getElementById('latency-val').textContent = lat + trend;
             badge.className = lat < 100 ? '' : lat < 200 ? 'warn' : 'bad';
             // Signal bars
             const bars = lat<50?4:lat<100?3:lat<200?2:1;
@@ -1250,6 +1253,7 @@ function showConnected() {
         const bps = Math.round((totalBytes - lastBytes) / 1024);
         lastBytes = totalBytes;
         document.getElementById('bandwidth').textContent = bps + ' KB/s';
+        const bd=document.getElementById('banner-data');if(bd)bd.textContent=(totalBytes/1048576).toFixed(1)+'MB';
         document.getElementById('total-data').textContent = (totalBytes/1048576).toFixed(1) + 'MB \u2191'+audioChunksOut+'\u2193'+audioChunksIn;
         const lr2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
         const ls=document.getElementById('loss-stat');if(ls){ls.textContent=lr2+'%';ls.style.color=lr2>5?'var(--red)':lr2>1?'#f39c12':'var(--green)';}
