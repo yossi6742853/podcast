@@ -805,8 +805,14 @@ function setupDataConn(c) {
         // Log connection type
         if(navigator.connection){const nc=navigator.connection;dlog('Network: '+nc.effectiveType+' ~'+nc.downlink+'Mbps rtt='+nc.rtt+'ms','ok');}
         startAudioRelay();
+        const wasConnected=isConnected;
         isConnected = true;
-        showConnected();
+        if(!wasConnected){showConnected();}else{
+            // Reconnect — just restart audio, don't re-show studio
+            dlog('Reconnected! Audio relay restarted.','ok');
+            showStatus('studio-status','\u2705 \u05D7\u05D9\u05D1\u05D5\u05E8 \u05D7\u05D5\u05D3\u05E9! \u05E9\u05DE\u05E2 \u05E4\u05E2\u05D9\u05DC.','success');
+            toast('\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9!',2000);
+        }
         // Start latency ping
         allIntervals.push(setInterval(() => {
             if (conn && conn.open) {conn.send({type: 'ping', t: Date.now()});pingsSent++;}
@@ -979,6 +985,8 @@ let chunkSeq = 0;           // sequence number for ordering
 
 function startAudioRelay() {
     if (!localStream || !conn) { dlog('startAudioRelay: no stream or conn!','err'); return; }
+    // If processor already exists and connected, skip re-creation (prevents duplicate chains)
+    if(relayProcessor){dlog('Audio relay already active, reusing','ok');return;}
     try {
         audioCtx = audioCtx || new AudioContext();
         dlog('AudioContext: sr='+audioCtx.sampleRate+' state='+audioCtx.state,'ok');
@@ -2424,21 +2432,27 @@ function quickReconnect(){
     if(!remoteId){showStatus('studio-status','\u05D0\u05D9\u05DF \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8','error');return;}
     showStatus('studio-status','<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9...','waiting');
     dlog('Quick reconnect to '+remoteId+'...','warn');
-    // Close old data channel
+    // Close old data channel but keep audioCtx alive
     if(conn){try{conn.close();}catch(e){}}
-    // Clean up audio relay
+    // Clean up audio relay processor (will be recreated)
     if(relayProcessor){relayProcessor.disconnect();relayProcessor=null;}
+    // Reset jitter buffer for fresh playback
     jitterBuf=[];playbackStarted=false;nextPlayTime=0;lastSeq=-1;
+    // Close remote audio ctx (will be recreated on first audio packet)
     if(remoteAudioCtx){try{remoteAudioCtx.close();}catch(e){}}
-    remoteAudioCtx=null;remoteGainNode=null;noiseFilter=null;eqBass=null;eqTreble=null;panNode=null;remoteAnalyser=null;remoteSR=0;
+    remoteAudioCtx=null;remoteGainNode=null;noiseFilter=null;eqBass=null;eqTreble=null;panNode=null;remoteAnalyser=null;remoteSR=0;reverbNode=null;
+    // Keep audioCtx alive for mic! Don't close it.
+    // Reset packet counters for fresh connection stats
+    lastPongTime=0;pingsSent=0;pongsReceived=0;
     // Reconnect
     if(isHost){
-        // Host waits for guest
-        dlog('Waiting for guest to reconnect...','ok');
+        dlog('Host waiting for guest reconnect...','ok');
+        showStatus('studio-status','<span class="loading-spinner"></span> \u05DE\u05D7\u05DB\u05D4 \u05DC\u05D0\u05D5\u05E8\u05D7...','waiting');
     }else{
         const newConn=peer.connect(remoteId,{reliable:true,serialization:'binary'});
         setupDataConn(newConn);
     }
+    toast('\uD83D\uDD04 \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9...',2000);
 }
 
 // === CONTROLS ===
