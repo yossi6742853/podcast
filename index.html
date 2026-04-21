@@ -67,6 +67,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .video-label{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.75);padding:4px 12px;border-radius:8px;font-size:0.8rem;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08)}
 .video-label.me{color:var(--gold)}.video-label.remote{color:var(--blue)}
 .video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.mute-indicator{position:absolute;bottom:8px;left:8px;background:rgba(231,76,60,0.85);color:#fff;padding:3px 8px;border-radius:6px;font-size:0.65rem;font-weight:700;display:none;z-index:5;animation:recBlink 1.5s infinite}
 .no-video-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;color:var(--muted);opacity:0.3}
 .avatar-initials{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;opacity:0.6}
 .avatar-initials.me{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(212,175,55,0.1));color:var(--gold);border:2px solid rgba(212,175,55,0.3)}
@@ -184,7 +185,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     <div id="stats-bar" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);padding:6px 14px;font-size:0.75rem;color:var(--muted);border-radius:0 0 0 10px;border-left:1px solid var(--border);border-bottom:1px solid var(--border);display:none;z-index:99;direction:ltr">
         <i class="bi bi-clock" style="opacity:0.5"></i><span id="conn-time-stat">--</span> | <i class="bi bi-speedometer2" style="opacity:0.5"></i><span id="bandwidth">0 KB/s</span> | <span id="total-data">0 MB</span> | <i class="bi bi-reception-4" style="opacity:0.5"></i><span id="loss-stat">0%</span> | <span id="rec-status-stat" style="color:var(--green)">Ready</span>
     </div>
-    <div id="latency-badge"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
+    <div id="latency-badge" onclick="const t='\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms\n\u05D0\u05D1\u05D3\u05D5: '+packetsLost+'\n\u05E0\u05E9\u05DC\u05D7: '+audioChunksOut+'\n\u05D4\u05EA\u05E7\u05D1\u05DC: '+audioChunksIn+'\nPing: '+pingsSent+'/'+pongsReceived;alert(t)"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
         <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.2 | 436</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
@@ -238,6 +239,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <video id="localVideo" muted playsinline></video>
                 <i class="bi bi-person-circle no-video-icon" id="local-no-vid"></i>
                 <div class="status-dot" title="&#x05de;&#x05d7;&#x05d5;&#x05d1;&#x05e8;"></div>
+                <div class="mute-indicator" id="mute-ind"><i class="bi bi-mic-mute-fill"></i> MUTE</div>
                 <div class="video-label me" id="label-local">&#x05d0;&#x05e0;&#x05d9;</div>
             </div>
             <div class="video-box" id="remote-box">
@@ -256,7 +258,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div style="display:flex;align-items:center;justify-content:center;gap:25px;flex-wrap:wrap">
             <div class="meter-box"><div class="meter-bar-wrap"><div class="meter-bar" id="meter-local" style="height:0%"></div><div class="meter-peak" id="peak-local" style="bottom:0%"></div></div><div class="meter-name me" id="name-local">&#x05d0;&#x05e0;&#x05d9;</div></div>
             <div>
-                <div class="timer" id="timer" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1; &#x05d8;&#x05d9;&#x05d9;&#x05de;&#x05e8;">00:00:00</div>
+                <div class="timer" id="timer" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1; &#x05d8;&#x05d9;&#x05d9;&#x05de;&#x05e8;" ondblclick="toggleRecording()">00:00:00</div>
                 <div id="rec-num-display" style="text-align:center;font-size:0.7rem;color:var(--muted)"></div>
                 <div id="talk-ratio" style="text-align:center;font-size:0.65rem;color:var(--muted);opacity:0.6"></div>
             </div>
@@ -379,7 +381,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background tab -->
         <!-- Chat tab -->
         <div class="tab-content" id="tab-chat">
-            <div id="chat-messages" style="height:150px;overflow-y:auto;background:var(--bg);border-radius:8px;padding:8px;border:1px solid var(--border);margin-bottom:4px;font-size:0.9rem;direction:rtl;scroll-behavior:smooth"></div>
+            <div id="chat-messages" style="height:180px;overflow-y:auto;background:var(--bg);border-radius:8px;padding:8px;border:1px solid var(--border);margin-bottom:4px;font-size:0.9rem;direction:rtl;scroll-behavior:smooth"></div>
             <div id="typing-ind" style="display:none;font-size:0.75rem;color:var(--muted);margin-bottom:4px;font-style:italic"></div>
             <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
                 <button onclick="sendReaction('\uD83D\uDC4D')" aria-label="&#x05dc;&#x05d9;&#x05d9;&#x05e7;" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='none'">&#x1f44d;</button>
@@ -400,7 +402,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 439 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 440 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1328,10 +1330,11 @@ function addDL(name,blob,dur){
 }
 let previewAudio=null;
 function playPreview(id,url,btn){
-    if(previewAudio&&!previewAudio.paused){previewAudio.pause();previewAudio=null;btn.innerHTML='<i class="bi bi-play-fill"></i>';return;}
-    previewAudio=new Audio(url);previewAudio.play();
+    if(previewAudio&&!previewAudio.paused){previewAudio.pause();previewAudio=null;if(btn)btn.innerHTML='<i class="bi bi-play-fill"></i>';return;}
+    previewAudio=new Audio(url);previewAudio.play().catch(()=>{});
     btn.innerHTML='<i class="bi bi-stop-fill"></i>';
-    previewAudio.onended=()=>{btn.innerHTML='<i class="bi bi-play-fill"></i>';previewAudio=null;};
+    previewAudio.onended=()=>{if(btn&&btn.isConnected)btn.innerHTML='<i class="bi bi-play-fill"></i>';previewAudio=null;};
+    previewAudio.onerror=()=>{previewAudio=null;};
 }
 function updateTimer(){
     if(!recStartTime)return;
@@ -1543,7 +1546,7 @@ function quickReconnect(){
 }
 
 // === CONTROLS ===
-function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i> \u05DE\u05D5\u05E9\u05EA\u05E7':'<i class="bi bi-mic-fill"></i> \u05D4\u05E9\u05EA\u05E7';b.className='btn btn-sm '+(isMuted?'btn-red':'btn-blue');}
+function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i> <span class="hide-mobile">\u05DE\u05D5\u05E9\u05EA\u05E7</span>':'<i class="bi bi-mic-fill"></i> <span class="hide-mobile">\u05D4\u05E9\u05EA\u05E7</span>';b.className='btn btn-sm '+(isMuted?'btn-red':'btn-blue');const mi=document.getElementById('mute-ind');if(mi)mi.style.display=isMuted?'block':'none';}
 function toggleCam(){if(!localStream)return;const vt=localStream.getVideoTracks();if(!vt.length)return;isCamOff=!isCamOff;vt.forEach(t=>t.enabled=!isCamOff);document.getElementById('local-no-vid').style.display=isCamOff?'block':'none';const b=document.getElementById('btn-cam');b.innerHTML=isCamOff?'<i class="bi bi-camera-video-off-fill"></i> \u05DB\u05D1\u05D5\u05D9':'<i class="bi bi-camera-video-fill"></i> \u05DE\u05E6\u05DC\u05DE\u05D4';b.className='btn btn-sm '+(isCamOff?'btn-red':'btn-blue');}
 function doDisconnect(){
     if(isRecording&&!confirm('\u05D9\u05E9 \u05D4\u05E7\u05DC\u05D8\u05D4 \u05E4\u05E2\u05D9\u05DC\u05D4! \u05DC\u05E0\u05EA\u05E7?'))return;
@@ -1878,7 +1881,11 @@ function exportMarkersSRT() {
 document.addEventListener('keydown', function(e) {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return; // don't hijack text inputs
     if (!isConnected) return;
-    if (e.key === 'r' || e.key === 'R') { e.preventDefault(); toggleRecording(); }
+    // Ctrl combos first (higher priority)
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); exportSessionLog(); }
+    else if (e.ctrlKey && (e.key === 'd' || e.key === 'D')) { e.preventDefault(); downloadAll(); }
+    // Plain keys
+    else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); toggleRecording(); }
     else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleMute(); }
     else if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleCam(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); pauseRecording(); }
@@ -1886,8 +1893,6 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 's' || e.key === 'S') { e.preventDefault(); sendTestTone(); }
     else if (e.key === 't' || e.key === 'T') { e.preventDefault(); switchTab('chat'); document.getElementById('chat-input').focus(); }
     else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
-    else if (e.ctrlKey && e.key === 's') { e.preventDefault(); exportSessionLog(); }
-    else if (e.ctrlKey && e.key === 'd') { e.preventDefault(); downloadAll(); }
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === '1') { e.preventDefault(); switchTab('recordings'); }
