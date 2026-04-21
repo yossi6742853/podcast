@@ -503,10 +503,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                     <span id="pan-val" style="min-width:30px">0</span>
                 </div>
                 <div style="margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
-                    <button class="btn btn-sm btn-gold" onclick="applyEQPreset('voice')" title="&#x05de;&#x05d9;&#x05d8;&#x05d1; &#x05dc;&#x05e7;&#x05d5;&#x05dc;"><i class="bi bi-mic"></i> &#x05e7;&#x05d5;&#x05dc;</button>
-                    <button class="btn btn-sm btn-blue" onclick="applyEQPreset('warm')" title="&#x05d7;&#x05dd; &#x05d5;&#x05e2;&#x05de;&#x05d5;&#x05e7;"><i class="bi bi-thermometer-half"></i> &#x05d7;&#x05dd;</button>
-                    <button class="btn btn-sm btn-green" onclick="applyEQPreset('bright')" title="&#x05d1;&#x05d4;&#x05d9;&#x05e8; &#x05d5;&#x05d7;&#x05d3;"><i class="bi bi-brightness-high"></i> &#x05d1;&#x05d4;&#x05d9;&#x05e8;</button>
-                    <button class="btn btn-sm btn-blue" onclick="resetAudioSettings()" style="opacity:0.7"><i class="bi bi-arrow-counterclockwise"></i> &#x05d0;&#x05e4;&#x05e1;</button>
+                    <button class="btn btn-sm btn-gold" onclick="applyEQPreset('voice')" title="&#x05de;&#x05d9;&#x05d8;&#x05d1; &#x05dc;&#x05e7;&#x05d5;&#x05dc;" style="padding:4px 10px"><i class="bi bi-mic"></i> &#x05e7;&#x05d5;&#x05dc;</button>
+                    <button class="btn btn-sm btn-blue" onclick="applyEQPreset('warm')" title="&#x05d7;&#x05dd;" style="padding:4px 10px"><i class="bi bi-thermometer-half"></i> &#x05d7;&#x05dd;</button>
+                    <button class="btn btn-sm btn-green" onclick="applyEQPreset('bright')" title="&#x05d1;&#x05d4;&#x05d9;&#x05e8;" style="padding:4px 10px"><i class="bi bi-brightness-high"></i> &#x05d1;&#x05d4;&#x05d9;&#x05e8;</button>
+                    <button class="btn btn-sm btn-red" onclick="applyEQPreset('radio')" title="&#x05e8;&#x05d3;&#x05d9;&#x05d5;" style="padding:4px 10px"><i class="bi bi-broadcast"></i> &#x05e8;&#x05d3;&#x05d9;&#x05d5;</button>
+                    <button class="btn btn-sm btn-blue" onclick="applyEQPreset('telephone')" title="&#x05d8;&#x05dc;&#x05e4;&#x05d5;&#x05df;" style="padding:4px 10px"><i class="bi bi-telephone"></i></button>
+                    <button class="btn btn-sm btn-blue" onclick="resetAudioSettings()" style="opacity:0.7;padding:4px 10px"><i class="bi bi-arrow-counterclockwise"></i></button>
                 </div>
             </div>
         </div>
@@ -551,7 +553,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 485 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 487 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -817,7 +819,9 @@ function setupDataConn(c) {
 }
 
 async function createRoom() {
-    userName = document.getElementById('user-name').value.trim() || '\u05DE\u05D0\u05E8\u05D7';
+    userName = document.getElementById('user-name').value.trim();
+    if(!userName){document.getElementById('user-name').focus();document.getElementById('user-name').style.borderColor='var(--red)';showStatus('room-status','\u05D4\u05DB\u05E0\u05E1 \u05D0\u05EA \u05E9\u05DE\u05DA','error');return;}
+    document.getElementById('user-name').style.borderColor='';
     // Disable buttons during connection
     const bc=document.getElementById('btn-create'),bj=document.getElementById('btn-join');
     if(bc)bc.disabled=true;if(bj)bj.disabled=true;
@@ -892,7 +896,9 @@ async function joinRoom() {
     // Extract room code from URL if pasted
     if(remoteId.includes('?join=')){try{remoteId=new URLSearchParams(remoteId.split('?')[1]).get('join')||remoteId;}catch(e){}}
     document.getElementById('room-id').value=remoteId;
-    userName = document.getElementById('user-name').value.trim() || '\u05D0\u05D5\u05E8\u05D7';
+    userName = document.getElementById('user-name').value.trim();
+    if(!userName){document.getElementById('user-name').focus();document.getElementById('user-name').style.borderColor='var(--red)';showStatus('room-status','\u05D4\u05DB\u05E0\u05E1 \u05D0\u05EA \u05E9\u05DE\u05DA','error');return;}
+    document.getElementById('user-name').style.borderColor='';
     if (!remoteId) { showStatus('room-status', '\u05D4\u05DB\u05E0\u05E1 \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8', 'error'); return; }
     const bc2=document.getElementById('btn-create'),bj2=document.getElementById('btn-join');
     if(bc2)bc2.disabled=true;if(bj2)bj2.disabled=true;
@@ -1860,7 +1866,7 @@ function exportTranscript(){
 }
 
 function applyEQPreset(preset){
-    const presets={voice:{bass:3,treble:2,nr:true},warm:{bass:6,treble:-3,nr:false},bright:{bass:-2,treble:8,nr:true}};
+    const presets={voice:{bass:3,treble:2,nr:true},warm:{bass:6,treble:-3,nr:false},bright:{bass:-2,treble:8,nr:true},radio:{bass:4,treble:5,nr:true},telephone:{bass:-8,treble:-4,nr:false}};
     const p=presets[preset];if(!p)return;
     document.getElementById('eq-bass').value=p.bass;
     document.getElementById('eq-treble').value=p.treble;
@@ -1868,7 +1874,8 @@ function applyEQPreset(preset){
     document.getElementById('noise-reduction').checked=p.nr;
     toggleNoiseReduction();
     dlog('EQ preset: '+preset+' (bass='+p.bass+' treble='+p.treble+')','ok');
-    showStatus('studio-status','\uD83C\uDFA7 \u05E4\u05E8\u05D9\u05E1\u05D8 "'+({voice:'\u05E7\u05D5\u05DC',warm:'\u05D7\u05DD',bright:'\u05D1\u05D4\u05D9\u05E8'}[preset]||preset)+'" \u05D4\u05D5\u05D7\u05DC','success');
+    const names={voice:'\u05E7\u05D5\u05DC',warm:'\u05D7\u05DD',bright:'\u05D1\u05D4\u05D9\u05E8',radio:'\u05E8\u05D3\u05D9\u05D5',telephone:'\u05D8\u05DC\u05E4\u05D5\u05DF'};
+    showStatus('studio-status','\uD83C\uDFA7 \u05E4\u05E8\u05D9\u05E1\u05D8 "'+(names[preset]||preset)+'" \u05D4\u05D5\u05D7\u05DC','success');
 }
 function resetAudioSettings(){
     document.getElementById('mic-gain').value=100;setMicGain(100);
@@ -2682,7 +2689,7 @@ function addChatMsg(name, text, isMe) {
     const msg = document.createElement('div');
     msg.style.cssText = 'margin-bottom:6px;padding:6px 10px;border-radius:8px;animation:tabFadeIn 0.3s;' +
         (isMe ? 'background:rgba(212,175,55,0.1);border-right:3px solid var(--gold);' : 'background:rgba(41,128,185,0.1);border-right:3px solid var(--blue);');
-    const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>');
+    const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>').replace(/\*([^*]+)\*/g,'<b>$1</b>');
     msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.75rem">' + new Date().toLocaleTimeString() + '</span><br>' + linkedText;
     box.appendChild(msg);totalChatMsgs++;
     // Auto-scroll only if near bottom
