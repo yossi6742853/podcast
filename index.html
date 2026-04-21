@@ -273,6 +273,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div class="meter-box"><div class="meter-bar-wrap"><div class="meter-bar" id="meter-local" style="height:0%"></div><div class="meter-peak" id="peak-local" style="bottom:0%"></div></div><div class="meter-name me" id="name-local">&#x05d0;&#x05e0;&#x05d9;</div></div>
             <div>
                 <div class="timer" id="timer" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; &#x05dc;&#x05d0;&#x05d9;&#x05e4;&#x05d5;&#x05e1; &#x05d8;&#x05d9;&#x05d9;&#x05de;&#x05e8;" ondblclick="toggleRecording()">00:00:00</div>
+                <div id="rec-progress-wrap" style="display:none;height:3px;background:var(--border);border-radius:2px;margin:4px auto;max-width:200px"><div id="rec-progress-bar" style="height:100%;width:0%;background:var(--red);border-radius:2px;transition:width 1s linear"></div></div>
                 <div id="rec-num-display" style="text-align:center;font-size:0.7rem;color:var(--muted)"></div>
                 <div id="talk-ratio" style="text-align:center;font-size:0.65rem;color:var(--muted);opacity:0.6"></div>
             </div>
@@ -480,6 +481,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background tab -->
         <!-- Chat tab -->
         <div class="tab-content" id="tab-chat">
+            <div id="chat-speaking" style="display:none;font-size:0.7rem;color:var(--muted);margin-bottom:3px;text-align:center"><span id="chat-speaking-text"></span></div>
             <div id="chat-messages" style="height:180px;overflow-y:auto;background:var(--bg);border-radius:8px;padding:8px;border:1px solid var(--border);margin-bottom:4px;font-size:0.9rem;direction:rtl;scroll-behavior:smooth"></div>
             <div id="typing-ind" style="display:none;font-size:0.75rem;color:var(--muted);margin-bottom:4px;font-style:italic"></div>
             <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
@@ -1147,8 +1149,8 @@ let maxPeakLocal=0,maxPeakRemote=0;
 let silenceCountLocal=0,silenceCountRemote=0;
 let speakTimeLocal=0,speakTimeRemote=0; // frames of speaking
 // Cache DOM refs for 60fps animation
-let _ml,_mr,_pl,_pr,_lb,_rb;
-function cacheMetersDOM(){_ml=document.getElementById('meter-local');_mr=document.getElementById('meter-remote');_pl=document.getElementById('peak-local');_pr=document.getElementById('peak-remote');_lb=document.getElementById('local-box');_rb=document.querySelector('#panel-studio .video-box:nth-child(2)');}
+let _ml,_mr,_pl,_pr,_lb,_rb,_mll,_mlr,_clipL=false,_clipR=false;
+function cacheMetersDOM(){_ml=document.getElementById('meter-local');_mr=document.getElementById('meter-remote');_pl=document.getElementById('peak-local');_pr=document.getElementById('peak-remote');_lb=document.getElementById('local-box');_rb=document.querySelector('#panel-studio .video-box:nth-child(2)');_mll=document.getElementById('mini-level-local');_mlr=document.getElementById('mini-level-remote');}
 function animateMeters(){
     if(!_ml)cacheMetersDOM();if(!_ml)return;
     const ll=getLevel(localAnalyser),rl=getLevel(remoteAnalyser);
@@ -1156,23 +1158,25 @@ function animateMeters(){
     _ml.parentElement.title=Math.round(ll)+'%';
     _mr.style.height=rl+'%';
     _mr.parentElement.title=Math.round(rl)+'%';
-    // Mini level bars in video labels
-    const mll=document.getElementById('mini-level-local'),mlr=document.getElementById('mini-level-remote');
-    if(mll){const h=Math.max(3,ll/100*14);mll.style.height=h+'px';mll.style.background=ll>70?'var(--red)':ll>30?'var(--green)':'rgba(255,255,255,0.15)';}
-    if(mlr){const h=Math.max(3,rl/100*14);mlr.style.height=h+'px';mlr.style.background=rl>70?'var(--red)':rl>30?'var(--green)':'rgba(255,255,255,0.15)';}
+    // Mini level bars in video labels (cached refs)
+    if(_mll){const h=Math.max(3,ll/100*14);_mll.style.height=h+'px';_mll.style.background=ll>70?'var(--red)':ll>30?'var(--green)':'rgba(255,255,255,0.15)';}
+    if(_mlr){const h=Math.max(3,rl/100*14);_mlr.style.height=h+'px';_mlr.style.background=rl>70?'var(--red)':rl>30?'var(--green)':'rgba(255,255,255,0.15)';}
     // Peak hold with slow decay
     if(ll>peakLocal)peakLocal=ll;else peakLocal=Math.max(0,peakLocal-peakDecay);
     if(rl>peakRemote)peakRemote=rl;else peakRemote=Math.max(0,peakRemote-peakDecay);
     if(ll>maxPeakLocal)maxPeakLocal=ll;if(rl>maxPeakRemote)maxPeakRemote=rl;
     if(_pl)_pl.style.bottom=peakLocal+'%';
     if(_pr)_pr.style.bottom=peakRemote+'%';
-    // Clipping warning
+    // Clipping warning (debounced)
     const mlw=_ml?_ml.parentElement:null;
     const mrw=_mr?_mr.parentElement:null;
-    if(ll>92){mlw.classList.add('clipping');setTimeout(()=>mlw.classList.remove('clipping'),400);}
-    if(rl>92){mrw.classList.add('clipping');setTimeout(()=>mrw.classList.remove('clipping'),400);}
+    if(ll>92&&!_clipL){_clipL=true;mlw.classList.add('clipping');setTimeout(()=>{mlw.classList.remove('clipping');_clipL=false;},400);}
+    if(rl>92&&!_clipR){_clipR=true;mrw.classList.add('clipping');setTimeout(()=>{mrw.classList.remove('clipping');_clipR=false;},400);}
     // Speaking indicator
     if(_lb){if(ll>25){_lb.classList.add('speaking');silenceCountLocal=0;speakTimeLocal++;}else{_lb.classList.remove('speaking');silenceCountLocal++;}}
+    // Chat speaking indicator
+    const csi=document.getElementById('chat-speaking'),cst=document.getElementById('chat-speaking-text');
+    if(csi&&cst){const localSpk=ll>25,remoteSpk=rl>25;if(localSpk||remoteSpk){csi.style.display='block';cst.textContent=(localSpk&&remoteSpk?'\uD83D\uDDE3 \u05E9\u05E0\u05D9\u05DB\u05DD \u05DE\u05D3\u05D1\u05E8\u05D9\u05DD':localSpk?'\uD83D\uDDE3 \u05D0\u05EA\u05D4 \u05DE\u05D3\u05D1\u05E8':'\uD83D\uDDE3 \u05D4\u05D0\u05D5\u05E8\u05D7 \u05DE\u05D3\u05D1\u05E8');}else{csi.style.display='none';}}
     if(_rb){if(rl>25){_rb.classList.add('speaking');silenceCountRemote=0;speakTimeRemote++;}else{_rb.classList.remove('speaking');silenceCountRemote++;}}
     // Auto-gain: keep remote volume close to local level
     if(remoteGainNode&&rl>0&&ll>10){
@@ -1464,6 +1468,7 @@ function stopRecording(){
     document.getElementById('timer').classList.remove('recording');
     document.querySelectorAll('.video-box').forEach(v=>v.classList.remove('rec-active'));
     document.getElementById('btn-pause').style.display='none';
+    const rpw2=document.getElementById('rec-progress-wrap');if(rpw2)rpw2.style.display='none';
     // Restore normal favicon
     try{document.querySelector('link[rel="icon"]').href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>\uD83C\uDF99\uFE0F</text></svg>";}catch(e){}
     // Release wake lock
@@ -1566,6 +1571,11 @@ function updateTimer(){
         }
     }
     document.getElementById('rec-status-stat').textContent='\u25CF REC '+estMB+'MB';
+    // Recording progress bar
+    const rpw=document.getElementById('rec-progress-wrap'),rpb=document.getElementById('rec-progress-bar');
+    const maxM=window._maxRecMins||120;
+    if(rpw&&maxM>0){rpw.style.display='block';rpb.style.width=Math.min(100,mins/maxM*100)+'%';rpb.style.background=mins>maxM*0.9?'var(--red)':mins>maxM*0.7?'#f39c12':'var(--green)';}
+    else if(rpw){rpw.style.display='none';}
 }
 function fmtTime(ms){const s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sec=String(s%60).padStart(2,'0');return h+':'+m+':'+sec;}
 
@@ -2502,6 +2512,11 @@ document.getElementById('user-name').addEventListener('change',function(){
 document.getElementById('room-id').addEventListener('change',function(){
     try{localStorage.setItem('podcast_last_room',this.value);}catch(e){}
 });
+// Auto-focus: if name exists, focus room ID; otherwise focus name
+setTimeout(()=>{
+    const un=document.getElementById('user-name'),ri=document.getElementById('room-id');
+    if(un&&un.value)ri.focus();else if(un)un.focus();
+},500);
 </script>
 </body>
 </html>
