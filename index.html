@@ -175,7 +175,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.1 | 430+</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v9.2 | 436</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -229,9 +229,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <div class="status-dot" title="&#x05de;&#x05d7;&#x05d5;&#x05d1;&#x05e8;"></div>
                 <div class="video-label me" id="label-local">&#x05d0;&#x05e0;&#x05d9;</div>
             </div>
-            <div class="video-box">
+            <div class="video-box" id="remote-box">
                 <video id="remoteVideo" playsinline autoplay></video>
                 <i class="bi bi-person-circle no-video-icon" id="remote-no-vid"></i>
+                <div id="remote-quality" style="position:absolute;top:8px;left:8px;font-size:0.6rem;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.6);color:var(--green);display:none"></div>
                 <div class="video-label remote" id="label-remote">&#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;</div>
             </div>
         </div>
@@ -265,7 +266,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
         <div id="studio-status"></div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
-            R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | P=&#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | B=&#x05e1;&#x05d9;&#x05de;&#x05df; | T=&#x05e6;&#x05d0;&#x05d8; | F=&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd; | ?=&#x05e2;&#x05d6;&#x05e8;&#x05d4;
+            R=&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; | P=&#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4; | M=&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4; | S=&#x05d8;&#x05e1;&#x05d8; | B=&#x05e1;&#x05d9;&#x05de;&#x05df; | T=&#x05e6;&#x05d0;&#x05d8; | F=&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0; | 1-4=&#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd; | ?=&#x05e2;&#x05d6;&#x05e8;&#x05d4;
         </div>
 
         <!-- TABS -->
@@ -382,7 +383,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 430+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v9.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 430+ &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -391,7 +392,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <h2 style="color:var(--gold);margin-bottom:15px">&#x05e2;&#x05d6;&#x05e8;&#x05d4; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d4;</h2>
         <div style="columns:2;column-gap:30px">
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
-            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
+            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
             &#x2022; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; 24kHz &#x05d3;&#x05e8;&#x05da; Data Channel<br>
             &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV + WebM<br>
@@ -573,8 +574,9 @@ function setupDataConn(c) {
 
 async function createRoom() {
     userName = document.getElementById('user-name').value.trim() || '\u05DE\u05D0\u05E8\u05D7';
-    showStatus('room-status', '\u05DE\u05EA\u05D7\u05D1\u05E8...', 'waiting');
+    showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
     try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
+    showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05E9\u05E8\u05EA...', 'waiting');
     const myId = 'bht_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
     peer = makePeer(myId);
     peer.on('open', function(id) {
@@ -602,6 +604,23 @@ async function createRoom() {
             };
             b.after(sb);
         }
+        // Copy link button
+        let clb = document.getElementById('copy-link-btn');
+        if (!clb) {
+            clb = document.createElement('button');
+            clb.id = 'copy-link-btn';
+            clb.className = 'btn btn-sm btn-blue';
+            clb.style.cssText = 'margin-top:4px;width:100%';
+            clb.innerHTML = '<i class="bi bi-link-45deg"></i> \u05D4\u05E2\u05EA\u05E7 \u05E7\u05D9\u05E9\u05D5\u05E8 \u05D9\u05E9\u05D9\u05E8';
+            clb.onclick = function() {
+                const joinUrl = location.origin + location.pathname + '?join=' + id;
+                navigator.clipboard.writeText(joinUrl).then(() => {
+                    clb.innerHTML = '<i class="bi bi-check2"></i> \u05D4\u05D5\u05E2\u05EA\u05E7!';
+                    setTimeout(() => clb.innerHTML = '<i class="bi bi-link-45deg"></i> \u05D4\u05E2\u05EA\u05E7 \u05E7\u05D9\u05E9\u05D5\u05E8 \u05D9\u05E9\u05D9\u05E8', 2000);
+                });
+            };
+            sb.after(clb);
+        }
         isHost = true;
         // Auto-copy room code
         navigator.clipboard.writeText(id).then(()=>dlog('Room code auto-copied!','ok')).catch(()=>{});
@@ -614,8 +633,9 @@ async function joinRoom() {
     const remoteId = document.getElementById('room-id').value.trim();
     userName = document.getElementById('user-name').value.trim() || '\u05D0\u05D5\u05E8\u05D7';
     if (!remoteId) { showStatus('room-status', '\u05D4\u05DB\u05E0\u05E1 \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8', 'error'); return; }
-    showStatus('room-status', '\u05DE\u05EA\u05D7\u05D1\u05E8...', 'waiting');
+    showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
     try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
+    showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05D7\u05D3\u05E8...', 'waiting');
     const myId = 'bht_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
     peer = makePeer(myId);
     peer.on('open', function() {
@@ -870,6 +890,15 @@ function showConnected() {
             afs.textContent=flowing?'\u2191'+audioChunksOut+' \u2193'+audioChunksIn:'\u26A0 '+ctxState;
             afs.style.color=flowing?'var(--green)':'var(--red)';
         }
+        // Remote quality badge
+        const rq=document.getElementById('remote-quality');
+        if(rq&&audioChunksIn>0){
+            rq.style.display='block';
+            const lossR=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
+            const qText=avgLatency<50?'\u2705 '+avgLatency+'ms':avgLatency<100?'\uD83D\uDFE2 '+avgLatency+'ms':avgLatency<200?'\uD83D\uDFE1 '+avgLatency+'ms':'\uD83D\uDD34 '+avgLatency+'ms';
+            rq.textContent=qText+(lossR>0?' | -'+lossR+'%':'');
+            rq.style.color=avgLatency<100?'var(--green)':avgLatency<200?'#f39c12':'var(--red)';
+        }
         // Audio flow check
         if(lastAudioTime>0&&Date.now()-lastAudioTime>10000&&isConnected){
             showStatus('studio-status','\u05DC\u05D0 \u05DE\u05EA\u05E7\u05D1\u05DC \u05D0\u05D5\u05D3\u05D9\u05D5 10+ \u05E9\u05E0\u05D9\u05D5\u05EA','error');
@@ -1063,18 +1092,26 @@ function pauseRecording(){
 }
 function toggleRecording(){
     if(isRecording){stopRecording();return;}
-    // Countdown 3-2-1 before recording
+    // Visual countdown overlay 3-2-1
     let count=3;
-    showStatus('studio-status',count+'...','waiting');
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+    overlay.innerHTML='<div style="font-size:8rem;font-weight:900;color:var(--red);text-shadow:0 0 60px rgba(231,76,60,0.5);animation:pulse 1s infinite">'+count+'</div>';
+    document.body.appendChild(overlay);
     document.getElementById('timer').textContent=count+'...';
+    playBeep(600,0.15);
     const cd=setInterval(()=>{
         count--;
         if(count>0){
-            showStatus('studio-status',count+'...','waiting');
+            overlay.querySelector('div').textContent=count;
             document.getElementById('timer').textContent=count+'...';
+            playBeep(600,0.15);
         }else{
+            overlay.querySelector('div').textContent='GO!';
+            overlay.querySelector('div').style.color='var(--green)';
+            playBeep(900,0.2);
+            setTimeout(()=>{overlay.remove();},400);
             clearInterval(cd);
-            showStatus('studio-status','\u25CF GO!','success');
             startRecording();
         }
     },1000);
@@ -1759,6 +1796,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleCam(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); pauseRecording(); }
     else if (e.key === 'b' || e.key === 'B') { e.preventDefault(); addMarker(); }
+    else if (e.key === 's' || e.key === 'S') { e.preventDefault(); sendTestTone(); }
     else if (e.key === 't' || e.key === 'T') { e.preventDefault(); switchTab('chat'); document.getElementById('chat-input').focus(); }
     else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
     else if (e.ctrlKey && e.key === 's') { e.preventDefault(); exportSessionLog(); }
@@ -1821,7 +1859,7 @@ if('Notification' in window && Notification.permission==='default'){
 }
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.1 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v9.2 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
