@@ -62,6 +62,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .video-label.me{color:var(--gold)}.video-label.remote{color:var(--blue)}
 .video-box .status-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 .no-video-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;color:var(--muted);opacity:0.3}
+.avatar-initials{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;opacity:0.6}
+.avatar-initials.me{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(212,175,55,0.1));color:var(--gold);border:2px solid rgba(212,175,55,0.3)}
+.avatar-initials.remote{background:linear-gradient(135deg,rgba(41,128,185,0.3),rgba(41,128,185,0.1));color:var(--blue);border:2px solid rgba(41,128,185,0.3)}
 .meter-box{text-align:center;max-width:60px}
 .meter-bar-wrap{height:60px;width:20px;background:var(--bg);border-radius:10px;margin:0 auto;position:relative;overflow:hidden;border:2px solid var(--border)}
 .meter-bar{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,var(--green),#f39c12,var(--red));border-radius:0 0 8px 8px;transition:height 0.08s ease-out}
@@ -494,6 +497,9 @@ function setupDataConn(c) {
             document.getElementById('name-remote').textContent = d.name;
             document.getElementById('label-remote').textContent = d.name;
             document.getElementById('banner-remote').textContent = d.name;
+            // Remote avatar initials
+            const rb2=document.getElementById('remote-box');
+            if(rb2){let rav=rb2.querySelector('.avatar-initials');if(!rav){rav=document.createElement('div');rav.className='avatar-initials remote';rb2.appendChild(rav);}rav.textContent=d.name.substring(0,2);}
         } else if (d.type === 'a') {
             playRemoteAudio(d.s, d.seq, d.sr);
         } else if (d.type === 'typing') {
@@ -601,12 +607,12 @@ async function createRoom() {
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
     try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05E9\u05E8\u05EA...', 'waiting');
-    const myId = 'bht_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    const myId = 'pod_' + Math.random().toString(36).substring(2, 8);
     peer = makePeer(myId);
     peer.on('open', function(id) {
         dlog('PeerJS OK! ID: ' + id, 'ok');
         document.getElementById('room-id').value = id;
-        showStatus('room-status', '\u05D7\u05D3\u05E8 \u05E0\u05D5\u05E6\u05E8! \u05E9\u05DC\u05D7 \u05DC\u05D0\u05D5\u05E8\u05D7 \u05D0\u05EA \u05D4\u05E7\u05D5\u05D3:', 'success');
+        showStatus('room-status', '<span class="loading-spinner"></span> \u05D7\u05D3\u05E8 \u05E0\u05D5\u05E6\u05E8! \u05DE\u05D7\u05DB\u05D4 \u05DC\u05D0\u05D5\u05E8\u05D7... \u05E9\u05DC\u05D7 \u05D0\u05EA \u05D4\u05E7\u05D5\u05D3:', 'success');
         let b = document.getElementById('id-display');
         if (!b) { b = document.createElement('div'); b.id = 'id-display'; b.className = 'room-id-display'; document.getElementById('room-status').after(b); }
         b.innerHTML = id + '<br><small style="font-size:0.45em;color:var(--gold2);opacity:0.7"><i class="bi bi-clipboard"></i> \u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4</small>';
@@ -645,6 +651,17 @@ async function createRoom() {
             };
             sb.after(clb);
         }
+        // Native share (mobile)
+        if(navigator.share){
+            let nsb=document.getElementById('native-share-btn');
+            if(!nsb){
+                nsb=document.createElement('button');nsb.id='native-share-btn';
+                nsb.className='btn btn-sm btn-gold';nsb.style.cssText='margin-top:4px;width:100%';
+                nsb.innerHTML='<i class="bi bi-share"></i> \u05E9\u05EA\u05E3...';
+                nsb.onclick=function(){const joinUrl=location.origin+location.pathname+'?join='+id;navigator.share({title:'\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 \uD83C\uDFA4',text:'\u05D1\u05D5\u05D0 \u05DC\u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8!',url:joinUrl}).catch(()=>{});};
+                (clb||sb).after(nsb);
+            }
+        }
         isHost = true;
         // Auto-copy room code
         navigator.clipboard.writeText(id).then(()=>dlog('Room code auto-copied!','ok')).catch(()=>{});
@@ -660,7 +677,7 @@ async function joinRoom() {
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05E7\u05D1\u05DC \u05D2\u05D9\u05E9\u05D4 \u05DC\u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF...', 'waiting');
     try { await getLocalStream(); } catch(e) { showStatus('room-status', '\u05E9\u05D2\u05D9\u05D0\u05D4: '+e.message, 'error'); return; }
     showStatus('room-status', '<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DC\u05D7\u05D3\u05E8...', 'waiting');
-    const myId = 'bht_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    const myId = 'pod_' + Math.random().toString(36).substring(2, 8);
     peer = makePeer(myId);
     peer.on('open', function() {
         dlog('Connecting to ' + remoteId + '...', 'ok');
@@ -854,6 +871,14 @@ function showConnected() {
     document.getElementById('label-local').textContent = userName;
     document.getElementById('banner-local').textContent = userName + (isHost?' (\u05DE\u05D0\u05E8\u05D7)':' (\u05D0\u05D5\u05E8\u05D7)');
     document.getElementById('remote-no-vid').style.display = 'block';
+    // Avatar initials
+    const initials=userName.substring(0,2);
+    const lb=document.getElementById('local-box');
+    if(lb&&!lb.querySelector('.avatar-initials')){const av=document.createElement('div');av.className='avatar-initials me';av.textContent=initials;lb.appendChild(av);}
+    // Update local avatar visibility based on video
+    const hasVid=localStream&&localStream.getVideoTracks().length>0;
+    const localAv=document.querySelector('#local-box .avatar-initials');
+    if(localAv)localAv.style.display=hasVid?'none':'flex';
     const connType=conn&&conn.reliable?'Reliable':'Best-effort';
     const actSR=audioCtx?audioCtx.sampleRate:48000;
     showStatus('studio-status', '\u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+Math.round(CHUNK_SIZE/actSR*1000)+'ms \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 \uD83D\uDCE1 \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5', 'success');
@@ -1284,7 +1309,7 @@ function addDL(name,blob,dur){
     const badgeText=isMixed?'\u05DE\u05E9\u05D5\u05DC\u05D1':isLocal?'\u05DE\u05E7\u05D5\u05DE\u05D9':isRemote?'\u05DE\u05E8\u05D5\u05D7\u05E7':ext;
     const badge='<span style="display:inline-block;background:'+badgeColor+';color:#000;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:900;margin-right:4px">'+badgeText+'</span><span style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;font-size:0.6rem;color:var(--muted)">'+ext+'</span>';
     const d=document.createElement('div');d.className='download-item';
-    d.innerHTML='<div class="info"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:'+badgeColor+'"></i><div><b>'+name+'</b><div class="size">'+badge+' '+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-sm btn-blue" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i> \u05D4\u05D5\u05E8\u05D3</a></div>';
+    d.innerHTML='<div class="info"><i class="bi bi-file-earmark-music" style="font-size:1.3rem;color:'+badgeColor+'"></i><div><b>'+name+'</b><div class="size">'+badge+' '+sz+' MB \u2022 '+dur+' \u2022 '+timeStamp+'</div></div></div><div style="display:flex;gap:4px"><button class="btn btn-sm btn-blue" onclick="playPreview(\''+uid+'\',\''+url+'\',this)"><i class="bi bi-play-fill"></i></button><a href="'+url+'" download="'+name+'" class="btn btn-sm btn-gold" onclick="setTimeout(()=>URL.revokeObjectURL(\''+url+'\'),5000)"><i class="bi bi-download"></i></a><button class="btn btn-sm btn-red" style="padding:4px 8px;opacity:0.6" onclick="this.closest(\'.download-item\').remove();dlog(\'Removed: '+name.replace(/'/g,"\\'")+'\',\'ok\')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></button></div>';
     document.getElementById('downloads').appendChild(d);
     // Update summary
     const rs=document.getElementById('rec-summary');
