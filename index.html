@@ -309,6 +309,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <span id="jitter-val" style="min-width:40px;font-size:0.8rem;color:var(--muted)">60ms</span>
             </div>
             <div class="music-controls">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.85rem">
+                    <input type="checkbox" id="auto-record" style="width:16px;height:16px;accent-color:var(--gold)">
+                    <i class="bi bi-record-circle"></i> &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;&#x05ea; &#x05d1;&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8;
+                </label>
+            </div>
+            <div class="music-controls">
                 <span class="music-label" style="min-width:80px">&#x05d6;&#x05de;&#x05df &#x05de;&#x05e7;&#x05e1;:</span>
                 <select id="max-rec-time" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.8rem" onchange="window._maxRecMins=parseInt(this.value)">
                     <option value="30">30 &#x05d3;&#x05e7;&#x05d5;&#x05ea;</option>
@@ -512,7 +518,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <h2 style="color:var(--gold);margin-bottom:15px">&#x05e2;&#x05d6;&#x05e8;&#x05d4; &#x05de;&#x05d4;&#x05d9;&#x05e8;&#x05d4;</h2>
         <div style="columns:2;column-gap:30px">
             <b style="color:var(--gold)">&#x05e7;&#x05d9;&#x05e6;&#x05d5;&#x05e8;&#x05d9;&#x05dd;:</b><br>
-            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
+            R = &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;<br>P = &#x05d4;&#x05e9;&#x05d4;&#x05d9;&#x05d9;&#x05d4;<br>M = &#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;<br>V = &#x05de;&#x05e6;&#x05dc;&#x05de;&#x05d4;<br>S = &#x05d8;&#x05e1;&#x05d8; &#x05e6;&#x05dc;&#x05d9;&#x05dc;<br>B = &#x05e1;&#x05d9;&#x05de;&#x05df;<br>G = &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;<br>H = &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05de;&#x05d0;&#x05e8;&#x05d7;<br>I = PiP<br>T = &#x05e6;&#x05d0;&#x05d8;<br>D = &#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;<br>F = &#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;<br>1-4 = &#x05d8;&#x05d0;&#x05d1;&#x05d9;&#x05dd;<br>Ctrl+S = &#x05d9;&#x05d5;&#x05de;&#x05df;<br>Ctrl+D = &#x05d4;&#x05d5;&#x05e8;&#x05d3; &#x05d4;&#x05db;&#x05dc;<br>? = &#x05e2;&#x05d6;&#x05e8;&#x05d4;<br>Esc = &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7;<br><br>
             <b style="color:var(--gold)">&#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea;:</b><br>
             &#x2022; &#x05d0;&#x05d5;&#x05d3;&#x05d9;&#x05d5; 24kHz &#x05d3;&#x05e8;&#x05da; Data Channel<br>
             &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; WAV + WebM<br>
@@ -533,12 +539,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
             <b style="color:var(--green)">&#x05d7;&#x05d3;&#x05e9; v9.4:</b><br>
-            &#x2022; PiP (&#x05ea;&#x05de;&#x05d5;&#x05e0;&#x05d4; &#x05d1;&#x05ea;&#x05d5;&#x05da; &#x05ea;&#x05de;&#x05d5;&#x05e0;&#x05d4;) &#x05dc;&#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5; &#x05de;&#x05e8;&#x05d5;&#x05d7;&#x05e7;<br>
-            &#x2022; &#x05de;&#x05d2;&#x05d1;&#x05d9;&#x05dc; &#x05e8;&#x05db;&#x05da; (soft limiter)<br>
-            &#x2022; &#x05d7;&#x05d3;&#x05e8;&#x05d9;&#x05dd; &#x05d0;&#x05d7;&#x05e8;&#x05d5;&#x05e0;&#x05d9;&#x05dd; + &#x05e0;&#x05d9;&#x05ea;&#x05d5;&#x05e7; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;<br>
-            &#x2022; &#x05d4;&#x05ea;&#x05e8;&#x05d0;&#x05d5;&#x05ea; &#x05d3;&#x05e4;&#x05d3;&#x05e4;&#x05df; + &#x05d4;&#x05d5;&#x05d3;&#x05e2;&#x05ea; &#x05d0;&#x05d5;&#x05e4;&#x05dc;&#x05d9;&#x05d9;&#x05df;<br>
-            &#x2022; &#x05db;&#x05e4;&#x05ea;&#x05d5;&#x05e8; &#x05d8;&#x05e1;&#x05d8; S + &#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea; G<br>
-            &#x2022; &#x05e1;&#x05e3; &#x05e8;&#x05e2;&#x05e9; + &#x05d6;&#x05de;&#x05df; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05de;&#x05ea;&#x05db;&#x05d5;&#x05d5;&#x05e0;&#x05d9;&#x05dd;
+            &#x2022; &#x05e4;&#x05d0;&#x05e0;&#x05dc; &#x05e9;&#x05dc;&#x05d9;&#x05d8;&#x05d4; &#x05dc;&#x05de;&#x05d0;&#x05e8;&#x05d7; (H)<br>
+            &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;<br>
+            &#x2022; &#x05d0;&#x05e4;&#x05e7;&#x05d8;&#x05d9;&#x05dd; &#x05e7;&#x05d5;&#x05dc;&#x05d9;&#x05d9;&#x05dd; + &#x05ea;&#x05de;&#x05dc;&#x05d5;&#x05dc; &#x05d7;&#x05d9;<br>
+            &#x2022; Push-to-Talk (&#x05e8;&#x05d5;&#x05d5;&#x05d7;)<br>
+            &#x2022; &#x05de;&#x05e6;&#x05d1; &#x05e7;&#x05d5;&#x05de;&#x05e4;&#x05e7;&#x05d8;&#x05d9; (C)<br>
+            &#x2022; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4; &#x05d0;&#x05d5;&#x05d8;&#x05d5;&#x05de;&#x05d8;&#x05d9;&#x05ea; &#x05d1;&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8;
         </div>
         <div style="margin-top:15px;text-align:center"><button class="btn btn-sm btn-gold" onclick="toggleHelp()">&#x05e1;&#x05d2;&#x05d5;&#x05e8;</button></div>
     </div>
@@ -1067,6 +1073,9 @@ function showConnected() {
     if(rid){let rr=JSON.parse(localStorage.getItem('podcast_recent_rooms')||'[]');rr=rr.filter(r=>r!==rid);rr.unshift(rid);if(rr.length>10)rr.length=10;localStorage.setItem('podcast_recent_rooms',JSON.stringify(rr));}
     dlog('\u05E1\u05E9\u05DF #'+sc,'ok');}catch(e){}
     startWaveform();
+    // Auto-record if setting is checked
+    const arChk=document.getElementById('auto-record');
+    if(arChk&&arChk.checked){setTimeout(()=>{if(isConnected&&!isRecording){dlog('Auto-recording started','ok');toggleRecording();}},3000);}
     // Apply guest mode restrictions if applicable
     if(window._applyGuestMode)setTimeout(window._applyGuestMode,500);
     // Update connection stats every second
@@ -1174,9 +1183,10 @@ function animateMeters(){
     if(rl>92&&!_clipR){_clipR=true;mrw.classList.add('clipping');setTimeout(()=>{mrw.classList.remove('clipping');_clipR=false;},400);}
     // Speaking indicator
     if(_lb){if(ll>25){_lb.classList.add('speaking');silenceCountLocal=0;speakTimeLocal++;}else{_lb.classList.remove('speaking');silenceCountLocal++;}}
-    // Chat speaking indicator
-    const csi=document.getElementById('chat-speaking'),cst=document.getElementById('chat-speaking-text');
-    if(csi&&cst){const localSpk=ll>25,remoteSpk=rl>25;if(localSpk||remoteSpk){csi.style.display='block';cst.textContent=(localSpk&&remoteSpk?'\uD83D\uDDE3 \u05E9\u05E0\u05D9\u05DB\u05DD \u05DE\u05D3\u05D1\u05E8\u05D9\u05DD':localSpk?'\uD83D\uDDE3 \u05D0\u05EA\u05D4 \u05DE\u05D3\u05D1\u05E8':'\uD83D\uDDE3 \u05D4\u05D0\u05D5\u05E8\u05D7 \u05DE\u05D3\u05D1\u05E8');}else{csi.style.display='none';}}
+    // Chat speaking indicator (cached)
+    if(!window._csi)window._csi=document.getElementById('chat-speaking');
+    if(!window._cst)window._cst=document.getElementById('chat-speaking-text');
+    if(window._csi&&window._cst){const localSpk=ll>25,remoteSpk=rl>25;if(localSpk||remoteSpk){window._csi.style.display='block';window._cst.textContent=(localSpk&&remoteSpk?'\uD83D\uDDE3 \u05E9\u05E0\u05D9\u05DB\u05DD \u05DE\u05D3\u05D1\u05E8\u05D9\u05DD':localSpk?'\uD83D\uDDE3 \u05D0\u05EA\u05D4 \u05DE\u05D3\u05D1\u05E8':'\uD83D\uDDE3 \u05D4\u05D0\u05D5\u05E8\u05D7 \u05DE\u05D3\u05D1\u05E8');}else{window._csi.style.display='none';}}
     if(_rb){if(rl>25){_rb.classList.add('speaking');silenceCountRemote=0;speakTimeRemote++;}else{_rb.classList.remove('speaking');silenceCountRemote++;}}
     // Auto-gain: keep remote volume close to local level
     if(remoteGainNode&&rl>0&&ll>10){
@@ -1194,13 +1204,15 @@ function animateMeters(){
             currentSilenceStart=null;
         }
     }
-    // Auto-duck music when speaking
-    const mp=document.getElementById('musicPlayer');
-    if(mp&&!mp.paused){
+    // Auto-duck music when speaking (cached refs)
+    if(!window._mpEl)window._mpEl=document.getElementById('musicPlayer');
+    if(!window._mvEl)window._mvEl=document.getElementById('music-vol');
+    if(!window._dlEl)window._dlEl=document.getElementById('duck-level');
+    if(window._mpEl&&!window._mpEl.paused){
         const speaking=ll>20||rl>20;
-        const baseVol=parseInt(document.getElementById('music-vol')?.value||30)/100;
-        const duckRatio=parseInt(document.getElementById('duck-level')?.value||30)/100;
-        mp.volume=speaking?baseVol*duckRatio:baseVol;
+        const baseVol=parseInt(window._mvEl?.value||30)/100;
+        const duckRatio=parseInt(window._dlEl?.value||30)/100;
+        window._mpEl.volume=speaking?baseVol*duckRatio:baseVol;
     }
     // Silence warning after ~10s, mic failure alert after ~20s
     if(isRecording&&silenceCountLocal>600&&silenceCountLocal%300===0){
@@ -1574,7 +1586,12 @@ function updateTimer(){
     // Recording progress bar
     const rpw=document.getElementById('rec-progress-wrap'),rpb=document.getElementById('rec-progress-bar');
     const maxM=window._maxRecMins||120;
-    if(rpw&&maxM>0){rpw.style.display='block';rpb.style.width=Math.min(100,mins/maxM*100)+'%';rpb.style.background=mins>maxM*0.9?'var(--red)':mins>maxM*0.7?'#f39c12':'var(--green)';}
+    if(rpw&&maxM>0){
+        rpw.style.display='block';rpb.style.width=Math.min(100,mins/maxM*100)+'%';rpb.style.background=mins>maxM*0.9?'var(--red)':mins>maxM*0.7?'#f39c12':'var(--green)';
+        // Show remaining time
+        const remaining=maxM-mins;
+        if(remaining<=10&&remaining>0){rpw.title=remaining+' \u05D3\u05E7\u05D5\u05EA \u05E0\u05D5\u05EA\u05E8\u05D5';}
+    }
     else if(rpw){rpw.style.display='none';}
 }
 function fmtTime(ms){const s=Math.floor(ms/1000),h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sec=String(s%60).padStart(2,'0');return h+':'+m+':'+sec;}
