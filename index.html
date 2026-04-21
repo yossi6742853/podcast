@@ -141,6 +141,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     .rec-controls{gap:4px;justify-content:center}
     .rec-controls .btn{padding:5px 10px;font-size:0.75rem}
     .rec-controls .btn .hide-mobile{display:none}
+    #stats-bar{font-size:0.6rem!important;padding:4px 8px!important}
+    #latency-badge{font-size:0.65rem!important;padding:3px 8px!important}
     .meter-box{max-width:50px}
     .meter-bar-wrap{height:50px;width:18px}
     .room-row{flex-direction:column}
@@ -262,6 +264,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <button class="btn btn-sm btn-blue" onclick="toggleStudioFS()" title="&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;"><i class="bi bi-fullscreen"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleDim()" title="&#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;"><i class="bi bi-brightness-low"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleHelp()" title="&#x05e2;&#x05d6;&#x05e8;&#x05d4;"><i class="bi bi-question-circle"></i></button>
+            <button class="btn btn-sm btn-green" onclick="quickReconnect()" title="&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8; &#x05de;&#x05d7;&#x05d3;&#x05e9;"><i class="bi bi-arrow-repeat"></i></button>
             <button class="btn btn-sm btn-red" onclick="doDisconnect()"><i class="bi bi-x-circle"></i> &#x05e0;&#x05ea;&#x05e7;</button>
         </div>
         <div id="studio-status"></div>
@@ -309,7 +312,12 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <span id="music-vol-val">30%</span>
             </div>
             <div id="music-name" style="color:var(--muted);font-size:0.85rem;margin-top:5px"></div>
-            <div id="music-time" style="color:var(--muted);font-size:0.8rem;margin-top:3px;direction:ltr"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
+                <div id="music-time" style="color:var(--muted);font-size:0.8rem;direction:ltr;min-width:90px"></div>
+                <div id="music-progress-wrap" style="flex:1;height:6px;background:var(--border);border-radius:3px;cursor:pointer;position:relative;display:none" onclick="seekMusicTo(event)">
+                    <div id="music-progress-bar" style="height:100%;width:0%;background:var(--gold);border-radius:3px;transition:width 0.3s"></div>
+                </div>
+            </div>
             <audio id="musicPlayer" loop ontimeupdate="updateMusicTime()"></audio>
             <div class="music-controls" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
                 <span class="music-label"><i class="bi bi-mic"></i> &#x05de;&#x05d9;&#x05e7;:</span>
@@ -502,10 +510,26 @@ function setupDataConn(c) {
             playRemoteAudio(d.s,0);
         } else if (d.type === 'countdown') {
             let n=d.n||3;
+            const ov=document.createElement('div');
+            ov.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+            ov.innerHTML='<div style="font-size:8rem;font-weight:900;color:var(--red);text-shadow:0 0 60px rgba(231,76,60,0.5);animation:pulse 1s infinite">'+n+'</div>';
+            document.body.appendChild(ov);
+            playBeep(600,0.15);
             const ci=setInterval(()=>{
-                if(n>0){showStatus('studio-status','\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DE\u05EA\u05D7\u05D9\u05DC\u05D4 \u05D1\u05E2\u05D5\u05D3 '+n+'...','waiting');n--;}
-                else{clearInterval(ci);showStatus('studio-status','\u25CF \u05DE\u05E7\u05DC\u05D9\u05D8\u05D9\u05DD!','error');}
+                n--;
+                if(n>0){ov.querySelector('div').textContent=n;playBeep(600,0.15);}
+                else{ov.querySelector('div').textContent='\u25CF REC';ov.querySelector('div').style.color='var(--green)';playBeep(900,0.2);setTimeout(()=>ov.remove(),400);clearInterval(ci);showStatus('studio-status','\u25CF \u05DE\u05E7\u05DC\u05D9\u05D8\u05D9\u05DD!','error');}
             },1000);
+        } else if (d.type === 'topics') {
+            // Sync topics from remote
+            const list=document.getElementById('topic-list');
+            if(list&&d.topics){
+                list.innerHTML='';topicCount=0;
+                d.topics.forEach(t=>addTopic(t));
+                updateTopicBadge();
+                dlog('\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E1\u05D5\u05E0\u05DB\u05E8\u05E0\u05D5 ('+d.topics.length+')','ok');
+                showStatus('studio-status','\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E2\u05D5\u05D3\u05DB\u05E0\u05D5 \u05DE\u05D4\u05DE\u05D0\u05E8\u05D7','success');
+            }
         } else if (d.type === 'msg') {
             addChatMsg(d.name || '\u05DE\u05E8\u05D5\u05D7\u05E7', d.text, false);
         } else if (d.type === 'ping') {
@@ -1323,7 +1347,8 @@ function toggleMusic(){
 }
 function setMusicVol(v){document.getElementById('musicPlayer').volume=v/100;document.getElementById('music-vol-val').textContent=v+'%';}
 function seekMusic(sec){const mp=document.getElementById('musicPlayer');if(mp&&mp.src)mp.currentTime=Math.max(0,mp.currentTime+sec);}
-function updateMusicTime(){const mp=document.getElementById('musicPlayer');if(!mp||!mp.duration)return;const cur=fmtTime(mp.currentTime*1000),tot=fmtTime(mp.duration*1000);document.getElementById('music-time').textContent=cur+' / '+tot;}
+function updateMusicTime(){const mp=document.getElementById('musicPlayer');if(!mp||!mp.duration)return;const cur=fmtTime(mp.currentTime*1000),tot=fmtTime(mp.duration*1000);document.getElementById('music-time').textContent=cur+' / '+tot;const pw=document.getElementById('music-progress-wrap');const pb=document.getElementById('music-progress-bar');if(pw)pw.style.display='block';if(pb)pb.style.width=Math.round(mp.currentTime/mp.duration*100)+'%';}
+function seekMusicTo(e){const mp=document.getElementById('musicPlayer');if(!mp||!mp.duration)return;const rect=e.currentTarget.getBoundingClientRect();const pct=(e.clientX-rect.left)/rect.width;mp.currentTime=pct*mp.duration;}
 function setRemoteVol(v){if(remoteGainNode)remoteGainNode.gain.value=v/100;document.getElementById('remote-vol-val').textContent=v+'%';}
 let micGainNode=null;
 function setMicGain(v){if(micGainNode)micGainNode.gain.value=v/100;document.getElementById('mic-gain-val').textContent=v+'%';}
@@ -1414,9 +1439,11 @@ function shareTopics(){
     const topics=[];
     document.querySelectorAll('.topic-item input').forEach(inp=>{if(inp.value.trim())topics.push(inp.value.trim());});
     if(topics.length===0)return;
+    // Send as structured data (syncs topics on remote) + as chat message
+    conn.send({type:'topics',topics:topics});
     conn.send({type:'msg',name:userName,text:'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n')});
     addChatMsg(userName,'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD:\n'+topics.map((t,i)=>(i+1)+'. '+t).join('\n'),true);
-    dlog('Topics shared ('+topics.length+')','ok');
+    dlog('Topics synced + shared ('+topics.length+')','ok');
 }
 function clearCompletedTopics(){
     document.querySelectorAll('.topic-item.completed').forEach(el=>el.remove());
@@ -1454,6 +1481,30 @@ function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900
 function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
 function playStopSound() { playBeep(800, 0.1); setTimeout(() => playBeep(600, 0.15), 150); }
+
+// === QUICK RECONNECT ===
+function quickReconnect(){
+    if(!peer||peer.destroyed){showStatus('studio-status','\u05DC\u05D0 \u05E0\u05D9\u05EA\u05DF \u05DC\u05D4\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9 \u2014 \u05E0\u05EA\u05E7 \u05D5\u05D4\u05EA\u05D7\u05D1\u05E8','error');return;}
+    const remoteId=document.getElementById('room-id').value;
+    if(!remoteId){showStatus('studio-status','\u05D0\u05D9\u05DF \u05E7\u05D5\u05D3 \u05D7\u05D3\u05E8','error');return;}
+    showStatus('studio-status','<span class="loading-spinner"></span> \u05DE\u05EA\u05D7\u05D1\u05E8 \u05DE\u05D7\u05D3\u05E9...','waiting');
+    dlog('Quick reconnect to '+remoteId+'...','warn');
+    // Close old data channel
+    if(conn){try{conn.close();}catch(e){}}
+    // Clean up audio relay
+    if(relayProcessor){relayProcessor.disconnect();relayProcessor=null;}
+    jitterBuf=[];playbackStarted=false;nextPlayTime=0;lastSeq=-1;
+    if(remoteAudioCtx){try{remoteAudioCtx.close();}catch(e){}}
+    remoteAudioCtx=null;remoteGainNode=null;noiseFilter=null;eqBass=null;eqTreble=null;panNode=null;remoteAnalyser=null;remoteSR=0;
+    // Reconnect
+    if(isHost){
+        // Host waits for guest
+        dlog('Waiting for guest to reconnect...','ok');
+    }else{
+        const newConn=peer.connect(remoteId,{reliable:true,serialization:'binary'});
+        setupDataConn(newConn);
+    }
+}
 
 // === CONTROLS ===
 function toggleMute(){if(!localStream)return;isMuted=!isMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!isMuted);const b=document.getElementById('btn-mute');b.innerHTML=isMuted?'<i class="bi bi-mic-mute-fill"></i> \u05DE\u05D5\u05E9\u05EA\u05E7':'<i class="bi bi-mic-fill"></i> \u05D4\u05E9\u05EA\u05E7';b.className='btn btn-sm '+(isMuted?'btn-red':'btn-blue');}
