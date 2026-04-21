@@ -915,9 +915,21 @@ function startAudioRelay() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     } catch(e) { dlog('AudioContext error: '+e.message,'err'); return; }
     const source = audioCtx.createMediaStreamSource(localStream);
+
+    // Studio mic chain: source -> HPF(80Hz) -> compressor -> gain -> processor
+    const micHPF = audioCtx.createBiquadFilter();
+    micHPF.type = 'highpass';micHPF.frequency.value = 80;micHPF.Q.value = 0.7;
+
+    const micCompressor = audioCtx.createDynamicsCompressor();
+    micCompressor.threshold.value = -25;micCompressor.knee.value = 15;
+    micCompressor.ratio.value = 3;micCompressor.attack.value = 0.003;micCompressor.release.value = 0.15;
+
     micGainNode = audioCtx.createGain();
     micGainNode.gain.value = 1.0;
-    source.connect(micGainNode);
+
+    source.connect(micHPF);
+    micHPF.connect(micCompressor);
+    micCompressor.connect(micGainNode);
 
     const processor = audioCtx.createScriptProcessor(CHUNK_SIZE, 1, 1);
     micGainNode.connect(processor);
@@ -938,12 +950,15 @@ function startAudioRelay() {
         if (!conn || !conn.open || isMuted) return;
         const input = e.inputBuffer.getChannelData(0);
 
-        // Noise gate — smooth: attenuate very quiet audio instead of hard cutoff
-        let peak = 0;
-        for (let i = 0; i < input.length; i++) { const a = Math.abs(input[i]); if (a > peak) peak = a; }
+        // Professional noise gate with smooth transitions
+        let rms = 0;
+        for (let i = 0; i < input.length; i++) rms += input[i] * input[i];
+        rms = Math.sqrt(rms / input.length); // RMS level (more accurate than peak)
         const gateThresh=window._noiseThreshold||0.003;
-        if (peak < gateThresh*0.5) { window._gateCount=(window._gateCount||0)+1; return; } // total silence — skip
+        if (rms < gateThresh*0.3) { window._gateCount=(window._gateCount||0)+1; return; } // total silence
         if(window._gateCount>50){dlog('Gate: '+window._gateCount+' chunks suppressed','ok');window._gateCount=0;}
+        // Smooth gate: attenuate near-silence instead of hard cut
+        if(rms < gateThresh){const atten=rms/gateThresh;for(let i=0;i<input.length;i++)input[i]*=atten;}
 
         // Soft limiter + Convert to Int16
         const samples = new Int16Array(input.length);
@@ -988,23 +1003,48 @@ function playRemoteAudio(samples, seq, sr) {
         dlog('Remote AudioCtx: sr='+remoteAudioCtx.sampleRate,'ok');
         remoteGainNode = remoteAudioCtx.createGain();
         remoteGainNode.gain.value = 1.0;
-        // Audio chain: gain -> compressor -> noiseFilter -> bass -> treble -> destination
-        remoteCompressor = remoteAudioCtx.createDynamicsCompressor();
-        const compressor = remoteCompressor;
-        compressor.threshold.value = -18;  // gentler threshold
-        compressor.knee.value = 20;       // wider knee = smoother
-        compressor.ratio.value = 3;        // 3:1 (gentler than 4:1)
-        compressor.attack.value = 0.005;   // slightly slower attack
-        compressor.release.value = 0.15;   // faster release
-        panNode=remoteAudioCtx.createStereoPanner();panNode.pan.value=0;
-        remoteGainNode.connect(panNode);
-        panNode.connect(compressor);
+        // Studio-grade audio chain:
+        // gain -> HPF(80Hz) -> de-esser -> presence -> compressor -> pan -> EQ -> destination
+
+        // 1. High-pass filter — remove rumble below 80Hz
         noiseFilter = remoteAudioCtx.createBiquadFilter();
         noiseFilter.type = 'highpass';
-        noiseFilter.frequency.value = 5;
+        noiseFilter.frequency.value = 80;
         noiseFilter.Q.value = 0.7;
-        compressor.connect(noiseFilter);
-        setupEQ(remoteAudioCtx, noiseFilter, remoteAudioCtx.destination);
+
+        // 2. De-esser — notch filter at 6-8kHz (reduces harsh sibilance)
+        const deEsser = remoteAudioCtx.createBiquadFilter();
+        deEsser.type = 'peaking';
+        deEsser.frequency.value = 6500;
+        deEsser.Q.value = 2;
+        deEsser.gain.value = -4; // reduce sibilance by 4dB
+
+        // 3. Presence boost — slight lift at 3kHz for clarity
+        const presence = remoteAudioCtx.createBiquadFilter();
+        presence.type = 'peaking';
+        presence.frequency.value = 3000;
+        presence.Q.value = 1;
+        presence.gain.value = 2; // +2dB presence
+
+        // 4. Compressor — broadcast-style
+        remoteCompressor = remoteAudioCtx.createDynamicsCompressor();
+        const compressor = remoteCompressor;
+        compressor.threshold.value = -20;
+        compressor.knee.value = 15;
+        compressor.ratio.value = 4;
+        compressor.attack.value = 0.003;
+        compressor.release.value = 0.1;
+
+        // 5. Pan
+        panNode=remoteAudioCtx.createStereoPanner();panNode.pan.value=0;
+
+        // Chain: gain -> HPF -> de-esser -> presence -> compressor -> pan -> EQ -> out
+        remoteGainNode.connect(noiseFilter);
+        noiseFilter.connect(deEsser);
+        deEsser.connect(presence);
+        presence.connect(compressor);
+        compressor.connect(panNode);
+        setupEQ(remoteAudioCtx, panNode, remoteAudioCtx.destination);
         remoteAnalyser = remoteAudioCtx.createAnalyser();
         remoteAnalyser.fftSize = 256;
         if(eqTreble) eqTreble.connect(remoteAnalyser);
