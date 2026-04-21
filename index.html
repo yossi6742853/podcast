@@ -23,7 +23,7 @@ html{scroll-behavior:smooth;scrollbar-color:rgba(212,175,55,0.2) var(--bg);scrol
 ::-webkit-scrollbar-thumb{background:rgba(212,175,55,0.2);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,0.4)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
-:root{--bg:#0a0a14;--card:#111120;--card2:#161630;--border:#1e1e35;--gold:#d4af37;--gold2:#f7e98e;--green:#27ae60;--red:#e74c3c;--blue:#2980b9;--text:#e0e0e0;--muted:#666;--glow:rgba(212,175,55,0.08);--radius:8px}
+:root{--bg:#0a0a14;--card:#111120;--card2:#161630;--border:#1e1e35;--gold:#d4af37;--gold2:#f7e98e;--green:#27ae60;--red:#e74c3c;--blue:#2980b9;--purple:#9b59b6;--text:#e0e0e0;--muted:#666;--glow:rgba(212,175,55,0.08);--radius:8px}
 body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:15px;animation:bodyFadeIn 0.8s ease-out;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;background-image:radial-gradient(ellipse at 20% 50%,rgba(30,30,80,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(80,50,20,0.1) 0%,transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(212,175,55,0.03) 0%,transparent 50%)}
 h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradient(135deg,#d4af37 0%,#f7e98e 25%,#d4af37 50%,#f7e98e 75%,#d4af37 100%);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerTitle 6s linear infinite;filter:drop-shadow(0 0 15px rgba(212,175,55,0.3))}
 @keyframes bodyFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -225,7 +225,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room" style="border-top:2px solid rgba(212,175,55,0.2)">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.3 | 580</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.4 | 600</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -598,7 +598,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,275+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 525 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 70+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.3 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 595 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.4 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 600 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd; &#x1f389;
     </div>
 </div>
 
@@ -2857,12 +2857,13 @@ function sendChat() {
         if(cmd==='/topic'||cmd==='/t'){if(arg)addTopic(arg);switchTab('topics');input.value='';return;}
         if(cmd==='/sfx'&&arg){playSFX(arg);input.value='';return;}
         if(cmd==='/rec'||cmd==='/record'){toggleRecording();input.value='';return;}
+        if(cmd==='/mute'){toggleMute();input.value='';return;}
         if(cmd==='/test'){sendTestTone();input.value='';return;}
         if(cmd==='/ping'){addChatMsg('\uD83C\uDFD3','\u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D9\u05E6\u05D9\u05D1\u05D5\u05EA: '+(pingsSent>0?Math.round(pongsReceived/pingsSent*100):0)+'%',false);input.value='';return;}
         if(cmd==='/who'){const names=[userName+' (\u05D0\u05E0\u05D9)'];participants.forEach(p=>names.push(p.name));addChatMsg('\uD83D\uDC65','\u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD ('+names.length+'): '+names.join(', '),false);input.value='';return;}
         if(cmd==='/time'){const rt=isRecording&&recStartTime?fmtTime(Date.now()-recStartTime):'--';const ct2=connStartTime?fmtTime(Date.now()-connStartTime):'--';addChatMsg('\u23F0','\u05D6\u05DE\u05DF \u05D7\u05D9\u05D1\u05D5\u05E8: '+ct2+(isRecording?' | \u05D4\u05E7\u05DC\u05D8\u05D4: '+rt:''),false);input.value='';return;}
         if(cmd==='/stats'){const dur2=connStartTime?fmtTime(Date.now()-connStartTime):'--';const mb2=((bytesSent+bytesReceived)/1048576).toFixed(1);addChatMsg('\uD83D\uDCCA','\u05DE\u05E9\u05DA: '+dur2+' | '+mb2+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | '+markers.length+' \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD',false);input.value='';return;}
-        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/rec /test /marker /clear /topic /sfx /stats /time /who /ping',false);input.value='';return;}
+        if(cmd==='/help'){addChatMsg('\uD83D\uDCA1','/rec /mute /test /marker /clear /topic /sfx /stats /time /who /ping /help',false);input.value='';return;}
     }
     const msg={type: 'msg', name: userName, text: text};
     if(participants.size>0)broadcast(msg);else if(conn&&conn.open)conn.send(msg);
@@ -3138,7 +3139,7 @@ setInterval(()=>{try{
 }catch(e){}},30000);
 
 // Welcome message
-dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.3 ===','ok');
+dlog('=== \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5 \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8 PRO v10.4 ===','ok');
 dlog('\u05D0\u05E9\u05E8 \u05DE\u05D9\u05E7\u05E8\u05D5\u05E4\u05D5\u05DF \u2192 \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u2192 \u05E9\u05DC\u05D7 \u05E7\u05D5\u05D3 \u2192 \u05D4\u05E7\u05DC\u05D8!','ok');
 // Show share bar only on shareable URLs (not file:// or localhost)
 if(location.protocol==='https:'||location.hostname.includes('github.io')){
