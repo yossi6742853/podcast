@@ -211,7 +211,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     </div>
     <div id="latency-badge" onclick="showConnectionInfo()"><span id="signal-bars" style="direction:ltr;margin-left:4px"></span> <span id="latency-val">--</span>ms</div>
     <div class="panel" id="panel-room">
-        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 514</span></div>
+        <div class="panel-title" style="justify-content:space-between"><span><i class="bi bi-door-open"></i> &#x05d7;&#x05d3;&#x05e8; &#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;</span><span style="font-size:0.65rem;color:var(--muted);font-weight:400">v10.2 | 520</span></div>
         <div id="share-url-bar" style="margin-bottom:8px;padding:8px 12px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.2);border-radius:8px;font-size:0.8rem;text-align:center;cursor:pointer;display:none" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.innerHTML='\u2705 \u05D4\u05D5\u05E2\u05EA\u05E7!';setTimeout(()=>this.innerHTML='\u{1F517} '+location.href+' <small>(\u05DC\u05D7\u05E5 \u05DC\u05D4\u05E2\u05EA\u05E7\u05D4)</small>',2000)})">
             <i class="bi bi-link-45deg"></i> &#x05e9;&#x05dc;&#x05d7; &#x05d0;&#x05ea; &#x05d4;&#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8; &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7; &#x05db;&#x05d3;&#x05d9; &#x05e9;&#x05d9;&#x05d9;&#x05db;&#x05e0;&#x05e1; &#x05dc;&#x05d0;&#x05d5;&#x05ea;&#x05d5; &#x05d3;&#x05e3;
         </div>
@@ -582,7 +582,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 519 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 520 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2531,6 +2531,7 @@ function doDisconnect(){
             +'<div style="background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;text-align:center"><div style="color:var(--muted);font-size:0.7rem">\u05DC\u05D8\u05E0\u05E1\u05D9</div><div style="font-weight:700;color:'+(avgLatency<100?'var(--green)':'#f39c12')+'">'+avgLatency+'ms</div></div>'
             +'</div>'
             +'<div style="text-align:center;margin-top:8px;font-size:0.75rem;color:var(--muted)">\u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length+' | \u05E6\u05D0\u05D8: '+totalChatMsgs+' | \u05DE\u05E9\u05EA\u05EA\u05E4\u05D9\u05DD: '+(participants.size+1)+'</div>'
+            +'<div style="display:flex;justify-content:center;gap:16px;margin-top:6px;font-size:0.7rem"><span style="color:var(--gold)">\u05D0\u05E0\u05D9: '+Math.round(speakTimeLocal/60)+'s</span><span style="color:var(--blue)">\u05DE\u05E8\u05D5\u05D7\u05E7: '+Math.round(speakTimeRemote/60)+'s</span></div>'
             +'<div style="text-align:center;margin-top:15px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
             +'<button class="btn btn-sm btn-blue" onclick="navigator.clipboard.writeText(\'\u05E1\u05D9\u05DB\u05D5\u05DD: '+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA | '+score+'/100 '+stars+'\').then(()=>this.textContent=\'\u2705\')"><i class="bi bi-clipboard"></i></button>'
             +'<button class="btn btn-sm btn-green" onclick="window.open(\'https://wa.me/?text=\'+encodeURIComponent(\'\uD83C\uDFA4 \u05E1\u05D9\u05DB\u05D5\u05DD \u05E4\u05D5\u05D3\u05E7\u05D0\u05E1\u05D8\\n'+dur+' | '+totalMB+'MB | '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA\\n'+score+'/100 '+stars+'\'),\'_blank\')"><i class="bi bi-whatsapp"></i></button>'
@@ -3207,6 +3208,11 @@ function saveSessionHistory(){
 if(!localStorage.getItem('podcast_welcomed')){
     localStorage.setItem('podcast_welcomed','1');
     showStatus('room-status','\uD83C\uDFA4 <b>\u05D1\u05E8\u05D5\u05DB\u05D9\u05DD \u05D4\u05D1\u05D0\u05D9\u05DD!</b> \u05D4\u05DB\u05E0\u05E1 \u05E9\u05DE\u05DA, \u05E6\u05D5\u05E8 \u05D7\u05D3\u05E8 \u05D5\u05E9\u05DC\u05D7 \u05D0\u05EA \u05D4\u05E7\u05D5\u05D3 \u05DC\u05D0\u05D5\u05E8\u05D7. \u05DC\u05D7\u05E5 "\u05D1\u05D3\u05D5\u05E7" \u05DC\u05D5\u05D5\u05D3\u05D0 \u05E9\u05D4\u05DB\u05DC \u05EA\u05E7\u05D9\u05DF.','info');
+}else{
+    // Returning user greeting
+    const savedN=localStorage.getItem('podcast_user_name');
+    const ls2=JSON.parse(localStorage.getItem('podcast_lifetime')||'{}');
+    if(savedN&&ls2.sessions>0)dlog('\u05E9\u05DC\u05D5\u05DD '+savedN+'! \u05E1\u05E9\u05DF #'+(ls2.sessions+1),'ok');
 }
 
 // Show session history
