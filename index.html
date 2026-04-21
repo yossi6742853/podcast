@@ -575,6 +575,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-gold" onclick="sendChat()"><i class="bi bi-send"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="exportChat()" title="&#x05d9;&#x05d9;&#x05e6;&#x05d0; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-download"></i></button>
                 <button class="btn btn-sm btn-blue" onclick="const cm=document.getElementById('chat-messages');if(cm)navigator.clipboard.writeText(cm.textContent).then(()=>toast('\u2705 \u05E6\u05D0\u05D8 \u05D4\u05D5\u05E2\u05EA\u05E7'))" title="&#x05d4;&#x05e2;&#x05ea;&#x05e7; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-clipboard"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="searchChat()" title="&#x05d7;&#x05e4;&#x05e9; &#x05d1;&#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-search"></i></button>
                 <button class="btn btn-sm btn-red" onclick="document.getElementById('chat-messages').innerHTML='';totalChatMsgs=0" title="&#x05e0;&#x05e7;&#x05d4; &#x05e6;&#x05d0;&#x05d8;" style="padding:6px 8px"><i class="bi bi-trash3"></i></button>
             </div>
         </div>
@@ -582,7 +583,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 520 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 521 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -2118,6 +2119,19 @@ function clearCompletedTopics(){
     document.querySelectorAll('.topic-item.completed').forEach(el=>el.remove());
     updateTopicBadge();dlog('Completed topics cleared','ok');
 }
+function searchChat(){
+    const term=prompt('\u05D7\u05E4\u05E9 \u05D1\u05E6\u05D0\u05D8:');
+    if(!term)return;
+    const msgs=document.querySelectorAll('#chat-messages div');
+    let found=0;
+    msgs.forEach(m=>{m.style.opacity='1';m.style.background='';
+        if(m.textContent.includes(term)){found++;m.style.background='rgba(212,175,55,0.15)';m.scrollIntoView({behavior:'smooth',block:'nearest'});}
+        else{m.style.opacity='0.3';}
+    });
+    toast(found>0?'\uD83D\uDD0D '+found+' \u05EA\u05D5\u05E6\u05D0\u05D5\u05EA':'\u05DC\u05D0 \u05E0\u05DE\u05E6\u05D0',2000);
+    // Reset after 5s
+    setTimeout(()=>{msgs.forEach(m=>{m.style.opacity='1';m.style.background='';});},5000);
+}
 function exportChat(){
     const msgs=document.getElementById('chat-messages');
     if(!msgs||!msgs.textContent.trim()){dlog('No chat to export','warn');return;}
@@ -3028,6 +3042,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === 'h' || e.key === 'H') { e.preventDefault(); const hp=document.getElementById('host-panel');if(hp&&isHost)hp.style.display=hp.style.display==='none'?'block':'none'; }
     else if (e.key === 'n' || e.key === 'N') { e.preventDefault(); switchTab('topics');addTopic();toast('\u2795 \u05E0\u05D5\u05E9\u05D0 \u05D7\u05D3\u05E9',1200); }
+    else if (e.key === 'j' || e.key === 'J') { e.preventDefault(); toggleMusic();toast(document.getElementById('musicPlayer')?.paused?'\u23F8 \u05DE\u05D5\u05D6\u05D9\u05E7\u05D4':'\u25B6 \u05DE\u05D5\u05D6\u05D9\u05E7\u05D4',1200); }
     else if (e.key === 'o' || e.key === 'O') { e.preventDefault(); speakOutro();toast('\uD83C\uDFC1 \u05E7\u05E8\u05D9\u05D9\u05E0\u05D5\u05EA \u05E1\u05D9\u05D5\u05DD',1500); }
     else if (e.key === 'w' || e.key === 'W') { e.preventDefault(); raiseHand(); }
     else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
