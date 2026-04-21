@@ -146,8 +146,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
 /* Topics */
 .topic-list{margin-top:8px}
-.topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);transition:all 0.3s;animation:tabFadeIn 0.3s}
+.topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);transition:all 0.3s;animation:tabFadeIn 0.3s;cursor:grab}
 .topic-item:hover{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);transform:translateX(2px)}
+.topic-item:active{cursor:grabbing;opacity:0.7}
 .topic-item .num{color:var(--gold);font-weight:900;min-width:25px;cursor:pointer}
 .topic-item.current{border-color:var(--gold);background:rgba(212,175,55,0.08)}
 .topic-item input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
@@ -387,14 +388,14 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="showQR()" title="QR &#x05dc;&#x05d0;&#x05d5;&#x05e8;&#x05d7;"><i class="bi bi-qr-code"></i></button>
             </div>
         </div>
-        <div style="margin-top:6px;font-size:0.65rem;color:var(--muted);text-align:center;opacity:0.5;line-height:1.6">
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">R</span>&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">M</span>&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">&#x05e8;&#x05d5;&#x05d5;&#x05d7;</span>PTT
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">B</span>&#x05e1;&#x05d9;&#x05de;&#x05df;
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">W</span>&#x05d9;&#x05d3;
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">G</span>&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;
-            <span style="background:rgba(255,255,255,0.05);padding:1px 4px;border-radius:3px;margin:1px">?</span>&#x05e2;&#x05d6;&#x05e8;&#x05d4;
+        <div style="margin-top:6px;font-size:0.6rem;color:var(--muted);text-align:center;opacity:0.4;line-height:1.8;display:flex;flex-wrap:wrap;justify-content:center;gap:2px">
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">R</span>&#x05d4;&#x05e7;&#x05dc;&#x05d8;&#x05d4;
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">M</span>&#x05d4;&#x05e9;&#x05ea;&#x05e7;&#x05d4;
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">&#x05e8;&#x05d5;&#x05d5;&#x05d7;</span>PTT
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">B</span>&#x05e1;&#x05d9;&#x05de;&#x05df;
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">N</span>&#x05e0;&#x05d5;&#x05e9;&#x05d0;
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">S</span>&#x05d8;&#x05e1;&#x05d8;
+            <span style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:3px">?</span>&#x05e2;&#x05d6;&#x05e8;&#x05d4;
         </div>
 
         <!-- TABS -->
@@ -579,7 +580,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15);cursor:default" title="3,120+ &#x05e9;&#x05d5;&#x05e8;&#x05d5;&#x05ea; &#x05e7;&#x05d5;&#x05d3; | 500 &#x05e1;&#x05d1;&#x05d1;&#x05d9; &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2; | 60+ &#x05ea;&#x05db;&#x05d5;&#x05e0;&#x05d5;&#x05ea; | Powered by Claude Code">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 509 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.2 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 510 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
