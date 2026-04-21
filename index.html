@@ -108,7 +108,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 .settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .settings-row label{font-size:0.85rem;color:var(--muted)}
 .settings-row select,.settings-row input[type=file]{padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;max-width:220px;font-size:0.85rem}
-.download-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-top:6px;border:1px solid var(--border);font-size:0.9rem}
+.download-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-top:6px;border:1px solid var(--border);font-size:0.9rem;animation:tabFadeIn 0.4s}
 .download-item .info{display:flex;align-items:center;gap:8px;overflow:hidden;min-width:0}
 .download-item .info b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;display:block}
 .download-item .size{color:var(--muted);font-size:0.8rem}
@@ -137,7 +137,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
 /* Topics */
 .topic-list{margin-top:8px}
-.topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border)}
+.topic-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);transition:all 0.3s;animation:tabFadeIn 0.3s}
+.topic-item:hover{background:rgba(255,255,255,0.02)}
 .topic-item .num{color:var(--gold);font-weight:900;min-width:25px;cursor:pointer}
 .topic-item.current{border-color:var(--gold);background:rgba(212,175,55,0.08)}
 .topic-item input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
@@ -160,6 +161,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
     .room-row input{width:100%}
     h1{font-size:1.4rem}
     .waveform{height:70px}
+}
+@media(max-width:500px){
+    .download-item{flex-direction:column;gap:6px;align-items:stretch}
+    .download-item .info b{max-width:100%!important}
 }
 @media(max-width:400px){
     .video-box{min-width:100%;aspect-ratio:4/3}
@@ -254,6 +259,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div style="position:relative">
             <div class="waveform" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()"></canvas></div>
             <div id="audio-flow-status" style="position:absolute;top:3px;right:8px;font-size:0.6rem;color:var(--muted);opacity:0.5"></div>
+            <button id="viz-mode-btn" onclick="toggleVizMode();this.innerHTML=vizMode==='bars'?'<i class=\'bi bi-soundwave\'></i>':'<i class=\'bi bi-bar-chart\'></i>'" style="position:absolute;bottom:4px;left:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--muted);font-size:0.6rem;padding:2px 6px;cursor:pointer" title="&#x05d4;&#x05d7;&#x05dc;&#x05e3; &#x05ea;&#x05e6;&#x05d5;&#x05d2;&#x05d4;"><i class="bi bi-soundwave"></i></button>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:center;gap:25px;flex-wrap:wrap">
@@ -292,6 +298,15 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <span class="music-label" style="min-width:80px">&#x05d1;&#x05d0;&#x05e4;&#x05e8; (ms):</span>
                 <input type="range" id="jitter-setting" min="20" max="200" value="60" oninput="document.getElementById('jitter-val').textContent=this.value+'ms'">
                 <span id="jitter-val" style="min-width:40px;font-size:0.8rem;color:var(--muted)">60ms</span>
+            </div>
+            <div class="music-controls">
+                <span class="music-label" style="min-width:80px">&#x05d6;&#x05de;&#x05df &#x05de;&#x05e7;&#x05e1;:</span>
+                <select id="max-rec-time" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:0.8rem" onchange="window._maxRecMins=parseInt(this.value)">
+                    <option value="30">30 &#x05d3;&#x05e7;&#x05d5;&#x05ea;</option>
+                    <option value="60">60 &#x05d3;&#x05e7;&#x05d5;&#x05ea;</option>
+                    <option value="120" selected>2 &#x05e9;&#x05e2;&#x05d5;&#x05ea;</option>
+                    <option value="0">&#x05dc;&#x05dc;&#x05d0; &#x05d4;&#x05d2;&#x05d1;&#x05dc;&#x05d4;</option>
+                </select>
             </div>
         </div>
         <div style="margin-top:6px;font-size:0.7rem;color:var(--muted);text-align:center;opacity:0.6">
@@ -1382,8 +1397,9 @@ function updateTimer(){
     // Milestone notifications + auto-markers
     const mins=Math.floor(elapsed/60);
     if(mins>0&&mins%30===0&&elapsed%60<0.2)dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05DB\u05D1\u05E8 '+mins+' \u05D3\u05E7\u05D5\u05EA!','warn');
-    // Safety: auto-stop after 2 hours (guard flag prevents double-stop)
-    if(mins>=120&&!window._twoHourStopped){window._twoHourStopped=true;dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05D4\u05D2\u05D9\u05E2\u05D4 \u05DC-2 \u05E9\u05E2\u05D5\u05EA \u2014 \u05E0\u05E2\u05E6\u05E8\u05EA \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA','warn');playBeep(400,0.5);stopRecording();return;}
+    // Safety: auto-stop at configured limit (guard flag prevents double-stop)
+    const maxMins=window._maxRecMins||120;
+    if(maxMins>0&&mins>=maxMins&&!window._twoHourStopped){window._twoHourStopped=true;dlog('\u05D4\u05E7\u05DC\u05D8\u05D4 \u05D4\u05D2\u05D9\u05E2\u05D4 \u05DC-'+maxMins+' \u05D3\u05E7\u05D5\u05EA \u2014 \u05E0\u05E2\u05E6\u05E8\u05EA','warn');playBeep(400,0.5);stopRecording();return;}
     // Auto-marker every 10 minutes
     if(mins>0&&mins%10===0&&elapsed%60<0.2){
         const autoTime=fmtTime(elapsed*1000);
@@ -1413,6 +1429,8 @@ function toggleMusic(){
         // Fade in
         let v=0;const fi=setInterval(()=>{v+=0.05;mp.volume=Math.min(v,baseVol);if(v>=baseVol)clearInterval(fi);},50);
         btn.innerHTML='<i class="bi bi-pause-fill"></i> \u05D4\u05E9\u05D4\u05D4';
+        // Show music indicator in banner
+        const bt=document.getElementById('banner-time');if(bt)bt.innerHTML+='\u00A0<span style="color:var(--gold);font-size:0.7rem">\uD83C\uDFB5</span>';
     }else{
         // Fade out
         let v=mp.volume;const fo=setInterval(()=>{v-=0.05;mp.volume=Math.max(0,v);if(v<=0){clearInterval(fo);mp.pause();}},50);
@@ -1473,7 +1491,9 @@ function addTopic(text=''){
     topicCount++;const list=document.getElementById('topic-list');
     const item=document.createElement('div');item.className='topic-item';item.id='topic-'+topicCount;
     const n=topicCount;
-    item.innerHTML='<span class="num" onclick="setCurrentTopic('+n+')">'+n+'</span><input placeholder="\u05E0\u05D5\u05E9\u05D0..." value="'+(text||'')+'" onkeydown="if(event.key===\'Enter\')addTopic()"><span class="done" onclick="toggleTopic('+n+')" title="\u05E1\u05D9\u05D9\u05DD"><i class="bi bi-check-circle"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',-1)" title="\u05DC\u05DE\u05E2\u05DC\u05D4"><i class="bi bi-chevron-up"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',1)" title="\u05DC\u05DE\u05D8\u05D4"><i class="bi bi-chevron-down"></i></span><span style="color:var(--red);cursor:pointer;font-size:0.9rem;margin-right:4px" onclick="removeTopic('+n+')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></span>';
+    const hints=['\u05E4\u05EA\u05D9\u05D7\u05D4...','\u05E0\u05D5\u05E9\u05D0 \u05E8\u05D0\u05E9\u05D5\u05DF...','\u05E0\u05D5\u05E9\u05D0 \u05E9\u05E0\u05D9...','\u05E0\u05D5\u05E9\u05D0 \u05E0\u05D5\u05E1\u05E3...'];
+    const ph=n<=hints.length?hints[n-1]:'\u05E0\u05D5\u05E9\u05D0 '+n+'...';
+    item.innerHTML='<span class="num" onclick="setCurrentTopic('+n+')" title="\u05DC\u05D7\u05E5 \u05DC\u05D4\u05D2\u05D3\u05D9\u05E8 \u05DB\u05E0\u05D5\u05DB\u05D7\u05D9">'+n+'</span><input placeholder="'+ph+'" value="'+(text||'')+'" onkeydown="if(event.key===\'Enter\')addTopic()"><span class="done" onclick="toggleTopic('+n+')" title="\u05E1\u05D9\u05D9\u05DD"><i class="bi bi-check-circle"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',-1)" title="\u05DC\u05DE\u05E2\u05DC\u05D4"><i class="bi bi-chevron-up"></i></span><span style="color:var(--muted);cursor:pointer;font-size:0.75rem" onclick="moveTopic('+n+',1)" title="\u05DC\u05DE\u05D8\u05D4"><i class="bi bi-chevron-down"></i></span><span style="color:var(--red);cursor:pointer;font-size:0.9rem;margin-right:4px" onclick="removeTopic('+n+')" title="\u05DE\u05D7\u05E7"><i class="bi bi-x"></i></span>';
     list.appendChild(item);item.querySelector('input').focus();
 }
 function toggleTopic(n){const el=document.getElementById('topic-'+n);if(el)el.classList.toggle('completed');updateTopicBadge();}
