@@ -287,6 +287,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <button class="btn btn-sm btn-green" onclick="sendTestTone()" title="&#x05e9;&#x05dc;&#x05d7; &#x05e6;&#x05dc;&#x05d9;&#x05dc; &#x05d8;&#x05e1;&#x05d8;"><i class="bi bi-broadcast"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleStudioFS()" title="&#x05de;&#x05e1;&#x05da; &#x05de;&#x05dc;&#x05d0;"><i class="bi bi-fullscreen"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleDim()" title="&#x05e2;&#x05de;&#x05e2;&#x05d5;&#x05dd;"><i class="bi bi-brightness-low"></i></button>
+            <button class="btn btn-sm btn-blue" onclick="toggleCompact()" id="btn-compact" title="&#x05de;&#x05e6;&#x05d1; &#x05de;&#x05e6;&#x05d5;&#x05de;&#x05e6;&#x05dd;"><i class="bi bi-layout-text-sidebar-reverse"></i></button>
             <button class="btn btn-sm btn-blue" onclick="const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'" title="&#x05d4;&#x05d2;&#x05d3;&#x05e8;&#x05d5;&#x05ea;"><i class="bi bi-gear"></i></button>
             <button class="btn btn-sm btn-blue" onclick="toggleHelp()" title="&#x05e2;&#x05d6;&#x05e8;&#x05d4;"><i class="bi bi-question-circle"></i></button>
             <button class="btn btn-sm btn-green" onclick="quickReconnect()" title="&#x05d7;&#x05d9;&#x05d1;&#x05d5;&#x05e8; &#x05de;&#x05d7;&#x05d3;&#x05e9;"><i class="bi bi-arrow-repeat"></i></button>
@@ -358,6 +359,13 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
 
         <!-- Music tab -->
         <div class="tab-content" id="tab-music">
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-gold" onclick="playSFX('ding')" title="&#x05e6;&#x05dc;&#x05e6;&#x05d5;&#x05dc; &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;"><i class="bi bi-bell"></i> &#x05d3;&#x05d9;&#x05e0;&#x05d2;</button>
+                <button class="btn btn-sm btn-blue" onclick="playSFX('transition')" title="&#x05de;&#x05e2;&#x05d1;&#x05e8;"><i class="bi bi-shuffle"></i> &#x05de;&#x05e2;&#x05d1;&#x05e8;</button>
+                <button class="btn btn-sm btn-green" onclick="playSFX('applause')" title="&#x05de;&#x05d7;&#x05d9;&#x05d0;&#x05d5;&#x05ea; &#x05db;&#x05e4;&#x05d9;&#x05d9;&#x05dd;"><i class="bi bi-hand-thumbs-up"></i> &#x05db;&#x05e4;&#x05d9;&#x05d9;&#x05dd;</button>
+                <button class="btn btn-sm btn-red" onclick="playSFX('buzzer')" title="&#x05d1;&#x05d0;&#x05d6;&#x05e8;"><i class="bi bi-x-octagon"></i> &#x05d1;&#x05d0;&#x05d6;&#x05e8;</button>
+                <button class="btn btn-sm btn-blue" onclick="playSFX('whoosh')" title="&#x05d5;&#x05d5;&#x05e9;"><i class="bi bi-wind"></i></button>
+            </div>
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-music-note-beamed"></i> &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2;</div>
             <div class="settings-row">
                 <label>&#x05d1;&#x05d7;&#x05e8; &#x05e7;&#x05d5;&#x05d1;&#x05e5;:</label>
@@ -1464,7 +1472,8 @@ function updateTimer(){
     const elapsed=(Date.now()-recStartTime)/1000;
     const estMB=((256000*elapsed)/8388608+(bytesReceived/1048576)).toFixed(1);
     document.getElementById('timer').textContent=t;
-    document.getElementById('timer').title='\u05D2\u05D5\u05D3\u05DC \u05DE\u05E9\u05D5\u05E2\u05E8: ~'+estMB+' MB';
+    const lossP2=audioChunksIn>0?Math.round(packetsLost/(audioChunksIn+packetsLost)*100):0;
+    document.getElementById('timer').title='~'+estMB+' MB | \u05DC\u05D8\u05E0\u05E1\u05D9: '+avgLatency+'ms | \u05D0\u05D9\u05DB\u05D5\u05EA: '+(100-lossP2)+'% | \u05E1\u05D9\u05DE\u05E0\u05D9\u05DD: '+markers.length;
     document.title='\uD83D\uDD34 '+t+' ('+estMB+'MB) \u2014 \u05E1\u05D8\u05D5\u05D3\u05D9\u05D5';
     // Milestone notifications + auto-markers
     const mins=Math.floor(elapsed/60);
@@ -1730,6 +1739,29 @@ function playBeep(freq, duration, vol) {
         osc.stop(_beepCtx.currentTime + (duration || 0.3));
     } catch(e) {}
 }
+// === SOUND EFFECTS ===
+function playSFX(type){
+    if(!_beepCtx||_beepCtx.state==='closed')_beepCtx=new AudioContext();
+    if(_beepCtx.state==='suspended')_beepCtx.resume();
+    const ctx=_beepCtx,now=ctx.currentTime;
+    if(type==='ding'){
+        // Pleasant bell ding
+        [800,1200,1600].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.value=0.12/(i+1);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.08);g.gain.exponentialRampToValueAtTime(0.001,now+0.6+i*0.08);o.stop(now+0.7+i*0.08);});
+    }else if(type==='transition'){
+        // Sweep whoosh
+        const o=ctx.createOscillator(),g=ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(200,now);o.frequency.exponentialRampToValueAtTime(2000,now+0.3);g.gain.setValueAtTime(0.08,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.4);o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.4);
+    }else if(type==='applause'){
+        // White noise burst (simulated clapping)
+        const buf=ctx.createBuffer(1,ctx.sampleRate*0.8,ctx.sampleRate);const d=buf.getChannelData(0);
+        for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*3);
+        const s=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();s.buffer=buf;f.type='bandpass';f.frequency.value=3000;f.Q.value=0.5;g.gain.value=0.15;s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(now);
+    }else if(type==='buzzer'){
+        const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=150;g.gain.value=0.1;o.connect(g);g.connect(ctx.destination);o.start(now);g.gain.exponentialRampToValueAtTime(0.001,now+0.5);o.stop(now+0.5);
+    }else if(type==='whoosh'){
+        const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(100,now);o.frequency.exponentialRampToValueAtTime(4000,now+0.2);o.frequency.exponentialRampToValueAtTime(100,now+0.4);g.gain.setValueAtTime(0.06,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.4);o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.4);
+    }
+    dlog('SFX: '+type,'ok');
+}
 function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900, 0.2), 150); }
 function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
@@ -1965,6 +1997,27 @@ function sendTestTone(){
     showStatus('studio-status','\uD83D\uDCE1 \u05E6\u05DC\u05D9\u05DC \u05D8\u05E1\u05D8 \u05E0\u05E9\u05DC\u05D7 (440Hz)','success');
 }
 
+// === COMPACT MODE ===
+let isCompact=false;
+function toggleCompact(){
+    isCompact=!isCompact;
+    const hide=['connected-banner','episode-title','tab-recordings','tab-music','tab-topics','tab-chat'];
+    const tabs=document.querySelector('.tabs');
+    if(isCompact){
+        // Hide non-essential elements
+        document.querySelectorAll('.video-grid,.tabs').forEach(el=>el.style.display='none');
+        document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
+        document.getElementById('btn-compact').innerHTML='<i class="bi bi-layout-text-sidebar"></i>';
+        dlog('Compact mode ON','ok');
+    }else{
+        document.querySelector('.video-grid').style.display='flex';
+        if(tabs)tabs.style.display='flex';
+        document.querySelector('.tab-content.active').style.display='block';
+        document.getElementById('btn-compact').innerHTML='<i class="bi bi-layout-text-sidebar-reverse"></i>';
+        dlog('Compact mode OFF','ok');
+    }
+}
+
 // === DIM MODE ===
 let dimmed=false;
 function toggleDim(){dimmed=!dimmed;document.body.style.filter=dimmed?'brightness(0.6)':'none';dlog('Dim: '+(dimmed?'ON':'OFF'),'ok');}
@@ -2180,6 +2233,7 @@ document.addEventListener('keydown', function(e) {
     else if (e.key === 't' || e.key === 'T') { e.preventDefault(); switchTab('chat'); document.getElementById('chat-input').focus(); }
     else if (e.key === '?') { e.preventDefault(); toggleHelp(); }
     else if (e.key === 'g' || e.key === 'G') { e.preventDefault(); const qs=document.getElementById('quick-settings');qs.style.display=qs.style.display==='none'?'block':'none'; }
+    else if (e.key === 'c' || e.key === 'C') { e.preventDefault(); toggleCompact(); }
     else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); toggleDim(); }
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleStudioFS(); }
     else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); pipRemote(); }
