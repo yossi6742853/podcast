@@ -271,7 +271,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
 
         <div style="position:relative">
-            <div class="waveform" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;, &#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05d0;&#x05e8;&#x05d5;&#x05db;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()" ontouchstart="window._longPressTO=setTimeout(()=>{addMarker();window._longPressTO=null;},600)" ontouchend="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}" ontouchmove="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}"></canvas></div>
+            <div class="waveform" title="&#x05dc;&#x05d7;&#x05e5; = &#x05d4;&#x05d7;&#x05dc;&#x05e3; &#x05ea;&#x05e6;&#x05d5;&#x05d2;&#x05d4; | &#x05dc;&#x05d7;&#x05e5; &#x05db;&#x05e4;&#x05d5;&#x05dc; = &#x05e1;&#x05d9;&#x05de;&#x05df; | &#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05d0;&#x05e8;&#x05d5;&#x05db;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df; (&#x05de;&#x05d5;&#x05d1;&#x05d9;&#x05d9;&#x05dc;)"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()" ontouchstart="window._longPressTO=setTimeout(()=>{addMarker();window._longPressTO=null;},600)" ontouchend="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}" ontouchmove="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}"></canvas></div>
             <div id="audio-flow-status" style="position:absolute;top:3px;right:8px;font-size:0.6rem;color:var(--muted);opacity:0.5"></div>
             <div id="audio-quality-score" style="position:absolute;top:3px;left:50%;transform:translateX(-50%);font-size:0.55rem;color:var(--green);opacity:0.5;display:none;display:flex;align-items:center;gap:3px"><span id="aq-text"></span><div style="width:30px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="aq-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 1s"></div></div></div>
             <button id="viz-mode-btn" onclick="toggleVizMode();const icons={bars:'\u2581\u2583\u2585',wave:'\u223F',spectrum:'\u25B3'};this.textContent=icons[vizMode]||vizMode" style="position:absolute;bottom:4px;left:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--muted);font-size:0.6rem;padding:2px 6px;cursor:pointer" title="&#x05d4;&#x05d7;&#x05dc;&#x05e3; &#x05ea;&#x05e6;&#x05d5;&#x05d2;&#x05d4;"><i class="bi bi-soundwave"></i></button>
@@ -353,6 +353,9 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                     <option value="256" selected>256 kbps</option>
                     <option value="320">320 kbps</option>
                 </select>
+            </div>
+            <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);text-align:center">
+                <button class="btn btn-sm btn-red" onclick="if(confirm('\u05DC\u05DE\u05D7\u05D5\u05E7 \u05D0\u05EA \u05DB\u05DC \u05D4\u05E0\u05EA\u05D5\u05E0\u05D9\u05DD \u05D4\u05E9\u05DE\u05D5\u05E8\u05D9\u05DD?')){Object.keys(localStorage).filter(k=>k.startsWith('podcast_')).forEach(k=>localStorage.removeItem(k));showStatus('studio-status','\u05DB\u05DC \u05D4\u05E0\u05EA\u05D5\u05E0\u05D9\u05DD \u05E0\u05DE\u05D7\u05E7\u05D5','success');}" style="opacity:0.5;font-size:0.7rem"><i class="bi bi-trash3"></i> &#x05de;&#x05d7;&#x05e7; &#x05e0;&#x05ea;&#x05d5;&#x05e0;&#x05d9;&#x05dd; &#x05e9;&#x05de;&#x05d5;&#x05e8;&#x05d9;&#x05dd;</button>
             </div>
         </div>
         <!-- Host Control Panel -->
@@ -1181,7 +1184,7 @@ function showConnected() {
     if(localAv)localAv.style.display=hasVid?'none':'flex';
     const connType=conn&&conn.reliable?'Reliable':'Best-effort';
     const actSR=audioCtx?audioCtx.sampleRate:48000;
-    showStatus('studio-status', '\u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+Math.round(CHUNK_SIZE/actSR*1000)+'ms \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 \uD83D\uDCE1 \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5', 'success');
+    showStatus('studio-status', '\u2705 \u05DE\u05D7\u05D5\u05D1\u05E8! '+(actSR/1000)+'kHz \u2022 '+connType+' \u2022 \u05DC\u05D7\u05E5 S \u05DC\u05D8\u05E1\u05D8 \u05D0\u05D5\u05D3\u05D9\u05D5, R \u05DC\u05D4\u05E7\u05DC\u05D8\u05D4', 'success');
     playConnectSound();
     document.querySelectorAll('.video-box').forEach(v=>v.classList.add('connected-glow'));
     // Notify if tab is background
@@ -2714,7 +2717,9 @@ function addChatMsg(name, text, isMe) {
     msg.style.cssText = 'margin-bottom:6px;padding:6px 10px;border-radius:8px;animation:tabFadeIn 0.3s;' +
         (isMe ? 'background:rgba(212,175,55,0.1);border-right:3px solid var(--gold);' : 'background:rgba(41,128,185,0.1);border-right:3px solid var(--blue);');
     const linkedText=escHtml(text).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--gold);text-decoration:underline">$1</a>').replace(/\*([^*]+)\*/g,'<b>$1</b>');
-    msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.75rem">' + new Date().toLocaleTimeString() + '</span><br>' + linkedText;
+    const timeStr=new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const recTime=(isRecording&&recStartTime)?'<span style="color:var(--red);font-size:0.65rem"> \u25CF '+fmtTime(Date.now()-recStartTime)+'</span>':'';
+    msg.innerHTML = '<b style="color:' + (isMe ? 'var(--gold)' : 'var(--blue)') + '">' + escHtml(name) + '</b> <span style="color:var(--muted);font-size:0.7rem">' + timeStr + recTime + '</span><br>' + linkedText;
     box.appendChild(msg);totalChatMsgs++;
     const cc=document.getElementById('chat-count');if(cc)cc.textContent=totalChatMsgs+' \u05D4\u05D5\u05D3\u05E2\u05D5\u05EA';
     // Auto-scroll only if near bottom
