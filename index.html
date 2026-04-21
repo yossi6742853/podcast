@@ -210,8 +210,8 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
             <div style="display:flex;align-items:center;gap:8px;animation:tabFadeIn 0.7s"><span style="background:linear-gradient(135deg,var(--blue),#3498db);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:900;box-shadow:0 2px 8px rgba(41,128,185,0.3)">2</span><div><b style="color:var(--blue)">&#x05d0;&#x05d5;&#x05e8;&#x05d7;</b><br><span style="font-size:0.7rem;opacity:0.7">&#x05d4;&#x05db;&#x05e0;&#x05e1; &#x05e7;&#x05d5;&#x05d3; &#x2192; &#x05d4;&#x05e6;&#x05d8;&#x05e8;&#x05e3;</span></div></div>
         </div>
         <div class="room-row">
-            <input id="room-id" placeholder="&#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8; &#x05d0;&#x05d5; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;" value="" oninput="const v=this.value;if(v.includes('?join=')){this.value=new URLSearchParams(v.split('?')[1]).get('join')||v;dlog('Extracted room code from URL','ok');}">
-            <input id="user-name" placeholder="&#x05d4;&#x05e9;&#x05dd; &#x05e9;&#x05dc;&#x05da;" value="">
+            <input id="room-id" placeholder="&#x05e7;&#x05d5;&#x05d3; &#x05d7;&#x05d3;&#x05e8; &#x05d0;&#x05d5; &#x05e7;&#x05d9;&#x05e9;&#x05d5;&#x05e8;" value="" oninput="const v=this.value;if(v.includes('?join=')){this.value=new URLSearchParams(v.split('?')[1]).get('join')||v;dlog('Extracted room code from URL','ok');}" onkeydown="if(event.key==='Enter'){event.preventDefault();this.value.trim()?joinRoom():createRoom();}">
+            <input id="user-name" placeholder="&#x05d4;&#x05e9;&#x05dd; &#x05e9;&#x05dc;&#x05da;" value="" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('room-id').value?joinRoom():createRoom();}">
         </div>
         <div class="toggle-row">
             <label><input type="checkbox" id="use-video"> <i class="bi bi-camera-video"></i> &#x05d5;&#x05d9;&#x05d3;&#x05d0;&#x05d5;</label>
@@ -558,7 +558,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 487 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 489 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1242,10 +1242,9 @@ function showConnected() {
         // Live talk ratio
         const ts=speakTimeLocal+speakTimeRemote;
         if(ts>120){const tr=document.getElementById('talk-ratio');if(tr){const lm=Math.round(speakTimeLocal/3600),rm=Math.round(speakTimeRemote/3600);tr.textContent='\u05D3\u05D9\u05D1\u05D5\u05E8: '+Math.round(speakTimeLocal/ts*100)+'%/'+Math.round(speakTimeRemote/ts*100)+'% ('+lm+'m/'+rm+'m)';}}
-        // Session duration warnings
+        // Session milestones (every 30 min)
         if(connStartTime){const connMins=Math.round((Date.now()-connStartTime)/60000);
-            if(connMins===45)showStatus('studio-status','45 \u05D3\u05E7\u05D5\u05EA \u05DE\u05D7\u05D5\u05D1\u05E8\u05D9\u05DD','waiting');
-            if(connMins===90)showStatus('studio-status','90 \u05D3\u05E7\u05D5\u05EA! \u05E9\u05E7\u05D5\u05DC \u05DC\u05E1\u05D9\u05D9\u05DD','waiting');
+            if(connMins>0&&connMins%30===0&&!window['_mile'+connMins]){window['_mile'+connMins]=true;dlog('\u23F0 '+connMins+' \u05D3\u05E7\u05D5\u05EA \u05DE\u05D7\u05D5\u05D1\u05E8\u05D9\u05DD','ok');playBeep(600,0.1);}
         }
         // Audio flow status
         const afs=document.getElementById('audio-flow-status');
@@ -1593,6 +1592,7 @@ function startRecording(){
 }
 function stopRecording(){
     if(!isRecording){dlog('stopRecording called but not recording','warn');return;}
+    try{
     isRecording=false;isPaused=false;clearInterval(timerInterval);if(autoSaveInterval)clearInterval(autoSaveInterval);recordingCount++;
     const silences=silenceSegments.length;
     const dur=recStartTime?fmtTime(Date.now()-recStartTime):'00:00:00';
@@ -1671,6 +1671,7 @@ function stopRecording(){
     // Update recordings tab badge
     const recTab=document.querySelector('.tab:first-child');
     if(recTab)recTab.innerHTML='<i class="bi bi-file-earmark-music"></i> \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA <span style="background:var(--gold);color:#000;border-radius:10px;padding:1px 6px;font-size:0.7rem;margin-right:4px">'+recordingCount+'</span>';
+    }catch(e){dlog('stopRecording error: '+e.message,'err');showStatus('studio-status','\u05E9\u05D2\u05D9\u05D0\u05D4 \u05D1\u05E2\u05E6\u05D9\u05E8\u05EA \u05D4\u05E7\u05DC\u05D8\u05D4: '+e.message,'error');isRecording=false;}
 }
 
 // Float32 to WAV Blob (proper WAV encoding)
@@ -2486,7 +2487,7 @@ function doDisconnect(){
     // Show last session info in room panel
     showStatus('room-status','\u05E1\u05E9\u05DF \u05E7\u05D5\u05D3\u05DD \u05D4\u05E1\u05EA\u05D9\u05D9\u05DD. '+recordingCount+' \u05D4\u05E7\u05DC\u05D8\u05D5\u05EA \u05E0\u05E9\u05DE\u05E8\u05D5.','success');
 }
-function showStatus(id,msg,type){let el=document.getElementById(id);if(!el){el=document.createElement('div');el.id=id;document.querySelector('.container').appendChild(el);}const icons={success:'check-circle',error:'exclamation-circle',waiting:'hourglass-split'};el.className='status '+type;el.innerHTML='<i class="bi bi-'+(icons[type]||'info-circle')+'"></i> '+msg;
+function showStatus(id,msg,type){let el=document.getElementById(id);if(!el){el=document.createElement('div');el.id=id;el.setAttribute('role','status');el.setAttribute('aria-live','polite');document.querySelector('.container').appendChild(el);}const icons={success:'check-circle',error:'exclamation-circle',waiting:'hourglass-split',info:'info-circle'};el.className='status '+type;el.innerHTML='<i class="bi bi-'+(icons[type]||'info-circle')+'"></i> '+msg;
     // Auto-dismiss success messages after 5s (only if message hasn't changed)
     if(type==='success'){clearTimeout(el._dismissTO);const msgId=Date.now();el._msgId=msgId;el._dismissTO=setTimeout(()=>{if(el._msgId===msgId){el.style.opacity='0';el.style.transition='opacity 0.4s';setTimeout(()=>{if(el._msgId===msgId){el.style.opacity='1';el.innerHTML='';el.className='';}},500);}},5000);}
 }
