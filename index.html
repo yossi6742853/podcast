@@ -447,8 +447,9 @@ let remoteGainNode = null;
 let nextPlayTime = 0;
 
 function makePeer(myId){
-    return new Peer(myId, {
-        debug: 0,
+    dlog('Creating PeerJS connection...','ok');
+    const p = new Peer(myId, {
+        debug: 1,
         config: {
             iceServers: [
                 {urls: 'stun:stun.l.google.com:19302'},
@@ -459,6 +460,11 @@ function makePeer(myId){
             ]
         }
     });
+    p.on('disconnected', function() {
+        dlog('PeerJS disconnected, reconnecting...','warn');
+        try { p.reconnect(); } catch(e) { dlog('Reconnect failed: '+e,'err'); }
+    });
+    return p;
 }
 
 function setupDataConn(c) {
