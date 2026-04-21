@@ -271,7 +271,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         </div>
 
         <div style="position:relative">
-            <div class="waveform" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()"></canvas></div>
+            <div class="waveform" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;, &#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05d0;&#x05e8;&#x05d5;&#x05db;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()" ontouchstart="window._longPressTO=setTimeout(()=>{addMarker();window._longPressTO=null;},600)" ontouchend="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}" ontouchmove="if(window._longPressTO){clearTimeout(window._longPressTO);window._longPressTO=null;}"></canvas></div>
             <div id="audio-flow-status" style="position:absolute;top:3px;right:8px;font-size:0.6rem;color:var(--muted);opacity:0.5"></div>
             <div id="audio-quality-score" style="position:absolute;top:3px;left:50%;transform:translateX(-50%);font-size:0.55rem;color:var(--green);opacity:0.5;display:none;display:flex;align-items:center;gap:3px"><span id="aq-text"></span><div style="width:30px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="aq-bar" style="height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 1s"></div></div></div>
             <button id="viz-mode-btn" onclick="toggleVizMode();const icons={bars:'\u2581\u2583\u2585',wave:'\u223F',spectrum:'\u25B3'};this.textContent=icons[vizMode]||vizMode" style="position:absolute;bottom:4px;left:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--muted);font-size:0.6rem;padding:2px 6px;cursor:pointer" title="&#x05d4;&#x05d7;&#x05dc;&#x05e3; &#x05ea;&#x05e6;&#x05d5;&#x05d2;&#x05d4;"><i class="bi bi-soundwave"></i></button>
@@ -558,7 +558,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <!-- Background removal removed — requires ML model not available behind NetFree -->
     </div>
     <div style="text-align:center;padding:10px;font-size:0.65rem;color:rgba(255,255,255,0.15)">
-        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 489 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
+        &#x05e1;&#x05d8;&#x05d5;&#x05d3;&#x05d9;&#x05d5; &#x05e4;&#x05d5;&#x05d3;&#x05e7;&#x05d0;&#x05e1;&#x05d8; PRO v10.1 &#x2022; &#x05d1;&#x05d9;&#x05ea; &#x05d4;&#x05ea;&#x05dc;&#x05de;&#x05d5;&#x05d3; &#x2022; 490 &#x05e9;&#x05d3;&#x05e8;&#x05d5;&#x05d2;&#x05d9;&#x05dd;
     </div>
 </div>
 
@@ -1230,6 +1230,7 @@ function showConnected() {
         document.getElementById('conn-time-stat').textContent = ct;
         const bt=document.getElementById('banner-time');
         if(bt){const qEmoji=avgLatency<50?'\u2705':avgLatency<100?'\uD83D\uDFE2':avgLatency<200?'\uD83D\uDFE1':'\uD83D\uDD34';const recInd=isRecording?(isPaused?' \u23F8':' \uD83D\uDD34'):'';bt.textContent=ct+' '+qEmoji+recInd;}
+        const cb=document.getElementById('connected-banner');if(cb)cb.style.borderColor=isRecording?'rgba(231,76,60,0.4)':'rgba(39,174,96,0.15)';
         const totalBytes = bytesSent + bytesReceived;
         const bps = Math.round((totalBytes - lastBytes) / 1024);
         lastBytes = totalBytes;
@@ -3084,6 +3085,20 @@ setTimeout(()=>{
     const un=document.getElementById('user-name'),ri=document.getElementById('room-id');
     if(un&&un.value)ri.focus();else if(un)un.focus();
 },500);
+
+// Touch swipe to switch tabs
+let _touchStartX=0;
+document.addEventListener('touchstart',e=>{_touchStartX=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+    if(!isConnected)return;
+    const dx=e.changedTouches[0].clientX-_touchStartX;
+    if(Math.abs(dx)<80)return; // minimum swipe distance
+    const tabs=['recordings','music','topics','chat'];
+    const activeIdx=tabs.findIndex(t=>document.querySelector('#tab-'+t+'.active'));
+    if(activeIdx<0)return;
+    const newIdx=dx>0?Math.max(0,activeIdx-1):Math.min(tabs.length-1,activeIdx+1); // RTL: swipe right = previous
+    if(newIdx!==activeIdx){switchTab(tabs[newIdx]);document.querySelectorAll('.tab')[newIdx]?.classList.add('active');}
+},{passive:true});
 </script>
 </body>
 </html>
