@@ -266,6 +266,7 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
         <div style="position:relative">
             <div class="waveform" title="&#x05dc;&#x05d7;&#x05d9;&#x05e6;&#x05d4; &#x05db;&#x05e4;&#x05d5;&#x05dc;&#x05d4; = &#x05e1;&#x05d9;&#x05de;&#x05df;"><canvas id="waveCanvas" ondblclick="addMarker()" onclick="toggleVizMode()"></canvas></div>
             <div id="audio-flow-status" style="position:absolute;top:3px;right:8px;font-size:0.6rem;color:var(--muted);opacity:0.5"></div>
+            <div id="audio-quality-score" style="position:absolute;top:3px;left:50%;transform:translateX(-50%);font-size:0.55rem;color:var(--green);opacity:0.4;display:none"></div>
             <button id="viz-mode-btn" onclick="toggleVizMode();const icons={bars:'\u2581\u2583\u2585',wave:'\u223F',spectrum:'\u25B3'};this.textContent=icons[vizMode]||vizMode" style="position:absolute;bottom:4px;left:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--muted);font-size:0.6rem;padding:2px 6px;cursor:pointer" title="&#x05d4;&#x05d7;&#x05dc;&#x05e3; &#x05ea;&#x05e6;&#x05d5;&#x05d2;&#x05d4;"><i class="bi bi-soundwave"></i></button>
         </div>
 
@@ -406,6 +407,10 @@ h1{font-size:1.8rem;margin-bottom:3px;text-align:center;background:linear-gradie
                 <button class="btn btn-sm btn-blue" onclick="playSFX('whoosh')" title="&#x05d5;&#x05d5;&#x05e9;"><i class="bi bi-wind"></i></button>
                 <button class="btn btn-sm btn-gold" onclick="playSFX('intro')" title="&#x05d2;&#x05d9;&#x05e0;&#x05d2;&#x05dc; &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;"><i class="bi bi-play-circle"></i> &#x05e4;&#x05ea;&#x05d9;&#x05d7;&#x05d4;</button>
                 <button class="btn btn-sm btn-red" onclick="playSFX('outro')" title="&#x05d2;&#x05d9;&#x05e0;&#x05d2;&#x05dc; &#x05e1;&#x05d9;&#x05d5;&#x05dd;"><i class="bi bi-stop-circle"></i> &#x05e1;&#x05d9;&#x05d5;&#x05dd;</button>
+                <button class="btn btn-sm btn-gold" onclick="playBGLoop('chill')" title="&#x05e8;&#x05d2;&#x05d5;&#x05e2;"><i class="bi bi-cloud"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="playBGLoop('upbeat')" title="&#x05d0;&#x05e0;&#x05e8;&#x05d2;&#x05d8;&#x05d9;"><i class="bi bi-lightning"></i></button>
+                <button class="btn btn-sm btn-green" onclick="playBGLoop('ambient')" title="&#x05d0;&#x05de;&#x05d1;&#x05d9;&#x05e0;&#x05d8;"><i class="bi bi-water"></i></button>
+                <button class="btn btn-sm btn-blue" onclick="stopBGLoop()" title="&#x05e2;&#x05e6;&#x05d5;&#x05e8; &#x05e8;&#x05e7;&#x05e2;"><i class="bi bi-stop-btn"></i></button>
             </div>
             <div class="panel-title" style="margin-bottom:8px"><i class="bi bi-music-note-beamed"></i> &#x05de;&#x05d5;&#x05d6;&#x05d9;&#x05e7;&#x05ea; &#x05e8;&#x05e7;&#x05e2;</div>
             <div class="settings-row">
@@ -866,10 +871,11 @@ async function joinRoom() {
     });
 }
 
-// === HIGH-QUALITY Audio Relay (24kHz, 512-sample chunks, jitter buffer) ===
-const RELAY_SR = 24000;     // 24kHz — great for voice
-const CHUNK_SIZE = 2048;    // 2048 samples = ~43ms at 48kHz — smoother audio
-const JITTER_MS = 120;      // 120ms jitter buffer — smoother playback
+// === HIGH-QUALITY Audio Relay ===
+const RELAY_SR = 24000;     // Reference SR (actual uses browser native ~48kHz)
+const CHUNK_SIZE = 2048;    // 2048 samples = ~43ms at 48kHz — smooth chunks
+const JITTER_MS = 120;      // 120ms jitter buffer for smooth playback
+const MAX_JITTER_CHUNKS = 10; // Max buffered chunks before dropping oldest
 let relayProcessor = null;
 let chunkSeq = 0;           // sequence number for ordering
 
@@ -1011,20 +1017,26 @@ function playRemoteAudio(samples, seq, sr) {
 }
 
 function drainJitterBuffer() {
+    // Drop old chunks if buffer overflow
+    while(jitterBuf.length>MAX_JITTER_CHUNKS){jitterBuf.shift();packetsLost++;}
     while (jitterBuf.length > 0) {
         const chunk = jitterBuf.shift();
         const useSR = remoteSR || remoteAudioCtx.sampleRate;
         const buffer = remoteAudioCtx.createBuffer(1, chunk.samples.length, useSR);
-        buffer.getChannelData(0).set(chunk.samples);
+        const data=buffer.getChannelData(0);
+        data.set(chunk.samples);
+        // Crossfade: gentle fade-in first 32 samples, fade-out last 32
+        const fade=Math.min(32,data.length/4);
+        for(let i=0;i<fade;i++){data[i]*=i/fade;}
+        for(let i=0;i<fade;i++){data[data.length-1-i]*=i/fade;}
         const src = remoteAudioCtx.createBufferSource();
         src.buffer = buffer;
         src.connect(remoteGainNode);
 
         const now = remoteAudioCtx.currentTime;
-        // If we've fallen behind, catch up
-        if (nextPlayTime < now - 0.1) {
-            nextPlayTime = now + 0.01;
-            dlog('Audio sync reset', 'warn');
+        // If we've fallen behind, catch up smoothly
+        if (nextPlayTime < now - 0.15) {
+            nextPlayTime = now + 0.02;
         }
         src.start(nextPlayTime);
         nextPlayTime += buffer.duration;
@@ -1126,8 +1138,19 @@ function showConnected() {
             const flowing=audioChunksOut>0||audioChunksIn>0;
             const ctxState=audioCtx?audioCtx.state:'none';
             afs.textContent=flowing?'\u2191'+audioChunksOut+' \u2193'+audioChunksIn:'\u26A0 '+ctxState;
-            afs.style.color=flowing?'var(--green)':'var(--red)';
         }
+        // Audio quality score
+        const aqsEl=document.getElementById('audio-quality-score');
+        if(aqsEl&&audioChunksIn>10){
+            const lossR=packetsLost/(audioChunksIn+packetsLost);
+            const latScore=avgLatency<50?1:avgLatency<100?0.8:avgLatency<200?0.5:0.2;
+            const lossScore=1-Math.min(1,lossR*10);
+            const qScore=Math.round((latScore*50+lossScore*50));
+            aqsEl.style.display='block';
+            aqsEl.textContent='\u05D0\u05D9\u05DB\u05D5\u05EA: '+qScore+'%';
+            aqsEl.style.color=qScore>80?'var(--green)':qScore>50?'#f39c12':'var(--red)';
+        }
+        if(afs)afs.style.color=(audioChunksOut>0||audioChunksIn>0)?'var(--green)':'var(--red)';
         // Remote quality badge
         const rq=document.getElementById('remote-quality');
         if(rq&&audioChunksIn>0){
@@ -1927,6 +1950,33 @@ function playSFX(type){
     document.body.appendChild(fl);setTimeout(()=>fl.remove(),1000);
     dlog('SFX: '+type,'ok');
 }
+// === BACKGROUND MUSIC LOOPS ===
+let bgLoopOscs=[];
+function stopBGLoop(){bgLoopOscs.forEach(o=>{try{o.stop();}catch(e){}});bgLoopOscs=[];dlog('BG music stopped','ok');}
+function playBGLoop(style){
+    stopBGLoop();
+    if(!_beepCtx||_beepCtx.state==='closed')_beepCtx=new AudioContext();
+    if(_beepCtx.state==='suspended')_beepCtx.resume();
+    const ctx=_beepCtx,now=ctx.currentTime;
+    const dur=16; // 16 second loop
+    if(style==='chill'){
+        // Soft pad chords (Am-F-C-G)
+        [[220,261,330],[174,220,261],[261,330,392],[196,247,294]].forEach((chord,ci)=>{
+            chord.forEach(f=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;g.gain.value=0.02;o.connect(g);g.connect(ctx.destination);o.start(now+ci*4);o.stop(now+ci*4+4.2);bgLoopOscs.push(o);});
+        });
+    }else if(style==='upbeat'){
+        // Rhythmic pulse
+        for(let i=0;i<dur*2;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.type='triangle';o.frequency.value=i%4===0?220:i%2===0?330:440;g.gain.setValueAtTime(0.04,now+i*0.5);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.5+0.3);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+i*0.5+0.35);bgLoopOscs.push(o);}
+    }else if(style==='ambient'){
+        // Slow evolving tones
+        [110,165,220,277].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;o.frequency.setValueAtTime(f,now);o.frequency.linearRampToValueAtTime(f*1.05,now+dur/2);o.frequency.linearRampToValueAtTime(f,now+dur);g.gain.value=0.015;o.connect(g);g.connect(ctx.destination);o.start(now+i*0.5);o.stop(now+dur);bgLoopOscs.push(o);});
+    }
+    dlog('BG loop: '+style+' ('+dur+'s)','ok');
+    showStatus('studio-status','\uD83C\uDFB5 \u05DE\u05D5\u05D6\u05D9\u05E7\u05EA \u05E8\u05E7\u05E2: '+style,'success');
+    // Auto-restart loop
+    setTimeout(()=>{if(bgLoopOscs.length>0)playBGLoop(style);},dur*1000);
+}
+
 function playConnectSound() { playBeep(600, 0.15); setTimeout(() => playBeep(900, 0.2), 150); }
 function playDisconnectSound() { playBeep(400, 0.3); }
 function playRecordSound() { playBeep(1000, 0.1); setTimeout(() => playBeep(1000, 0.1), 120); setTimeout(() => playBeep(1200, 0.15), 240); }
